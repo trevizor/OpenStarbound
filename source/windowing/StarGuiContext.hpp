@@ -53,6 +53,8 @@ public:
   Maybe<Vec2I> mousePosition(InputEvent const& event) const;
 
   Set<InterfaceAction> actions(InputEvent const& event) const;
+  Set<InterfaceAction> actions(ControllerButton button) const;
+  Set<InterfaceAction> actions(ControllerAxis axis, float value) const;
   // used to cancel chorded inputs on KeyUp
   Set<InterfaceAction> actionsForKey(Key key) const;
   void refreshKeybindings();

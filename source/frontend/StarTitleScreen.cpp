@@ -102,7 +102,7 @@ bool TitleScreen::handleInputEvent(InputEvent const& event) {
   if (auto mouseMove = event.ptr<MouseMoveEvent>())
     m_cursorScreenPos = Vec2I(mouseMove->mousePosition);
 
-  if (event.is<KeyDownEvent>()) {
+  if (event.is<KeyDownEvent>() || event.is<ControllerButtonDownEvent>()) {
     if (GuiContext::singleton().actions(event).contains(InterfaceAction::TitleBack)) {
       back();
       return true;

@@ -78,6 +78,18 @@ bool KeybindingsMenu::sendEvent(InputEvent const& event) {
         setKeybinding(KeyChord{keyDown->key, m_currentMods});
         return true;
       }
+    } else if (auto controllerDown = event.ptr<ControllerButtonDownEvent>()) {
+      setKeybinding(ControllerButtonChord{controllerDown->controllerButton});
+      return true;
+    } else if (auto controllerAxis = event.ptr<ControllerAxisEvent>()) {
+      if (controllerAxis->controllerAxis != ControllerAxis::Invalid
+          && (controllerAxis->controllerAxisValue >= 0.5f || controllerAxis->controllerAxisValue <= -0.5f)) {
+        setKeybinding(ControllerAxisChord{
+            controllerAxis->controllerAxis,
+            controllerAxis->controllerAxisValue >= 0.0f ? (int8_t)1 : (int8_t)-1,
+            0.5f});
+        return true;
+      }
     }
   }
 
@@ -123,7 +135,7 @@ void KeybindingsMenu::buildListsFromConfig() {
       auto newListMember = list->addItem();
       auto actionString = keybind.get("action").toString();
       auto action = InterfaceActionNames.getLeft(actionString);
-      List<KeyChord> inputDesc;
+      List<InputDescriptor> inputDesc;
       try {
         for (auto const& bindingEntry : bindings.get(actionString).iterateArray())
           inputDesc.append(inputDescriptorFromJson(bindingEntry));
@@ -154,7 +166,7 @@ bool KeybindingsMenu::activateBinding(Widget* widget) {
   return false;
 }
 
-void KeybindingsMenu::setKeybinding(KeyChord desc) {
+void KeybindingsMenu::setKeybinding(InputDescriptor const& desc) {
   if (!m_activeKeybinding)
     return;
 

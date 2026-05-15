@@ -15,7 +15,7 @@
 namespace Star {
 
 OptionsMenu::OptionsMenu(PaneManager* manager, UniverseClientPtr client)
-  : m_sfxRange(0, 100), m_musicRange(0, 100), m_paneManager(manager) {
+  : m_sfxRange(0, 100), m_musicRange(0, 100), m_controllerMouseSpeedRange(100, 3000), m_controllerMouseDeadzoneRange(0, 95), m_paneManager(manager) {
   auto root = Root::singletonPtr();
   auto assets = root->assets();
 
@@ -51,6 +51,15 @@ OptionsMenu::OptionsMenu(PaneManager* manager, UniverseClientPtr client)
   reader.registerCallback("headRotationCheckbox", [=](Widget*) {
       updateHeadRotation();
     });
+  reader.registerCallback("controllerMouseEnabledCheckbox", [=](Widget*) {
+      updateControllerMouseEnabled();
+    });
+  reader.registerCallback("controllerMouseSpeedSlider", [=](Widget*) {
+      updateControllerMouseSpeed();
+    });
+  reader.registerCallback("controllerMouseDeadzoneSlider", [=](Widget*) {
+      updateControllerMouseDeadzone();
+    });
   reader.registerCallback("backButton", [=](Widget*) {
       dismiss();
     });
@@ -82,15 +91,22 @@ OptionsMenu::OptionsMenu(PaneManager* manager, UniverseClientPtr client)
   m_clientP2PJoinableButton = fetchChild<ButtonWidget>("clientP2PJoinableCheckbox");
   m_allowAssetsMismatchButton = fetchChild<ButtonWidget>("allowAssetsMismatchCheckbox");
   m_headRotationButton = fetchChild<ButtonWidget>("headRotationCheckbox");
+  m_controllerMouseEnabledButton = fetchChild<ButtonWidget>("controllerMouseEnabledCheckbox");
+  m_controllerMouseSpeedSlider = fetchChild<SliderBarWidget>("controllerMouseSpeedSlider");
+  m_controllerMouseDeadzoneSlider = fetchChild<SliderBarWidget>("controllerMouseDeadzoneSlider");
 
   m_instrumentLabel = fetchChild<LabelWidget>("instrumentValueLabel");
   m_sfxLabel = fetchChild<LabelWidget>("sfxValueLabel");
   m_musicLabel = fetchChild<LabelWidget>("musicValueLabel");
   m_p2pJoinableLabel = fetchChild<LabelWidget>("clientP2PJoinableLabel");
+  m_controllerMouseSpeedValueLabel = fetchChild<LabelWidget>("controllerMouseSpeedValueLabel");
+  m_controllerMouseDeadzoneValueLabel = fetchChild<LabelWidget>("controllerMouseDeadzoneValueLabel");
 
   m_instrumentSlider->setRange(m_sfxRange, assets->json("/interface/optionsmenu/optionsmenu.config:sfxDelta").toInt());
   m_sfxSlider->setRange(m_sfxRange, assets->json("/interface/optionsmenu/optionsmenu.config:sfxDelta").toInt());
   m_musicSlider->setRange(m_musicRange, assets->json("/interface/optionsmenu/optionsmenu.config:musicDelta").toInt());
+  m_controllerMouseSpeedSlider->setRange(m_controllerMouseSpeedRange, 50);
+  m_controllerMouseDeadzoneSlider->setRange(m_controllerMouseDeadzoneRange, 1);
 
   m_voiceSettingsMenu = make_shared<VoiceSettingsMenu>(assets->json(config.getString("voiceSettingsPanePath", "/interface/opensb/voicechat/voicechat.config")));
   m_modBindingsMenu = make_shared<BindingsMenu>(assets->json(config.getString("bindingsPanePath", "/interface/opensb/bindings/bindings.config")));
@@ -121,7 +137,10 @@ StringList const OptionsMenu::ConfigKeys = {
   "clientIPJoinable",
   "clientP2PJoinable",
   "allowAssetsMismatch",
-  "humanoidHeadRotation"
+  "humanoidHeadRotation",
+  "controllerMouseEnabled",
+  "controllerMouseSpeed",
+  "controllerMouseDeadzone"
 };
 
 void OptionsMenu::initConfig() {
@@ -178,6 +197,25 @@ void OptionsMenu::updateHeadRotation() {
   Humanoid::globalHeadRotation() = m_headRotationButton->isChecked();
 }
 
+void OptionsMenu::updateControllerMouseEnabled() {
+  m_localChanges.set("controllerMouseEnabled", m_controllerMouseEnabledButton->isChecked());
+  Root::singleton().configuration()->set("controllerMouseEnabled", m_controllerMouseEnabledButton->isChecked());
+}
+
+void OptionsMenu::updateControllerMouseSpeed() {
+  float speed = (float)m_controllerMouseSpeedSlider->val();
+  m_localChanges.set("controllerMouseSpeed", speed);
+  Root::singleton().configuration()->set("controllerMouseSpeed", speed);
+  m_controllerMouseSpeedValueLabel->setText(strf("{}", m_controllerMouseSpeedSlider->val()));
+}
+
+void OptionsMenu::updateControllerMouseDeadzone() {
+  float deadzone = (float)m_controllerMouseDeadzoneSlider->val() / 100.0f;
+  m_localChanges.set("controllerMouseDeadzone", deadzone);
+  Root::singleton().configuration()->set("controllerMouseDeadzone", deadzone);
+  m_controllerMouseDeadzoneValueLabel->setText(strf("{}%", m_controllerMouseDeadzoneSlider->val()));
+}
+
 void OptionsMenu::syncGuiToConf() {
   m_instrumentSlider->setVal(m_localChanges.get("instrumentVol").toInt(), false);
   m_instrumentLabel->setText(toString(m_instrumentSlider->val()));
@@ -193,6 +231,15 @@ void OptionsMenu::syncGuiToConf() {
   m_clientP2PJoinableButton->setChecked(m_localChanges.get("clientP2PJoinable").toBool());
   m_allowAssetsMismatchButton->setChecked(m_localChanges.get("allowAssetsMismatch").toBool());
   m_headRotationButton->setChecked(m_localChanges.get("humanoidHeadRotation").optBool().value(true));
+  m_controllerMouseEnabledButton->setChecked(m_localChanges.get("controllerMouseEnabled").optBool().value(true));
+
+  int controllerMouseSpeed = (int)round(m_localChanges.get("controllerMouseSpeed").optFloat().value(1400.0f));
+  m_controllerMouseSpeedSlider->setVal(controllerMouseSpeed, false);
+  m_controllerMouseSpeedValueLabel->setText(strf("{}", m_controllerMouseSpeedSlider->val()));
+
+  int controllerMouseDeadzone = (int)round(m_localChanges.get("controllerMouseDeadzone").optFloat().value(0.20f) * 100.0f);
+  m_controllerMouseDeadzoneSlider->setVal(controllerMouseDeadzone, false);
+  m_controllerMouseDeadzoneValueLabel->setText(strf("{}%", m_controllerMouseDeadzoneSlider->val()));
 
   auto appController = GuiContext::singleton().applicationController();
   if (!appController->p2pNetworkingService()) {

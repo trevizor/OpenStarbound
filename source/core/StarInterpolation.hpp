@@ -31,7 +31,7 @@ T2 sinEase(T1 const& offset, T2 const& f0, T2 const& f1) {
 
 template <typename T1, typename T2>
 T2 lerp(T1 const& offset, T2 const& f0, T2 const& f1) {
-  return f0 * (1 - offset) + f1 * (offset);
+  return f0 + (f1 - f0) * offset;
 }
 
 template <typename T1, typename T2>
@@ -89,7 +89,7 @@ struct LinearWeightOperator {
   typedef Array<Weight, 2> WeightVec;
 
   WeightVec operator()(Weight x) const {
-    return {1 - x, x};
+    return {Weight(1) - x, x};
   }
 };
 
@@ -102,9 +102,9 @@ struct StepWeightOperator {
 
   WeightVec operator()(Weight x) const {
     if (x < threshold)
-      return {1, 0};
+      return {Weight(1), Weight(0)};
     else
-      return {0, 1};
+      return {Weight(0), Weight(1)};
   }
 
   Weight threshold;
@@ -117,7 +117,7 @@ struct SinWeightOperator {
 
   WeightVec operator()(Weight x) const {
     Weight w = (sin(x * Constants::pi - Constants::pi / 2) + 1) / 2;
-    return {1 - w, w};
+    return {Weight(1) - w, w};
   }
 };
 
@@ -128,7 +128,7 @@ struct Hermite2WeightOperator {
 
   WeightVec operator()(Weight x) const {
     Weight w = x * x * (3 - 2 * x);
-    return {1 - w, w};
+    return {Weight(1) - w, w};
   }
 };
 
@@ -139,7 +139,7 @@ struct Quintic2WeightOperator {
 
   WeightVec operator()(Weight x) const {
     Weight w = x * x * x * (x * (x * 6 - 15) + 10);
-    return {1 - w, w};
+    return {Weight(1) - w, w};
   }
 };
 
@@ -156,7 +156,7 @@ struct Cubic4WeightOperator {
     if (linearExtrapolate && x > 1) {
       return {0, 0, 2 - x, x - 1};
     } else if (linearExtrapolate && x < 0) {
-      return {-x, 1 + x, 0, 0};
+      return {-x, Weight(1) + x, Weight(0), Weight(0)};
     } else {
       // (-1/2 * f0 +  3/2 * f1 + -3/2 * f2 +  1/2 * f3) * x*x*x +
       // (   1 * f0 + -5/2 * f1 +    2 * f2 + -1/2 * f3) * x*x +
@@ -165,10 +165,11 @@ struct Cubic4WeightOperator {
 
       Weight x2 = x * x;
       Weight x3 = x2 * x;
-      return WeightVec(-0.5 * x3 + 1 * x2 - 0.5 * x,
-          1.5 * x3 + -2.5 * x2 + 1.0,
-          -1.5 * x3 + 2.0 * x2 + 0.5 * x,
-          0.5 * x3 - 0.5 * x2);
+      return Array<Weight, 4>{
+          Weight(-0.5) * x3 + Weight(1) * x2 - Weight(0.5) * x,
+          Weight(1.5) * x3 + Weight(-2.5) * x2 + Weight(1),
+          Weight(-1.5) * x3 + Weight(2.0) * x2 + Weight(0.5) * x,
+          Weight(0.5) * x3 - Weight(0.5) * x2};
     }
   }
   bool linearExtrapolate;

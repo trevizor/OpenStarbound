@@ -89,6 +89,7 @@ private:
 
   bool isActionTaken(InterfaceAction action) const;
   bool isActionTakenEdge(InterfaceAction action) const;
+  void updateControllerMouse(float dt);
 
   void updateCamera(float dt);
 
@@ -143,8 +144,13 @@ private:
   bool m_controllerInput;
   Vec2F m_controllerLeftStick;
   Vec2F m_controllerRightStick;
+  Vec2F m_controllerRightStickRaw;
   List<KeyDownEvent> m_heldKeyEvents;
   List<KeyDownEvent> m_edgeKeyEvents;
+  List<ControllerButtonDownEvent> m_heldControllerButtonEvents;
+  List<ControllerButtonDownEvent> m_edgeControllerButtonEvents;
+  HashMap<ControllerAxis, float> m_controllerAxisValues;
+  Set<InterfaceAction> m_edgeControllerAxisActions;
 
   Maybe<PendingMultiPlayerConnection> m_pendingMultiPlayerConnection;
   Maybe<HostAddressWithPort> m_currentRemoteJoin;

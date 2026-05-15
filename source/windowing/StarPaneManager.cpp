@@ -231,7 +231,7 @@ bool PaneManager::sendInputEvent(InputEvent const& event) {
   // the keyboard otherwise it will always be used to close first before being
   // a normal event. This is so a window can control its own closing if it
   // really needs to (like the keybindings window).
-  if (event.is<KeyDownEvent>() && m_context->actions(event).contains(InterfaceAction::GuiClose)) {
+  if ((event.is<KeyDownEvent>() || event.is<ControllerButtonDownEvent>()) && m_context->actions(event).contains(InterfaceAction::GuiClose)) {
     if (auto top = topPane({PaneLayer::ModalWindow, PaneLayer::Window})) {
       dismiss(top);
       return true;

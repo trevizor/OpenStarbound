@@ -124,6 +124,14 @@ Set<InterfaceAction> GuiContext::actions(InputEvent const& event) const {
   return m_keyBindings.actions(event);
 }
 
+Set<InterfaceAction> GuiContext::actions(ControllerButton button) const {
+  return m_keyBindings.actions(button);
+}
+
+Set<InterfaceAction> GuiContext::actions(ControllerAxis axis, float value) const {
+  return m_keyBindings.actions(axis, value);
+}
+
 Set<InterfaceAction> GuiContext::actionsForKey(Key key) const {
   return m_keyBindings.actionsForKey(key);
 }

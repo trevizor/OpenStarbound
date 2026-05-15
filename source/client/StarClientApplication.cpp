@@ -34,6 +34,8 @@
 #include "imgui.h"
 #include "imgui_freetype.h"
 
+#include <cmath>
+
 #if defined STAR_SYSTEM_WINDOWS
 #include <windows.h>
 extern "C" __declspec(dllexport) DWORD NvOptimusEnablement = 1;
@@ -41,6 +43,19 @@ extern "C" __declspec(dllexport) DWORD AmdPowerXpressRequestHighPerformance = 1;
 #endif // graphics driver is told by these exports to default to the dedicated GPU
 
 namespace Star {
+
+static float applyControllerAxisResponse(float value, float deadzone, float sensitivity) {
+  deadzone = clamp(deadzone, 0.0f, 0.95f);
+  sensitivity = max(0.1f, sensitivity);
+
+  float magnitude = std::abs(value);
+  if (magnitude <= deadzone)
+    return 0.0f;
+
+  float normalized = (magnitude - deadzone) / (1.0f - deadzone);
+  float curved = std::pow(clamp(normalized, 0.0f, 1.0f), sensitivity);
+  return std::copysign(clamp(curved, 0.0f, 1.0f), value);
+}
 
 Json const AdditionalAssetsSettings = Json::parseJson(R"JSON(
     {
@@ -75,6 +90,12 @@ Json const AdditionalDefaultConfiguration = Json::parseJson(R"JSON(
       "cameraSpeedFactor" : 1.0,
       "interfaceScale" : 0,
       "speechBubbles" : true,
+      "controllerInput" : true,
+      "controllerAxisDeadzone" : 0.20,
+      "controllerAxisSensitivity" : 1.0,
+      "controllerMouseEnabled" : true,
+      "controllerMouseSpeed" : 1400.0,
+      "controllerMouseDeadzone" : 0.20,
 
       "title" : {
         "multiPlayerAddress" : "",
@@ -84,15 +105,17 @@ Json const AdditionalDefaultConfiguration = Json::parseJson(R"JSON(
       },
 
       "bindings" : {
-        "PlayerUp" :  [ { "type" : "key", "value" : "W", "mods" : [] } ],
-        "PlayerDown" :  [ { "type" : "key", "value" : "S", "mods" : [] } ],
-        "PlayerLeft" :  [ { "type" : "key", "value" : "A", "mods" : [] } ],
-        "PlayerRight" :  [ { "type" : "key", "value" : "D", "mods" : [] } ],
-        "PlayerJump" :  [ { "type" : "key", "value" : "Space", "mods" : [] } ],
+        "PlayerUp" :  [ { "type" : "key", "value" : "W", "mods" : [] }, { "type" : "controllerAxis", "value" : "LeftY", "direction" : -1, "threshold" : 0.35 } ],
+        "PlayerDown" :  [ { "type" : "key", "value" : "S", "mods" : [] }, { "type" : "controllerAxis", "value" : "LeftY", "direction" : 1, "threshold" : 0.35 } ],
+        "PlayerLeft" :  [ { "type" : "key", "value" : "A", "mods" : [] }, { "type" : "controllerAxis", "value" : "LeftX", "direction" : -1, "threshold" : 0.35 } ],
+        "PlayerRight" :  [ { "type" : "key", "value" : "D", "mods" : [] }, { "type" : "controllerAxis", "value" : "LeftX", "direction" : 1, "threshold" : 0.35 } ],
+        "PlayerJump" :  [ { "type" : "key", "value" : "Space", "mods" : [] }, { "type" : "controller", "value" : "A" } ],
+        "PlayerMainItem" : [ { "type" : "controllerAxis", "value" : "TriggerRight", "direction" : 1, "threshold" : 0.4 } ],
+        "PlayerAltItem" : [ { "type" : "controllerAxis", "value" : "TriggerLeft", "direction" : 1, "threshold" : 0.4 } ],
         "PlayerDropItem" :  [ { "type" : "key", "value" : "Q", "mods" : [] } ],
-        "PlayerInteract" :  [ { "type" : "key", "value" : "E", "mods" : [] } ],
-        "PlayerShifting" :  [ { "type" : "key", "value" : "RShift", "mods" : [] }, { "type" : "key", "value" : "LShift", "mods" : [] } ],
-        "PlayerTechAction1" :  [ { "type" : "key", "value" : "F", "mods" : [] } ],
+        "PlayerInteract" :  [ { "type" : "key", "value" : "E", "mods" : [] }, { "type" : "controller", "value" : "X" } ],
+        "PlayerShifting" :  [ { "type" : "key", "value" : "RShift", "mods" : [] }, { "type" : "key", "value" : "LShift", "mods" : [] }, { "type" : "controller", "value" : "LeftShoulder" } ],
+        "PlayerTechAction1" :  [ { "type" : "key", "value" : "F", "mods" : [] }, { "type" : "controller", "value" : "B" } ],
         "PlayerTechAction2" :  [],
         "PlayerTechAction3" :  [],
         "EmoteBlabbering" :  [ { "type" : "key", "value" : "Right", "mods" : ["LCtrl", "LShift"] } ],
@@ -110,12 +133,12 @@ Json const AdditionalDefaultConfiguration = Json::parseJson(R"JSON(
         "EmoteSleep" :  [ { "type" : "key", "value" : "Left", "mods" : ["LCtrl", "LShift"] } ],
         "ShowLabels" :  [ { "type" : "key", "value" : "RAlt", "mods" : [] }, { "type" : "key", "value" : "LAlt", "mods" : [] } ],
         "CameraShift" :  [ { "type" : "key", "value" : "RCtrl", "mods" : [] }, { "type" : "key", "value" : "LCtrl", "mods" : [] } ],
-        "TitleBack" :  [ { "type" : "key", "value" : "Esc", "mods" : [] } ],
-        "CinematicSkip" :  [ { "type" : "key", "value" : "Esc", "mods" : [] } ],
-        "CinematicNext" :  [ { "type" : "key", "value" : "Right", "mods" : [] }, { "type" : "key", "value" : "Return", "mods" : [] } ],
-        "GuiClose" :  [ { "type" : "key", "value" : "Esc", "mods" : [] } ],
+        "TitleBack" :  [ { "type" : "key", "value" : "Esc", "mods" : [] }, { "type" : "controller", "value" : "Back" } ],
+        "CinematicSkip" :  [ { "type" : "key", "value" : "Esc", "mods" : [] }, { "type" : "controller", "value" : "Back" } ],
+        "CinematicNext" :  [ { "type" : "key", "value" : "Right", "mods" : [] }, { "type" : "key", "value" : "Return", "mods" : [] }, { "type" : "controller", "value" : "A" } ],
+        "GuiClose" :  [ { "type" : "key", "value" : "Esc", "mods" : [] }, { "type" : "controller", "value" : "Back" } ],
         "GuiShifting" :  [ { "type" : "key", "value" : "RShift", "mods" : [] }, { "type" : "key", "value" : "LShift", "mods" : [] } ],
-        "KeybindingCancel" :  [ { "type" : "key", "value" : "Esc", "mods" : [] } ],
+        "KeybindingCancel" :  [ { "type" : "key", "value" : "Esc", "mods" : [] }, { "type" : "controller", "value" : "Back" } ],
         "KeybindingClear" :  [ { "type" : "key", "value" : "Del", "mods" : [] }, { "type" : "key", "value" : "Backspace", "mods" : [] } ],
         "ChatPageUp" :  [ { "type" : "key", "value" : "PageUp", "mods" : [] } ],
         "ChatPageDown" :  [ { "type" : "key", "value" : "PageDown", "mods" : [] } ],
@@ -126,12 +149,12 @@ Json const AdditionalDefaultConfiguration = Json::parseJson(R"JSON(
         "ChatBeginCommand" :  [ { "type" : "key", "value" : "/", "mods" : [] } ],
         "ChatStop" :  [ { "type" : "key", "value" : "Esc", "mods" : [] } ],
         "InterfaceHideHud" :  [ { "type" : "key", "value" : "F1", "mods" : [] } ],
-        "InterfaceChangeBarGroup" :  [ { "type" : "key", "value" : "X", "mods" : [] } ],
-        "InterfaceDeselectHands" :  [ { "type" : "key", "value" : "Z", "mods" : [] } ],
-        "InterfaceBar1" :  [ { "type" : "key", "value" : "1", "mods" : [] } ],
-        "InterfaceBar2" :  [ { "type" : "key", "value" : "2", "mods" : [] } ],
-        "InterfaceBar3" :  [ { "type" : "key", "value" : "3", "mods" : [] } ],
-        "InterfaceBar4" :  [ { "type" : "key", "value" : "4", "mods" : [] } ],
+        "InterfaceChangeBarGroup" :  [ { "type" : "key", "value" : "X", "mods" : [] }, { "type" : "controller", "value" : "RightShoulder" } ],
+        "InterfaceDeselectHands" :  [ { "type" : "key", "value" : "Z", "mods" : [] }, { "type" : "controller", "value" : "LeftShoulder" } ],
+        "InterfaceBar1" :  [ { "type" : "key", "value" : "1", "mods" : [] }, { "type" : "controller", "value" : "DPadUp" } ],
+        "InterfaceBar2" :  [ { "type" : "key", "value" : "2", "mods" : [] }, { "type" : "controller", "value" : "DPadRight" } ],
+        "InterfaceBar3" :  [ { "type" : "key", "value" : "3", "mods" : [] }, { "type" : "controller", "value" : "DPadDown" } ],
+        "InterfaceBar4" :  [ { "type" : "key", "value" : "4", "mods" : [] }, { "type" : "controller", "value" : "DPadLeft" } ],
         "InterfaceBar5" :  [ { "type" : "key", "value" : "5", "mods" : [] } ],
         "InterfaceBar6" :  [ { "type" : "key", "value" : "6", "mods" : [] } ],
         "InterfaceBar7" :  [],
@@ -145,11 +168,11 @@ Json const AdditionalDefaultConfiguration = Json::parseJson(R"JSON(
         "InterfaceRepeatCommand" :  [ { "type" : "key", "value" : "P", "mods" : [] } ],
         "InterfaceToggleFullscreen" :  [ { "type" : "key", "value" : "F11", "mods" : [] } ],
         "InterfaceReload" :  [],
-        "InterfaceEscapeMenu" :  [ { "type" : "key", "value" : "Esc", "mods" : [] } ],
-        "InterfaceInventory" :  [ { "type" : "key", "value" : "I", "mods" : [] } ],
+        "InterfaceEscapeMenu" :  [ { "type" : "key", "value" : "Esc", "mods" : [] }, { "type" : "controller", "value" : "Start" } ],
+        "InterfaceInventory" :  [ { "type" : "key", "value" : "I", "mods" : [] }, { "type" : "controller", "value" : "Y" } ],
         "InterfaceCodex" :  [ { "type" : "key", "value" : "L", "mods" : [] } ],
-        "InterfaceQuest" :  [ { "type" : "key", "value" : "J", "mods" : [] } ],
-        "InterfaceCrafting" :  [ { "type" : "key", "value" : "C", "mods" : [] } ]
+        "InterfaceQuest" :  [ { "type" : "key", "value" : "J", "mods" : [] }, { "type" : "controller", "value" : "Guide" } ],
+        "InterfaceCrafting" :  [ { "type" : "key", "value" : "C", "mods" : [] }, { "type" : "controller", "value" : "X" } ]
       }
     }
   )JSON");
@@ -338,15 +361,55 @@ void ClientApplication::processInput(InputEvent const& event) {
         return KeyDownEvent{keyEvent.key, keyEvent.mods & ~*modKey};
       });
   }
+  else if (auto cDown = event.ptr<ControllerButtonDownEvent>()) {
+    bool alreadyHeld = false;
+    for (auto const& heldEvent : m_heldControllerButtonEvents) {
+      if (heldEvent.controller == cDown->controller && heldEvent.controllerButton == cDown->controllerButton) {
+        alreadyHeld = true;
+        break;
+      }
+    }
+
+    if (!alreadyHeld)
+      m_heldControllerButtonEvents.append(*cDown);
+
+    m_edgeControllerButtonEvents.append(*cDown);
+  }
+  else if (auto cUp = event.ptr<ControllerButtonUpEvent>()) {
+    eraseWhere(m_heldControllerButtonEvents, [&](auto const& heldEvent) {
+      return heldEvent.controller == cUp->controller && heldEvent.controllerButton == cUp->controllerButton;
+    });
+  }
   else if (auto cAxis = event.ptr<ControllerAxisEvent>()) {
+    auto configuration = m_root->configuration();
+    float axisDeadzone = configuration->get("controllerAxisDeadzone").optFloat().value(0.20f);
+    float axisSensitivity = configuration->get("controllerAxisSensitivity").optFloat().value(1.0f);
+    float axisValue = applyControllerAxisResponse(cAxis->controllerAxisValue, axisDeadzone, axisSensitivity);
+
+    float oldAxisValue = m_controllerAxisValues.value(cAxis->controllerAxis, 0.0f);
+    auto oldActions = m_guiContext->actions(cAxis->controllerAxis, oldAxisValue);
+
     if (cAxis->controllerAxis == ControllerAxis::LeftX)
-      m_controllerLeftStick[0] = cAxis->controllerAxisValue;
+      m_controllerLeftStick[0] = axisValue;
     else if (cAxis->controllerAxis == ControllerAxis::LeftY)
-      m_controllerLeftStick[1] = cAxis->controllerAxisValue;
-    else if (cAxis->controllerAxis == ControllerAxis::RightX)
-      m_controllerRightStick[0] = cAxis->controllerAxisValue;
-    else if (cAxis->controllerAxis == ControllerAxis::RightY)
-      m_controllerRightStick[1] = cAxis->controllerAxisValue;
+      m_controllerLeftStick[1] = axisValue;
+    else if (cAxis->controllerAxis == ControllerAxis::RightX) {
+      m_controllerRightStickRaw[0] = cAxis->controllerAxisValue;
+      m_controllerRightStick[0] = axisValue;
+    }
+    else if (cAxis->controllerAxis == ControllerAxis::RightY) {
+      m_controllerRightStickRaw[1] = cAxis->controllerAxisValue;
+      m_controllerRightStick[1] = axisValue;
+    }
+
+    if (cAxis->controllerAxis != ControllerAxis::Invalid)
+      m_controllerAxisValues[cAxis->controllerAxis] = axisValue;
+
+    auto newActions = m_guiContext->actions(cAxis->controllerAxis, axisValue);
+    for (auto action : newActions) {
+      if (!oldActions.contains(action))
+        m_edgeControllerAxisActions.add(action);
+    }
   }
 
   bool processed = !m_errorScreen->accepted() && m_errorScreen->handleInputEvent(event);
@@ -409,6 +472,9 @@ void ClientApplication::update() {
     updateTitle(dt);
   else if (m_state > MainAppState::Title)
     updateRunning(dt);
+
+  if (m_state >= MainAppState::Title)
+    updateControllerMouse(dt);
   
   // Swallow leftover encoded voice data if we aren't in-game to allow mic read to continue for settings.
   if (m_state <= MainAppState::Title) {
@@ -418,8 +484,47 @@ void ClientApplication::update() {
 
   m_guiContext->cleanup();
   m_edgeKeyEvents.clear();
+  m_edgeControllerButtonEvents.clear();
+  m_edgeControllerAxisActions.clear();
   m_input->update();
   ++m_framesSkipped;
+}
+
+void ClientApplication::updateControllerMouse(float dt) {
+  if (!m_controllerInput)
+    return;
+
+  auto configuration = m_root->configuration();
+  if (!configuration->get("controllerMouseEnabled").optBool().value(true))
+    return;
+
+  float mouseSpeed = configuration->get("controllerMouseSpeed").optFloat().value(1400.0f);
+  if (mouseSpeed <= 0.0f)
+    return;
+
+  float mouseDeadzone = configuration->get("controllerMouseDeadzone").optFloat().value(0.20f);
+  Vec2F stick;
+  stick[0] = applyControllerAxisResponse(m_controllerRightStickRaw[0], mouseDeadzone, 1.0f);
+  stick[1] = applyControllerAxisResponse(m_controllerRightStickRaw[1], mouseDeadzone, 1.0f);
+
+  if (stick.magnitudeSquared() <= 0.0f)
+    return;
+
+  Vec2F screenSize = Vec2F(renderer()->screenSize());
+  if (screenSize[0] <= 0.0f || screenSize[1] <= 0.0f)
+    return;
+
+  Vec2F mousePosition = m_input->mousePosition();
+  Vec2F mouseDelta = Vec2F(stick[0], -stick[1]) * mouseSpeed * dt;
+  Vec2F nextMousePosition = mousePosition + mouseDelta;
+
+  nextMousePosition[0] = clamp(nextMousePosition[0], 0.0f, screenSize[0] - 1.0f);
+  nextMousePosition[1] = clamp(nextMousePosition[1], 0.0f, screenSize[1] - 1.0f);
+
+  if ((nextMousePosition - mousePosition).magnitudeSquared() <= 0.0f)
+    return;
+
+  appController()->setCursorPosition(Vec2I::round(nextMousePosition));
 }
 
 void ClientApplication::render() {
@@ -1323,6 +1428,16 @@ bool ClientApplication::isActionTaken(InterfaceAction action) const {
       return true;
   }
 
+  for (auto controllerButtonEvent : m_heldControllerButtonEvents) {
+    if (m_guiContext->actions(controllerButtonEvent).contains(action))
+      return true;
+  }
+
+  for (auto axisState : m_controllerAxisValues) {
+    if (m_guiContext->actions(axisState.first, axisState.second).contains(action))
+      return true;
+  }
+
   return false;
 }
 
@@ -1331,6 +1446,14 @@ bool ClientApplication::isActionTakenEdge(InterfaceAction action) const {
     if (m_guiContext->actions(keyEvent).contains(action))
       return true;
   }
+
+  for (auto controllerButtonEvent : m_edgeControllerButtonEvents) {
+    if (m_guiContext->actions(controllerButtonEvent).contains(action))
+      return true;
+  }
+
+  if (m_edgeControllerAxisActions.contains(action))
+    return true;
 
   return false;
 }

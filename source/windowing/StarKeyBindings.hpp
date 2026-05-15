@@ -90,10 +90,22 @@ struct KeyChord {
   bool operator<(KeyChord const& rhs) const;
 };
 
-KeyChord inputDescriptorFromJson(Json const& json);
-Json inputDescriptorToJson(KeyChord const& chord);
+struct ControllerButtonChord {
+  ControllerButton button;
+};
 
-String printInputDescriptor(KeyChord chord);
+struct ControllerAxisChord {
+  ControllerAxis axis;
+  int8_t direction;
+  float threshold;
+};
+
+using InputDescriptor = MVariant<KeyChord, ControllerButtonChord, ControllerAxisChord>;
+
+InputDescriptor inputDescriptorFromJson(Json const& json);
+Json inputDescriptorToJson(InputDescriptor const& descriptor);
+
+String printInputDescriptor(InputDescriptor const& descriptor);
 
 STAR_CLASS(KeyBindings);
 
@@ -105,12 +117,16 @@ public:
   Set<InterfaceAction> actions(Key key) const;
   Set<InterfaceAction> actions(InputEvent const& event) const;
   Set<InterfaceAction> actions(KeyChord chord) const;
+  Set<InterfaceAction> actions(ControllerButton button) const;
+  Set<InterfaceAction> actions(ControllerAxis axis, float value) const;
   Set<InterfaceAction> actionsForKey(Key key) const;
 
 private:
   // Maps the primary key to a list of InterfaceActions, and any mods that they
   // require to be held.
   Map<Key, List<pair<KeyMod, InterfaceAction>>> m_actions;
+  Map<ControllerButton, List<InterfaceAction>> m_controllerButtonActions;
+  List<pair<ControllerAxisChord, InterfaceAction>> m_controllerAxisActions;
 };
 
 }

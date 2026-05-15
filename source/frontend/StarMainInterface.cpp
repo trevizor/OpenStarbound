@@ -290,7 +290,7 @@ bool MainInterface::handleInputEvent(InputEvent const& event) {
       return true;
   }
 
-  if (event.is<KeyDownEvent>()) {
+  if (event.is<KeyDownEvent>() || event.is<ControllerButtonDownEvent>()) {
     if (m_chat->hasFocus()) {
       if (m_guiContext->actions(event).contains(InterfaceAction::ChatSendLine)) {
         doChat(m_chat->currentChat(), true);

@@ -539,7 +539,7 @@ bool Cinematic::handleInputEvent(InputEvent const& event) {
     return false;
   if (event.is<MouseButtonUpEvent>() || event.is<KeyUpEvent>())
     return false;
-  if (event.is<KeyDownEvent>()) {
+  if (event.is<KeyDownEvent>() || event.is<ControllerButtonDownEvent>()) {
     if (m_currentTimeSkip) {
       setTime(m_currentTimeSkip.take().skipToTime);
       return true;

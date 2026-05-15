@@ -22,7 +22,7 @@ public:
 private:
   void buildListsFromConfig();
   bool activateBinding(Widget* widget);
-  void setKeybinding(KeyChord desc);
+  void setKeybinding(InputDescriptor const& desc);
   void clearActive();
   void exitActiveMode();
   void apply();
