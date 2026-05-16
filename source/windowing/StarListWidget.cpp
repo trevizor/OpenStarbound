@@ -268,6 +268,9 @@ void ListWidget::snapCursorToSelection() {
   if (!selectedWidget())
     return;
 
+  if (Root::singleton().configuration()->get("controllerMouseEnabled").optBool().value(true))
+    return;
+
   if (auto appController = context()->applicationController())
     appController->setCursorPosition(Vec2I::round(selectedWidget()->screenPosition() + selectedWidget()->size() / 2));
 }

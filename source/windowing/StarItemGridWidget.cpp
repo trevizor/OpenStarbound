@@ -237,6 +237,9 @@ void ItemGridWidget::snapCursorToSelection() {
   if (!m_slots.size() || m_selectedIndex >= m_slots.size())
     return;
 
+  if (Root::singleton().configuration()->get("controllerMouseEnabled").optBool().value(true))
+    return;
+
   auto slot = m_slots.at(m_selectedIndex);
   if (auto appController = context()->applicationController())
     appController->setCursorPosition(Vec2I::round(slot->screenPosition() + slot->size() / 2));
