@@ -639,9 +639,6 @@ void ClientApplication::processInput(InputEvent const& event) {
     if (auto cDown = event.ptr<ControllerButtonDownEvent>()) {
       switch (cDown->controllerButton) {
         case ControllerButton::A: {
-          if (cDown->controllerButton == ControllerButton::A)
-            routeInputEvent(InputEvent{ControllerButtonDownEvent{cDown->controller, ControllerButton::A}});
-
           InputEvent mouseEvent{MouseButtonDownEvent{MouseButton::Left, m_input->mousePosition()}};
           routeInputEvent(mouseEvent);
           break;
@@ -683,9 +680,6 @@ void ClientApplication::processInput(InputEvent const& event) {
     }
 
     if (auto cUp = event.ptr<ControllerButtonUpEvent>()) {
-      if (cUp->controllerButton == ControllerButton::A)
-        routeInputEvent(InputEvent{ControllerButtonUpEvent{cUp->controller, ControllerButton::A}});
-
       if (cUp->controllerButton == ControllerButton::A)
         routeInputEvent(InputEvent{MouseButtonUpEvent{MouseButton::Left, m_input->mousePosition()}});
       return;
@@ -1216,7 +1210,6 @@ void ClientApplication::renderPanelWheelOverlay() {
 
   Vec2F center = Vec2F(m_guiContext->windowInterfaceSize()) / 2.0f;
   float radius = 62.0f;
-  float slotSize = 24.0f;
   float fullCircle = 6.28318530718f;
 
   for (int index = 0; index < optionCount; ++index) {
@@ -1225,14 +1218,8 @@ void ClientApplication::renderPanelWheelOverlay() {
     Vec2F slotCenter = center + Vec2F(cos(angle), -sin(angle)) * radius;
 
     bool selected = m_panelWheelSelection && *m_panelWheelSelection == option;
-    Vec4B bgColor = selected ? Vec4B(25, 25, 25, 225) : Vec4B(5, 5, 5, 170);
-    m_guiContext->drawInterfaceQuad(RectF::withCenter(slotCenter, Vec2F::filled(slotSize)), bgColor);
-
-    if (selected)
-      m_guiContext->drawInterfacePolyLines(PolyF(RectF::withCenter(slotCenter, Vec2F::filled(slotSize + 6.0f))), Vec4B(170, 220, 255, 255), 1.5f);
-
     if (auto icon = panelWheelOptionIcon(option, assets))
-      m_guiContext->drawInterfaceQuad(*icon, slotCenter, selected ? 1.0f : 0.9f);
+      m_guiContext->drawInterfaceQuad(*icon, slotCenter, selected ? 1.05f : 0.95f);
     else
       m_guiContext->renderInterfaceText(panelWheelOptionLabel(option), {slotCenter, HorizontalAnchor::HMidAnchor, VerticalAnchor::VMidAnchor});
   }
