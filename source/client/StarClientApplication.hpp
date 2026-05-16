@@ -26,6 +26,8 @@ public:
     QuestLog,
     MmUpgrade,
     Collections,
+    BeamUp,
+    BeamDown,
     EscapeMenu
   };
 
@@ -100,6 +102,9 @@ private:
   bool isActionTaken(InterfaceAction action) const;
   bool isActionTakenEdge(InterfaceAction action) const;
   bool panelInteractionModeActive() const;
+  Vec2F panelCursorStepSize() const;
+  bool trySnapPanelCursor(Vec2F& targetScreenPos, float snapRadiusUi) const;
+  void movePanelCursorByStep(Vec2I const& direction);
   void centerCursorOnPanelTarget();
   void updateControllerMouse(float dt);
   void renderHotbarWheelOverlay();
@@ -166,11 +171,9 @@ private:
   bool m_panelWheelActive = false;
   Maybe<PanelWheelOption> m_panelWheelSelection;
   bool m_panelDragMouseHeld = false;
-  bool m_panelFocusHeld = false;
   bool m_panelInventoryFocusToggle = false;
   bool m_lastPanelModeActive = false;
   float m_panelControlReenableTimer = 0.0f;
-  float m_panelFocusRecenterTimer = 0.0f;
   float m_panelScrollAccumulator = 0.0f;
   float m_lastPlayerHealth = 0.0f;
   bool m_lastPlayerHealthValid = false;

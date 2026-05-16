@@ -19,6 +19,7 @@
 #include "StarInput.hpp"
 #include "StarListWidget.hpp"
 #include "StarItemSlotWidget.hpp"
+#include "StarButtonWidget.hpp"
 #include "StarVoice.hpp"
 #include "StarCurve25519.hpp"
 #include "StarInterpolation.hpp"
@@ -102,30 +103,22 @@ static ItemPtr hotbarWheelItemForSelection(PlayerInventoryPtr const& inventory, 
   return {};
 }
 
-static ClientApplication::PanelWheelOption panelWheelOptionFromIndex(int index) {
-  static List<ClientApplication::PanelWheelOption> options = {
+static List<ClientApplication::PanelWheelOption> panelWheelOptions(bool canBeamUp, bool canBeamDown) {
+  List<ClientApplication::PanelWheelOption> options = {
     ClientApplication::PanelWheelOption::Inventory,
     ClientApplication::PanelWheelOption::Crafting,
     ClientApplication::PanelWheelOption::Codex,
     ClientApplication::PanelWheelOption::QuestLog,
     ClientApplication::PanelWheelOption::MmUpgrade,
-    ClientApplication::PanelWheelOption::Collections,
-    ClientApplication::PanelWheelOption::EscapeMenu
+    ClientApplication::PanelWheelOption::Collections
   };
 
-  return options.at(pmod(index, (int)options.size()));
-}
+  if (canBeamUp)
+    options.append(ClientApplication::PanelWheelOption::BeamUp);
+  else if (canBeamDown)
+    options.append(ClientApplication::PanelWheelOption::BeamDown);
 
-static List<ClientApplication::PanelWheelOption> const& panelWheelOptions() {
-  static List<ClientApplication::PanelWheelOption> options = {
-    ClientApplication::PanelWheelOption::Inventory,
-    ClientApplication::PanelWheelOption::Crafting,
-    ClientApplication::PanelWheelOption::Codex,
-    ClientApplication::PanelWheelOption::QuestLog,
-    ClientApplication::PanelWheelOption::MmUpgrade,
-    ClientApplication::PanelWheelOption::Collections,
-    ClientApplication::PanelWheelOption::EscapeMenu
-  };
+  options.append(ClientApplication::PanelWheelOption::EscapeMenu);
   return options;
 }
 
@@ -143,11 +136,43 @@ static String panelWheelOptionLabel(ClientApplication::PanelWheelOption option) 
       return "Upgrade";
     case ClientApplication::PanelWheelOption::Collections:
       return "Collections";
+    case ClientApplication::PanelWheelOption::BeamUp:
+      return "Beam Up";
+    case ClientApplication::PanelWheelOption::BeamDown:
+      return "Beam Down";
     case ClientApplication::PanelWheelOption::EscapeMenu:
       return "Menu";
   }
 
   return "";
+}
+
+static Maybe<String> panelWheelOptionIcon(ClientApplication::PanelWheelOption option, AssetsConstPtr const& assets) {
+  if (!assets)
+    return {};
+
+  switch (option) {
+    case ClientApplication::PanelWheelOption::Inventory:
+      return assets->json("/interface.config:mainBar.inventory.base").toString();
+    case ClientApplication::PanelWheelOption::Crafting:
+      return assets->json("/interface.config:mainBar.craft.base").toString();
+    case ClientApplication::PanelWheelOption::Codex:
+      return assets->json("/interface.config:mainBar.codex.base").toString();
+    case ClientApplication::PanelWheelOption::QuestLog:
+      return assets->json("/interface.config:mainBar.questLog.base").toString();
+    case ClientApplication::PanelWheelOption::MmUpgrade:
+      return assets->json("/interface.config:mainBar.mmUpgrade.base").toString();
+    case ClientApplication::PanelWheelOption::Collections:
+      return assets->json("/interface.config:mainBar.collections.base").toString();
+    case ClientApplication::PanelWheelOption::BeamUp:
+      return assets->json("/interface.config:mainBar.beamUp.base").toString();
+    case ClientApplication::PanelWheelOption::BeamDown:
+      return assets->json("/interface.config:mainBar.beam.base").toString();
+    case ClientApplication::PanelWheelOption::EscapeMenu:
+      return {};
+  }
+
+  return {};
 }
 
 static void ensureBindingActionDefault(ConfigurationPtr const& configuration, InterfaceAction action) {
@@ -220,7 +245,7 @@ Json const AdditionalDefaultConfiguration = Json::parseJson(R"JSON(
         "PlayerJump" :  [ { "type" : "key", "value" : "Space", "mods" : [] }, { "type" : "controller", "value" : "A" } ],
         "PlayerDropItem" :  [ { "type" : "key", "value" : "Q", "mods" : [] } ],
         "PlayerInteract" :  [ { "type" : "key", "value" : "E", "mods" : [] }, { "type" : "controller", "value" : "B" } ],
-        "PlayerShifting" :  [ { "type" : "key", "value" : "RShift", "mods" : [] }, { "type" : "key", "value" : "LShift", "mods" : [] }, { "type" : "controller", "value" : "LeftShoulder" } ],
+        "PlayerShifting" :  [ { "type" : "key", "value" : "RShift", "mods" : [] }, { "type" : "key", "value" : "LShift", "mods" : [] }],
         "PlayerTechAction1" :  [ { "type" : "key", "value" : "F", "mods" : [] } ],
         "PlayerTechAction2" :  [],
         "PlayerTechAction3" :  [],
@@ -262,7 +287,7 @@ Json const AdditionalDefaultConfiguration = Json::parseJson(R"JSON(
         "InterfaceChangeBarGroup" :  [ { "type" : "key", "value" : "X", "mods" : [] }, { "type" : "controller", "value" : "RightShoulder" } ],
         "InterfaceHotbarWheelHold" : [ { "type" : "controller", "value" : "DPadDown" } ],
         "InterfacePanelWheelHold" : [ { "type" : "controller", "value" : "DPadUp" } ],
-        "InterfaceDeselectHands" :  [ { "type" : "key", "value" : "Z", "mods" : [] }, { "type" : "controller", "value" : "LeftShoulder" } ],
+        "InterfaceDeselectHands" :  [ { "type" : "key", "value" : "Z", "mods" : [] } ],
         "InterfaceBar1" :  [ { "type" : "key", "value" : "1", "mods" : [] } ],
         "InterfaceBarPrevious" :  [ { "type" : "controller", "value" : "DPadLeft" } ],
         "InterfaceBarNext" :  [ { "type" : "controller", "value" : "DPadRight" } ],
@@ -606,15 +631,6 @@ void ClientApplication::processInput(InputEvent const& event) {
           m_panelDragMouseHeld = false;
           routeInputEvent(InputEvent{MouseButtonUpEvent{MouseButton::Left, m_input->mousePosition()}});
         }
-      } else if (cAxis->controllerAxis == ControllerAxis::TriggerRight) {
-        float triggerValue = cAxis->controllerAxisValue;
-        if (!m_panelFocusHeld && m_panelFocusRecenterTimer <= 0.0f && triggerValue > 0.70f) {
-          m_panelFocusHeld = true;
-          m_panelFocusRecenterTimer = 0.15f;
-          centerCursorOnPanelTarget();
-        } else if (m_panelFocusHeld && triggerValue < 0.35f) {
-          m_panelFocusHeld = false;
-        }
       }
 
       return;
@@ -622,18 +638,12 @@ void ClientApplication::processInput(InputEvent const& event) {
 
     if (auto cDown = event.ptr<ControllerButtonDownEvent>()) {
       switch (cDown->controllerButton) {
-        case ControllerButton::X:
         case ControllerButton::A: {
+          if (cDown->controllerButton == ControllerButton::A)
+            routeInputEvent(InputEvent{ControllerButtonDownEvent{cDown->controller, ControllerButton::A}});
+
           InputEvent mouseEvent{MouseButtonDownEvent{MouseButton::Left, m_input->mousePosition()}};
           routeInputEvent(mouseEvent);
-          break;
-        }
-        case ControllerButton::Y: {
-          bool wasShiftHeld = m_guiContext->shiftHeld();
-          m_guiContext->setShiftHeld(true);
-          routeInputEvent(InputEvent{MouseButtonDownEvent{MouseButton::Left, m_input->mousePosition()}});
-          routeInputEvent(InputEvent{MouseButtonUpEvent{MouseButton::Left, m_input->mousePosition()}});
-          m_guiContext->setShiftHeld(wasShiftHeld);
           break;
         }
         case ControllerButton::B: {
@@ -645,6 +655,21 @@ void ClientApplication::processInput(InputEvent const& event) {
           }
           break;
         }
+        case ControllerButton::LeftStick:
+          centerCursorOnPanelTarget();
+          break;
+        case ControllerButton::DPadLeft:
+          movePanelCursorByStep(Vec2I(-1, 0));
+          break;
+        case ControllerButton::DPadRight:
+          movePanelCursorByStep(Vec2I(1, 0));
+          break;
+        case ControllerButton::DPadUp:
+          movePanelCursorByStep(Vec2I(0, -1));
+          break;
+        case ControllerButton::DPadDown:
+          movePanelCursorByStep(Vec2I(0, 1));
+          break;
         case ControllerButton::LeftShoulder:
           routeInputEvent(InputEvent{ControllerButtonDownEvent{cDown->controller, ControllerButton::DPadLeft}});
           break;
@@ -658,7 +683,10 @@ void ClientApplication::processInput(InputEvent const& event) {
     }
 
     if (auto cUp = event.ptr<ControllerButtonUpEvent>()) {
-      if (cUp->controllerButton == ControllerButton::X || cUp->controllerButton == ControllerButton::A)
+      if (cUp->controllerButton == ControllerButton::A)
+        routeInputEvent(InputEvent{ControllerButtonUpEvent{cUp->controller, ControllerButton::A}});
+
+      if (cUp->controllerButton == ControllerButton::A)
         routeInputEvent(InputEvent{MouseButtonUpEvent{MouseButton::Left, m_input->mousePosition()}});
       return;
     }
@@ -770,6 +798,107 @@ bool ClientApplication::panelInteractionModeActive() const {
   return (bool)paneManager->topPane({PaneLayer::ModalWindow, PaneLayer::Window});
 }
 
+Vec2F ClientApplication::panelCursorStepSize() const {
+  float interfaceScale = m_guiContext ? m_guiContext->interfaceScale() : 1.0f;
+  float defaultStepUi = 32.0f;
+
+  if (m_mainInterface) {
+    auto paneManager = m_mainInterface->paneManager();
+    if (paneManager) {
+      for (auto const& pane : paneManager->getAllPanes()) {
+        if (!pane)
+          continue;
+
+        List<WidgetPtr> stack = {pane};
+        while (!stack.empty()) {
+          auto widget = stack.takeLast();
+          if (!widget)
+            continue;
+
+          if (auto slot = as<ItemSlotWidget>(widget)) {
+            Vec2F slotSize = Vec2F(slot->screenBoundRect().size());
+            if (slotSize[0] > 0.0f && slotSize[1] > 0.0f)
+              return slotSize * interfaceScale;
+          }
+
+          for (size_t i = 0; i < widget->numChildren(); ++i)
+            stack.append(widget->getChildNum(i));
+        }
+      }
+    }
+  }
+
+  return Vec2F::filled(defaultStepUi * interfaceScale);
+}
+
+bool ClientApplication::trySnapPanelCursor(Vec2F& targetScreenPos, float snapRadiusUi) const {
+  if (!m_mainInterface || !m_guiContext)
+    return false;
+
+  auto paneManager = m_mainInterface->paneManager();
+  if (!paneManager)
+    return false;
+
+  auto topPane = paneManager->topPane({PaneLayer::ModalWindow, PaneLayer::Window});
+  if (!topPane)
+    return false;
+
+  float interfaceScale = m_guiContext->interfaceScale();
+  Vec2F targetUi = targetScreenPos / interfaceScale;
+  Vec2F bestCenterUi;
+  float bestDistanceSq = 1.0e30f;
+  float snapRadiusSq = snapRadiusUi * snapRadiusUi;
+
+  List<WidgetPtr> stack = {topPane};
+  while (!stack.empty()) {
+    auto widget = stack.takeLast();
+    if (!widget || !widget->visibility() || !widget->active())
+      continue;
+
+    bool snapCandidate = as<ButtonWidget>(widget) || as<ItemSlotWidget>(widget) || as<ListWidget>(widget);
+    if (snapCandidate) {
+      RectI rect = widget->screenBoundRect();
+      Vec2F centerUi = Vec2F(rect.center());
+      float distanceSq = (centerUi - targetUi).magnitudeSquared();
+      if (distanceSq <= snapRadiusSq && distanceSq < bestDistanceSq) {
+        bestDistanceSq = distanceSq;
+        bestCenterUi = centerUi;
+      }
+    }
+
+    for (size_t i = 0; i < widget->numChildren(); ++i)
+      stack.append(widget->getChildNum(i));
+  }
+
+  if (bestDistanceSq < 1.0e30f) {
+    targetScreenPos = bestCenterUi * interfaceScale;
+    return true;
+  }
+
+  return false;
+}
+
+void ClientApplication::movePanelCursorByStep(Vec2I const& direction) {
+  if (!m_guiContext)
+    return;
+
+  Vec2F step = panelCursorStepSize();
+  Vec2F targetPos = m_input->mousePosition();
+  targetPos += Vec2F((float)direction[0] * step[0], (float)-direction[1] * step[1]);
+
+  float interfaceScale = m_guiContext->interfaceScale();
+  float snapRadiusUi = max(step[0], step[1]) / interfaceScale;
+  trySnapPanelCursor(targetPos, snapRadiusUi);
+
+  Vec2F screenSize = Vec2F(renderer()->screenSize());
+  targetPos[0] = clamp(targetPos[0], 0.0f, screenSize[0] - 1.0f);
+  targetPos[1] = clamp(targetPos[1], 0.0f, screenSize[1] - 1.0f);
+
+  Vec2I cursorPosition = Vec2I::round(targetPos);
+  cursorPosition[1] = (int)screenSize[1] - 1 - cursorPosition[1];
+  appController()->setCursorPosition(cursorPosition);
+}
+
 void ClientApplication::centerCursorOnPanelTarget() {
   if (!m_mainInterface)
     return;
@@ -852,7 +981,7 @@ void ClientApplication::updateControllerMouse(float dt) {
       }
     }
 
-    float speedScale = slowOverInteractive ? 0.50f : 0.75f;
+    float speedScale = slowOverInteractive ? 0.30f : 0.50f;
     Vec2F mouseDelta = Vec2F(m_controllerLeftStick[0], -m_controllerLeftStick[1]) * (baseSpeed * speedScale) * dt;
     if (mouseDelta.magnitudeSquared() <= 0.0f)
       return;
@@ -881,6 +1010,7 @@ void ClientApplication::updateControllerMouse(float dt) {
   float mouseDeadzone = configuration->get("controllerMouseDeadzone").optFloat().value(0.20f);
   float aimingDeadzone = mouseDeadzone * 2.0f;
   bool lockAimDirection = isActionTaken(InterfaceAction::PlayerControllerMoveOnly);
+  bool forcedAimOnly = isActionTaken(InterfaceAction::PlayerControllerAimOnly);
 
   if (m_state > MainAppState::Title && m_player && m_universeClient && m_universeClient->worldClient()) {
     Vec2F rightStick;
@@ -903,6 +1033,17 @@ void ClientApplication::updateControllerMouse(float dt) {
       return;
     }
 
+    Vec2F playerPosition = m_player->position();
+    if (lockAimDirection && !m_controllerLockedAimDirectionValid) {
+      Vec2F cursorWorld = m_mainInterface->cursorWorldPosition();
+      Vec2F cursorDirection = m_universeClient->worldClient()->geometry().diff(cursorWorld, playerPosition);
+      float cursorDirectionMagnitude = cursorDirection.magnitude();
+      if (cursorDirectionMagnitude > 0.001f) {
+        m_controllerLockedAimDirection = cursorDirection / cursorDirectionMagnitude;
+        m_controllerLockedAimDirectionValid = true;
+      }
+    }
+
     float leftStickMagnitude = m_controllerLeftStick.magnitude();
     if (stickAxisActive(m_controllerLeftStick, aimingDeadzone) || (lockAimDirection && m_controllerLockedAimDirectionValid)) {
       Maybe<Vec2F> liveStickDirection;
@@ -920,7 +1061,6 @@ void ClientApplication::updateControllerMouse(float dt) {
         return;
       }
 
-      Vec2F playerPosition = m_player->position();
       Vec2F castStart = playerPosition + stickDirection * 0.5f;
       Vec2F projectedCursorWorld = playerPosition + stickDirection * 12.0f;
 
@@ -937,6 +1077,15 @@ void ClientApplication::updateControllerMouse(float dt) {
       Vec2F screenSize = Vec2F(renderer()->screenSize());
       screenCursor[0] = clamp(screenCursor[0], 0.0f, screenSize[0] - 1.0f);
       screenCursor[1] = clamp(screenCursor[1], 0.0f, screenSize[1] - 1.0f);
+
+      if (forcedAimOnly) {
+        Vec2F currentMouse = m_input->mousePosition();
+        Vec2F toTarget = screenCursor - currentMouse;
+        float maxStep = mouseSpeed * 0.5f * dt;
+        float distance = toTarget.magnitude();
+        if (distance > maxStep && distance > 0.0f)
+          screenCursor = currentMouse + toTarget / distance * maxStep;
+      }
 
       Vec2I cursorPosition = Vec2I::round(screenCursor);
       cursorPosition[1] = (int)screenSize[1] - 1 - cursorPosition[1];
@@ -1056,10 +1205,14 @@ void ClientApplication::renderPanelWheelOverlay() {
   if (!m_panelWheelActive || !m_guiContext)
     return;
 
-  auto const& options = panelWheelOptions();
+  bool canBeamUp = m_universeClient && m_universeClient->canBeamUp();
+  bool canBeamDown = m_universeClient && m_universeClient->canBeamDown();
+  auto options = panelWheelOptions(canBeamUp, canBeamDown);
   int optionCount = options.size();
   if (optionCount <= 0)
     return;
+
+  auto assets = m_root->assets();
 
   Vec2F center = Vec2F(m_guiContext->windowInterfaceSize()) / 2.0f;
   float radius = 62.0f;
@@ -1078,7 +1231,10 @@ void ClientApplication::renderPanelWheelOverlay() {
     if (selected)
       m_guiContext->drawInterfacePolyLines(PolyF(RectF::withCenter(slotCenter, Vec2F::filled(slotSize + 6.0f))), Vec4B(170, 220, 255, 255), 1.5f);
 
-    m_guiContext->renderInterfaceText(panelWheelOptionLabel(option), {slotCenter, HorizontalAnchor::HMidAnchor, VerticalAnchor::VMidAnchor});
+    if (auto icon = panelWheelOptionIcon(option, assets))
+      m_guiContext->drawInterfaceQuad(*icon, slotCenter, selected ? 1.0f : 0.9f);
+    else
+      m_guiContext->renderInterfaceText(panelWheelOptionLabel(option), {slotCenter, HorizontalAnchor::HMidAnchor, VerticalAnchor::VMidAnchor});
   }
 }
 
@@ -1669,8 +1825,18 @@ void ClientApplication::updateRunning(float dt) {
     }
 
     bool movementLockedByAimOnly = isActionTaken(InterfaceAction::PlayerControllerAimOnly);
-    bool panelWheelHeld = isActionTaken(InterfaceAction::InterfacePanelWheelHold);
-    bool hotbarWheelHeld = isActionTaken(InterfaceAction::InterfaceHotbarWheelHold);
+    bool panelModeActive = panelInteractionModeActive();
+    bool panelWheelHeld = !panelModeActive && isActionTaken(InterfaceAction::InterfacePanelWheelHold);
+    bool hotbarWheelHeld = !panelModeActive && isActionTaken(InterfaceAction::InterfaceHotbarWheelHold);
+    bool canBeamUp = m_universeClient && m_universeClient->canBeamUp();
+    bool canBeamDown = m_universeClient && m_universeClient->canBeamDown();
+
+    if (panelModeActive) {
+      m_panelWheelActive = false;
+      m_panelWheelSelection.reset();
+      m_hotbarWheelActive = false;
+      m_hotbarWheelSelection.reset();
+    }
 
     if (m_panelWheelActive && !panelWheelHeld) {
       if (m_panelWheelSelection && m_mainInterface) {
@@ -1692,6 +1858,12 @@ void ClientApplication::updateRunning(float dt) {
             break;
           case PanelWheelOption::Collections:
             m_mainInterface->paneManager()->toggleRegisteredPane(MainInterfacePanes::Collections);
+            break;
+          case PanelWheelOption::BeamUp:
+            m_mainInterface->warpToOwnShip();
+            break;
+          case PanelWheelOption::BeamDown:
+            m_mainInterface->warpToOrbitedWorld();
             break;
           case PanelWheelOption::EscapeMenu:
             m_mainInterface->paneManager()->toggleRegisteredPane(MainInterfacePanes::EscapeDialog);
@@ -1718,9 +1890,10 @@ void ClientApplication::updateRunning(float dt) {
         if (angle < 0.0f)
           angle += fullCircle;
 
-        int optionCount = panelWheelOptions().size();
+        auto options = panelWheelOptions(canBeamUp, canBeamDown);
+        int optionCount = options.size();
         int index = (int)floor((angle / fullCircle) * optionCount) % optionCount;
-        m_panelWheelSelection = panelWheelOptionFromIndex(index);
+        m_panelWheelSelection = options.at(index);
       } else {
         m_panelWheelSelection.reset();
       }
@@ -1812,16 +1985,12 @@ void ClientApplication::updateRunning(float dt) {
       p2pNetworkingService->setActivityData("In Game", finalDetails.utf8Ptr(), m_timeSinceJoin, party);
     }
 
-    bool panelModeActive = panelInteractionModeActive();
     if (m_lastPanelModeActive && !panelModeActive)
       m_panelControlReenableTimer = max(m_panelControlReenableTimer, 0.1f);
     m_lastPanelModeActive = panelModeActive;
 
     if (m_panelControlReenableTimer > 0.0f)
       m_panelControlReenableTimer = max(0.0f, m_panelControlReenableTimer - dt);
-
-    if (m_panelFocusRecenterTimer > 0.0f)
-      m_panelFocusRecenterTimer = max(0.0f, m_panelFocusRecenterTimer - dt);
 
     bool controlsSuppressed = panelModeActive || m_panelControlReenableTimer > 0.0f;
 
@@ -1915,7 +2084,6 @@ void ClientApplication::updateRunning(float dt) {
     }
 
     if (!controlsSuppressed) {
-      m_panelFocusHeld = false;
       m_panelInventoryFocusToggle = false;
       m_panelDragMouseHeld = false;
 
@@ -2023,7 +2191,9 @@ void ClientApplication::updateRunning(float dt) {
           m_universeServer->addClient(UniverseConnection(P2PPacketSocket::open(std::move(p2pClient))));
       }
 
-      m_universeServer->setPause(m_mainInterface->escapeDialogOpen());
+      bool wheelPause = m_state == MainAppState::SinglePlayer &&
+          (m_hotbarWheelActive || m_panelWheelActive || hotbarWheelHeld || panelWheelHeld);
+      m_universeServer->setPause(m_mainInterface->escapeDialogOpen() || wheelPause);
     }
 
     Vec2F aimPosition = m_player->aimPosition();
