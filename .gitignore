@@ -7,6 +7,8 @@
 /linux/
 /mac/
 /dist/
+/win64/
+/storage/
 /installer/
 /vcpkg/
 /client_distribution/
