@@ -19,6 +19,16 @@ STAR_CLASS(Voice);
 
 class ClientApplication : public Application {
 public:
+  enum class PanelWheelOption {
+    Inventory,
+    Crafting,
+    Codex,
+    QuestLog,
+    MmUpgrade,
+    Collections,
+    EscapeMenu
+  };
+
   void setPostProcessLayerPasses(String const& layer, unsigned const& passes);
   void setPostProcessGroupEnabled(String const& group, bool const& enabled, Maybe<bool> const& save);
   bool postProcessGroupEnabled(String const& group);
@@ -89,7 +99,11 @@ private:
 
   bool isActionTaken(InterfaceAction action) const;
   bool isActionTakenEdge(InterfaceAction action) const;
+  bool panelInteractionModeActive() const;
+  void centerCursorOnPanelTarget();
   void updateControllerMouse(float dt);
+  void renderHotbarWheelOverlay();
+  void renderPanelWheelOverlay();
 
   void updateCamera(float dt);
 
@@ -147,6 +161,19 @@ private:
   Vec2F m_controllerRightStickRaw;
   Vec2F m_controllerLockedAimDirection;
   bool m_controllerLockedAimDirectionValid = false;
+  bool m_hotbarWheelActive = false;
+  Maybe<SelectedActionBarLocation> m_hotbarWheelSelection;
+  bool m_panelWheelActive = false;
+  Maybe<PanelWheelOption> m_panelWheelSelection;
+  bool m_panelDragMouseHeld = false;
+  bool m_panelFocusHeld = false;
+  bool m_panelInventoryFocusToggle = false;
+  bool m_lastPanelModeActive = false;
+  float m_panelControlReenableTimer = 0.0f;
+  float m_panelFocusRecenterTimer = 0.0f;
+  float m_panelScrollAccumulator = 0.0f;
+  float m_lastPlayerHealth = 0.0f;
+  bool m_lastPlayerHealthValid = false;
   List<KeyDownEvent> m_heldKeyEvents;
   List<KeyDownEvent> m_edgeKeyEvents;
   List<ControllerButtonDownEvent> m_heldControllerButtonEvents;

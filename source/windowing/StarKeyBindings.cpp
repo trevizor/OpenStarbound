@@ -72,6 +72,8 @@ EnumMap<InterfaceAction> const InterfaceActionNames{
     {InterfaceAction::InterfaceShowHelp, "InterfaceShowHelp"},
     {InterfaceAction::InterfaceHideHud, "InterfaceHideHud"},
     {InterfaceAction::InterfaceChangeBarGroup, "InterfaceChangeBarGroup"},
+    {InterfaceAction::InterfaceHotbarWheelHold, "InterfaceHotbarWheelHold"},
+    {InterfaceAction::InterfacePanelWheelHold, "InterfacePanelWheelHold"},
     {InterfaceAction::InterfaceDeselectHands, "InterfaceDeselectHands"},
     {InterfaceAction::InterfaceBarPrevious, "InterfaceBarPrevious"},
     {InterfaceAction::InterfaceBarNext, "InterfaceBarNext"},

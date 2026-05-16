@@ -58,6 +58,8 @@ enum class InterfaceAction {
   InterfaceShowHelp,
   InterfaceHideHud,
   InterfaceChangeBarGroup,
+  InterfaceHotbarWheelHold,
+  InterfacePanelWheelHold,
   InterfaceDeselectHands,
   InterfaceBarPrevious,
   InterfaceBarNext,

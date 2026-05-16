@@ -489,19 +489,6 @@ public:
     m_videoDriver = SDL_GetCurrentVideoDriver();
     Logger::info("Application: using Video Driver '{}'", m_videoDriver);
 
-    Logger::info("Application: Initializing SDL Controller");
-    if (!SDL_InitSubSystem(SDL_INIT_GAMEPAD))
-      throw ApplicationException(strf("Couldn't initialize SDL Controller: {}", SDL_GetError()));
-
-    Logger::info("Application: Initializing SDL Audio");
-    if (!SDL_InitSubSystem(SDL_INIT_AUDIO))
-      throw ApplicationException(strf("Couldn't initialize SDL Audio: {}", SDL_GetError()));
-
-    m_audioDriver = SDL_GetCurrentAudioDriver();
-    Logger::info("Application: using Audio Driver '{}'", m_audioDriver);
-
-    SDL_SetJoystickEventsEnabled(true);
-
     m_platformServices = PcPlatformServices::create(applicationPath, platformArguments);
     if (!m_platformServices)
       Logger::info("Application: No platform services available");
@@ -603,6 +590,8 @@ public:
     SDL_ShowWindow(m_sdlWindow);
     SDL_RaiseWindow(m_sdlWindow);
 
+    Logger::info("Application: Deferring SDL Controller/Audio initialization until after first frame");
+
     int width;
     int height;
     SDL_GetWindowSize(m_sdlWindow, &width, &height);
@@ -612,25 +601,6 @@ public:
     setVSyncEnabled(m_windowVSync);
 
     SDL_StopTextInput(m_sdlWindow);
-
-    Logger::info("Application: Opening audio device");
-    m_audioOutputData.clear();
-    SDL_AudioSpec desired = {SDL_AUDIO_S16, 2, 44100};
-    m_sdlAudioOutputStream = SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &desired,
-    [](void* userdata, SDL_AudioStream* stream, int len, int) {
-      if (len > 0) {
-        auto sdlPlatform = ((SdlPlatform*)(userdata));
-        sdlPlatform->m_audioOutputData.resize(len);
-        sdlPlatform->getAudioData(sdlPlatform->m_audioOutputData.data(), len);
-        SDL_PutAudioStreamData(stream, sdlPlatform->m_audioOutputData.data(), len);
-      }
-    }, this);
-    if (!m_sdlAudioOutputStream) {
-      Logger::error("Application: Could not open audio device, no sound available!");
-    } else {
-      Logger::info("Application: Opened default audio device with 44.1khz / 16 bit stereo audio");
-      SDL_ResumeAudioDevice(SDL_GetAudioStreamDevice(m_sdlAudioOutputStream));
-    }
 
     m_renderer = make_shared<OpenGlRenderer>();
     m_renderer->setScreenSize(m_windowSize);
@@ -765,6 +735,11 @@ public:
         SDL_GL_SwapWindow(m_sdlWindow);
         m_renderRate = m_renderTicker.tick();
 
+        // Keep startup responsive by performing expensive subsystem init
+        // only after we have rendered at least one frame.
+        if (!m_deferredSubsystemsInitialized)
+          initializeDeferredSubsystems();
+
         if (m_quitRequested) {
           Logger::info("Application: quit requested");
           quit = true;
@@ -796,7 +771,10 @@ public:
       Logger::error("Application: threw exception during shutdown: {}", outputException(e, true));
     }
 
-    SDL_CloseAudioDevice(SDL_GetAudioStreamDevice(m_sdlAudioOutputStream));
+    if (m_sdlAudioOutputStream) {
+      SDL_CloseAudioDevice(SDL_GetAudioStreamDevice(m_sdlAudioOutputStream));
+      m_sdlAudioOutputStream = 0;
+    }
     m_SdlControllers.clear();
 
     SDL_SetCursor(NULL);
@@ -1019,17 +997,21 @@ private:
     }
 
     AudioFormat enableAudio() override {
+      parent->initializeDeferredSubsystems();
       parent->m_audioEnabled = true;
-      SDL_ResumeAudioDevice(SDL_GetAudioStreamDevice(parent->m_sdlAudioOutputStream));
+      if (parent->m_sdlAudioOutputStream)
+        SDL_ResumeAudioDevice(SDL_GetAudioStreamDevice(parent->m_sdlAudioOutputStream));
       return AudioFormat{44100, 2};
     }
 
     void disableAudio() override {
       parent->m_audioEnabled = false;
-      SDL_PauseAudioDevice(SDL_GetAudioStreamDevice(parent->m_sdlAudioOutputStream));
+      if (parent->m_sdlAudioOutputStream)
+        SDL_PauseAudioDevice(SDL_GetAudioStreamDevice(parent->m_sdlAudioOutputStream));
     }
 
     bool openAudioInputDevice(uint32_t deviceId, int freq, int channels, AudioCallback callback) override {
+      parent->initializeDeferredSubsystems();
       return parent->openAudioInputDevice(deviceId, freq, channels, callback);
     };
 
@@ -1172,6 +1154,51 @@ private:
     }
 
     return inputEvents;
+  }
+
+  void initializeDeferredSubsystems() {
+    if (m_deferredSubsystemsInitialized)
+      return;
+
+    m_deferredSubsystemsInitialized = true;
+
+    Logger::info("Application: Initializing deferred SDL Controller subsystem");
+    if (!SDL_InitSubSystem(SDL_INIT_GAMEPAD)) {
+      Logger::warn("Application: Couldn't initialize SDL Controller: {}", SDL_GetError());
+    } else {
+      SDL_SetJoystickEventsEnabled(true);
+    }
+
+    Logger::info("Application: Initializing deferred SDL Audio subsystem");
+    if (!SDL_InitSubSystem(SDL_INIT_AUDIO)) {
+      Logger::warn("Application: Couldn't initialize SDL Audio: {}", SDL_GetError());
+      return;
+    }
+
+    m_audioDriver = SDL_GetCurrentAudioDriver();
+    Logger::info("Application: using Audio Driver '{}'", m_audioDriver);
+
+    Logger::info("Application: Opening audio device");
+    m_audioOutputData.clear();
+    SDL_AudioSpec desired = {SDL_AUDIO_S16, 2, 44100};
+    m_sdlAudioOutputStream = SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &desired,
+    [](void* userdata, SDL_AudioStream* stream, int len, int) {
+      if (len > 0) {
+        auto sdlPlatform = ((SdlPlatform*)(userdata));
+        sdlPlatform->m_audioOutputData.resize(len);
+        sdlPlatform->getAudioData(sdlPlatform->m_audioOutputData.data(), len);
+        SDL_PutAudioStreamData(stream, sdlPlatform->m_audioOutputData.data(), len);
+      }
+    }, this);
+
+    if (!m_sdlAudioOutputStream) {
+      Logger::warn("Application: Could not open audio device, no sound available!");
+      return;
+    }
+
+    Logger::info("Application: Opened default audio device with 44.1khz / 16 bit stereo audio");
+    if (m_audioEnabled)
+      SDL_ResumeAudioDevice(SDL_GetAudioStreamDevice(m_sdlAudioOutputStream));
   }
 
   void getAudioData(Uint8* stream, int len) {
@@ -1359,9 +1386,10 @@ private:
   bool m_acceptingTextInput = false;
   bool m_audioEnabled = false;
   bool m_quitRequested = false;
+  bool m_deferredSubsystemsInitialized = false;
   float m_displayScale = 1.0f;
-  const char* m_videoDriver;
-  const char* m_audioDriver;
+  const char* m_videoDriver = nullptr;
+  const char* m_audioDriver = nullptr;
 
   OpenGlRendererPtr m_renderer;
   ApplicationUPtr m_application;

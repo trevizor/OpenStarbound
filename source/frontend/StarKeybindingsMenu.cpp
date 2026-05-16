@@ -166,9 +166,40 @@ void KeybindingsMenu::buildListsFromConfig() {
   };
 
   auto assets = Root::singleton().assets();
-  doKeybindingsFor(m_playerList, assets->json("/interface/windowconfig/keybindingsmenu.config:keyActions.player"));
-  doKeybindingsFor(m_toolBarList, assets->json("/interface/windowconfig/keybindingsmenu.config:keyActions.toolbar"));
-  doKeybindingsFor(m_gameList, assets->json("/interface/windowconfig/keybindingsmenu.config:keyActions.game"));
+  Json playerActions = assets->json("/interface/windowconfig/keybindingsmenu.config:keyActions.player");
+  Json toolbarActions = assets->json("/interface/windowconfig/keybindingsmenu.config:keyActions.toolbar");
+  Json gameActions = assets->json("/interface/windowconfig/keybindingsmenu.config:keyActions.game");
+
+  Set<String> configuredActions;
+  auto collectConfiguredActions = [&configuredActions](Json const& keybinds) {
+    for (auto const& keybind : keybinds.iterateArray())
+      configuredActions.add(keybind.getString("action"));
+  };
+
+  collectConfiguredActions(playerActions);
+  collectConfiguredActions(toolbarActions);
+  collectConfiguredActions(gameActions);
+
+  JsonArray mergedGameActions = gameActions.toArray();
+  for (auto const& bindingPair : Root::singleton().configuration()->get("bindings").iterateObject()) {
+    if (configuredActions.contains(bindingPair.first))
+      continue;
+
+    try {
+      auto action = InterfaceActionNames.getLeft(bindingPair.first);
+      if (action == InterfaceAction::None)
+        continue;
+
+      mergedGameActions.append(JsonObject{{"action", bindingPair.first}, {"label", bindingPair.first}});
+      configuredActions.add(bindingPair.first);
+    } catch (std::exception const&) {
+      // Ignore unknown custom bindings we cannot map to an InterfaceAction.
+    }
+  }
+
+  doKeybindingsFor(m_playerList, playerActions);
+  doKeybindingsFor(m_toolBarList, toolbarActions);
+  doKeybindingsFor(m_gameList, mergedGameActions);
 }
 
 void KeybindingsMenu::selectTab(int delta) {

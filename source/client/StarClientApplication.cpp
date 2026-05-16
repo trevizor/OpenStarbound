@@ -8,13 +8,17 @@
 #include "StarRoot.hpp"
 #include "StarVersion.hpp"
 #include "StarPlayer.hpp"
+#include "StarPlayerInventory.hpp"
 #include "StarPlayerStorage.hpp"
 #include "StarPlayerLog.hpp"
+#include "StarContainerInterface.hpp"
 #include "StarAssets.hpp"
 #include "StarWorldTemplate.hpp"
 #include "StarWorldClient.hpp"
 #include "StarRootLoader.hpp"
 #include "StarInput.hpp"
+#include "StarListWidget.hpp"
+#include "StarItemSlotWidget.hpp"
 #include "StarVoice.hpp"
 #include "StarCurve25519.hpp"
 #include "StarInterpolation.hpp"
@@ -55,6 +59,95 @@ static float applyControllerAxisResponse(float value, float deadzone, float sens
   float normalized = (magnitude - deadzone) / (1.0f - deadzone);
   float curved = std::pow(clamp(normalized, 0.0f, 1.0f), sensitivity);
   return std::copysign(clamp(curved, 0.0f, 1.0f), value);
+}
+
+static bool stickAxisActive(Vec2F const& stick, float threshold = 0.0f) {
+  return std::abs(stick[0]) > threshold || std::abs(stick[1]) > threshold;
+}
+
+static int hotbarWheelSlotCount(PlayerInventoryPtr const& inventory) {
+  return inventory ? (int)inventory->customBarIndexes() + EssentialItemCount : 0;
+}
+
+static SelectedActionBarLocation hotbarWheelSelectionFromIndex(PlayerInventoryPtr const& inventory, int index) {
+  if (!inventory)
+    return {};
+
+  int customBarCount = inventory->customBarIndexes();
+  int slotCount = customBarCount + EssentialItemCount;
+  if (slotCount <= 0)
+    return {};
+
+  index = pmod(index, slotCount);
+  if (index < customBarCount / 2)
+    return SelectedActionBarLocation((CustomBarIndex)index);
+  if (index < customBarCount / 2 + EssentialItemCount)
+    return SelectedActionBarLocation((EssentialItem)(index - customBarCount / 2));
+  return SelectedActionBarLocation((CustomBarIndex)(index - EssentialItemCount));
+}
+
+static ItemPtr hotbarWheelItemForSelection(PlayerInventoryPtr const& inventory, SelectedActionBarLocation const& selection) {
+  if (!inventory)
+    return {};
+
+  if (selection.is<CustomBarIndex>()) {
+    if (auto slot = inventory->customBarPrimarySlot(selection.get<CustomBarIndex>()))
+      return inventory->itemsAt(*slot);
+    return {};
+  }
+
+  if (selection.is<EssentialItem>())
+    return inventory->essentialItem(selection.get<EssentialItem>());
+
+  return {};
+}
+
+static ClientApplication::PanelWheelOption panelWheelOptionFromIndex(int index) {
+  static List<ClientApplication::PanelWheelOption> options = {
+    ClientApplication::PanelWheelOption::Inventory,
+    ClientApplication::PanelWheelOption::Crafting,
+    ClientApplication::PanelWheelOption::Codex,
+    ClientApplication::PanelWheelOption::QuestLog,
+    ClientApplication::PanelWheelOption::MmUpgrade,
+    ClientApplication::PanelWheelOption::Collections,
+    ClientApplication::PanelWheelOption::EscapeMenu
+  };
+
+  return options.at(pmod(index, (int)options.size()));
+}
+
+static List<ClientApplication::PanelWheelOption> const& panelWheelOptions() {
+  static List<ClientApplication::PanelWheelOption> options = {
+    ClientApplication::PanelWheelOption::Inventory,
+    ClientApplication::PanelWheelOption::Crafting,
+    ClientApplication::PanelWheelOption::Codex,
+    ClientApplication::PanelWheelOption::QuestLog,
+    ClientApplication::PanelWheelOption::MmUpgrade,
+    ClientApplication::PanelWheelOption::Collections,
+    ClientApplication::PanelWheelOption::EscapeMenu
+  };
+  return options;
+}
+
+static String panelWheelOptionLabel(ClientApplication::PanelWheelOption option) {
+  switch (option) {
+    case ClientApplication::PanelWheelOption::Inventory:
+      return "Inventory";
+    case ClientApplication::PanelWheelOption::Crafting:
+      return "Craft";
+    case ClientApplication::PanelWheelOption::Codex:
+      return "Codex";
+    case ClientApplication::PanelWheelOption::QuestLog:
+      return "Quest";
+    case ClientApplication::PanelWheelOption::MmUpgrade:
+      return "Upgrade";
+    case ClientApplication::PanelWheelOption::Collections:
+      return "Collections";
+    case ClientApplication::PanelWheelOption::EscapeMenu:
+      return "Menu";
+  }
+
+  return "";
 }
 
 static void ensureBindingActionDefault(ConfigurationPtr const& configuration, InterfaceAction action) {
@@ -125,10 +218,8 @@ Json const AdditionalDefaultConfiguration = Json::parseJson(R"JSON(
         "PlayerLeft" :  [ { "type" : "key", "value" : "A", "mods" : [] }, { "type" : "controllerAxis", "value" : "LeftX", "direction" : -1, "threshold" : 0.35 } ],
         "PlayerRight" :  [ { "type" : "key", "value" : "D", "mods" : [] }, { "type" : "controllerAxis", "value" : "LeftX", "direction" : 1, "threshold" : 0.35 } ],
         "PlayerJump" :  [ { "type" : "key", "value" : "Space", "mods" : [] }, { "type" : "controller", "value" : "A" } ],
-        "PlayerMainItem" : [ { "type" : "controllerAxis", "value" : "TriggerRight", "direction" : 1, "threshold" : 0.4 } ],
-        "PlayerAltItem" : [ { "type" : "controllerAxis", "value" : "TriggerLeft", "direction" : 1, "threshold" : 0.4 } ],
         "PlayerDropItem" :  [ { "type" : "key", "value" : "Q", "mods" : [] } ],
-        "PlayerInteract" :  [ { "type" : "key", "value" : "E", "mods" : [] } ],
+        "PlayerInteract" :  [ { "type" : "key", "value" : "E", "mods" : [] }, { "type" : "controller", "value" : "B" } ],
         "PlayerShifting" :  [ { "type" : "key", "value" : "RShift", "mods" : [] }, { "type" : "key", "value" : "LShift", "mods" : [] }, { "type" : "controller", "value" : "LeftShoulder" } ],
         "PlayerTechAction1" :  [ { "type" : "key", "value" : "F", "mods" : [] } ],
         "PlayerTechAction2" :  [],
@@ -169,6 +260,8 @@ Json const AdditionalDefaultConfiguration = Json::parseJson(R"JSON(
         "ChatStop" :  [ { "type" : "key", "value" : "Esc", "mods" : [] } ],
         "InterfaceHideHud" :  [ { "type" : "key", "value" : "F1", "mods" : [] } ],
         "InterfaceChangeBarGroup" :  [ { "type" : "key", "value" : "X", "mods" : [] }, { "type" : "controller", "value" : "RightShoulder" } ],
+        "InterfaceHotbarWheelHold" : [ { "type" : "controller", "value" : "DPadDown" } ],
+        "InterfacePanelWheelHold" : [ { "type" : "controller", "value" : "DPadUp" } ],
         "InterfaceDeselectHands" :  [ { "type" : "key", "value" : "Z", "mods" : [] }, { "type" : "controller", "value" : "LeftShoulder" } ],
         "InterfaceBar1" :  [ { "type" : "key", "value" : "1", "mods" : [] } ],
         "InterfaceBarPrevious" :  [ { "type" : "controller", "value" : "DPadLeft" } ],
@@ -237,6 +330,8 @@ void ClientApplication::applicationInit(ApplicationControllerPtr appController) 
   auto configuration = m_root->configuration();
   ensureBindingActionDefault(configuration, InterfaceAction::InterfacePanelClose);
   ensureBindingActionDefault(configuration, InterfaceAction::InterfaceToggleControllerMouse);
+  ensureBindingActionDefault(configuration, InterfaceAction::InterfaceHotbarWheelHold);
+  ensureBindingActionDefault(configuration, InterfaceAction::InterfacePanelWheelHold);
   ensureBindingActionDefault(configuration, InterfaceAction::PlayerControllerAimOnly);
   ensureBindingActionDefault(configuration, InterfaceAction::PlayerControllerMoveOnly);
 
@@ -458,7 +553,116 @@ void ClientApplication::processInput(InputEvent const& event) {
     }
   }
 
-  bool processed = routeInputEvent(event);
+  bool panelMode = panelInteractionModeActive();
+  bool shouldRouteOriginal = !(panelMode && (event.is<ControllerButtonDownEvent>() || event.is<ControllerButtonUpEvent>() || event.is<ControllerAxisEvent>()));
+  bool processed = shouldRouteOriginal ? routeInputEvent(event) : false;
+
+  if (panelMode) {
+    auto panelHasList = [&](PanePtr const& pane) {
+      if (!pane)
+        return false;
+
+      List<WidgetPtr> stack = {pane};
+      while (!stack.empty()) {
+        auto widget = stack.takeLast();
+        if (!widget)
+          continue;
+        if (as<ListWidget>(widget))
+          return true;
+        for (size_t i = 0; i < widget->numChildren(); ++i)
+          stack.append(widget->getChildNum(i));
+      }
+
+      return false;
+    };
+
+    if (auto cAxis = event.ptr<ControllerAxisEvent>()) {
+      if (cAxis->controllerAxis == ControllerAxis::RightY && m_mainInterface) {
+        auto topPane = m_mainInterface->paneManager()->topPane({PaneLayer::ModalWindow, PaneLayer::Window});
+        float axisY = m_controllerRightStick[1];
+        if (topPane && panelHasList(topPane) && std::abs(axisY) > 0.55f) {
+          m_panelScrollAccumulator += axisY * 6.0f * GlobalTimestep;
+          while (m_panelScrollAccumulator >= 1.0f) {
+            InputEvent mouseEvent{MouseWheelEvent{MouseWheel::Up, m_input->mousePosition()}};
+            routeInputEvent(mouseEvent);
+            m_panelScrollAccumulator -= 1.0f;
+          }
+          while (m_panelScrollAccumulator <= -1.0f) {
+            InputEvent mouseEvent{MouseWheelEvent{MouseWheel::Down, m_input->mousePosition()}};
+            routeInputEvent(mouseEvent);
+            m_panelScrollAccumulator += 1.0f;
+          }
+        } else {
+          m_panelScrollAccumulator = 0.0f;
+        }
+      }
+
+      if (cAxis->controllerAxis == ControllerAxis::TriggerLeft) {
+        bool triggerHeld = cAxis->controllerAxisValue > 0.6f;
+        if (triggerHeld && !m_panelDragMouseHeld) {
+          m_panelDragMouseHeld = true;
+          routeInputEvent(InputEvent{MouseButtonDownEvent{MouseButton::Left, m_input->mousePosition()}});
+        } else if (!triggerHeld && m_panelDragMouseHeld) {
+          m_panelDragMouseHeld = false;
+          routeInputEvent(InputEvent{MouseButtonUpEvent{MouseButton::Left, m_input->mousePosition()}});
+        }
+      } else if (cAxis->controllerAxis == ControllerAxis::TriggerRight) {
+        float triggerValue = cAxis->controllerAxisValue;
+        if (!m_panelFocusHeld && m_panelFocusRecenterTimer <= 0.0f && triggerValue > 0.70f) {
+          m_panelFocusHeld = true;
+          m_panelFocusRecenterTimer = 0.15f;
+          centerCursorOnPanelTarget();
+        } else if (m_panelFocusHeld && triggerValue < 0.35f) {
+          m_panelFocusHeld = false;
+        }
+      }
+
+      return;
+    }
+
+    if (auto cDown = event.ptr<ControllerButtonDownEvent>()) {
+      switch (cDown->controllerButton) {
+        case ControllerButton::X:
+        case ControllerButton::A: {
+          InputEvent mouseEvent{MouseButtonDownEvent{MouseButton::Left, m_input->mousePosition()}};
+          routeInputEvent(mouseEvent);
+          break;
+        }
+        case ControllerButton::Y: {
+          bool wasShiftHeld = m_guiContext->shiftHeld();
+          m_guiContext->setShiftHeld(true);
+          routeInputEvent(InputEvent{MouseButtonDownEvent{MouseButton::Left, m_input->mousePosition()}});
+          routeInputEvent(InputEvent{MouseButtonUpEvent{MouseButton::Left, m_input->mousePosition()}});
+          m_guiContext->setShiftHeld(wasShiftHeld);
+          break;
+        }
+        case ControllerButton::B: {
+          if (m_state > MainAppState::Title && m_mainInterface)
+            m_mainInterface->paneManager()->dismissAllPanes({PaneLayer::ModalWindow, PaneLayer::Window});
+          else {
+            routeInputEvent(InputEvent{KeyDownEvent{Key::Escape, KeyMod::NoMod}});
+            routeInputEvent(InputEvent{KeyUpEvent{Key::Escape}});
+          }
+          break;
+        }
+        case ControllerButton::LeftShoulder:
+          routeInputEvent(InputEvent{ControllerButtonDownEvent{cDown->controller, ControllerButton::DPadLeft}});
+          break;
+        case ControllerButton::RightShoulder:
+          routeInputEvent(InputEvent{ControllerButtonDownEvent{cDown->controller, ControllerButton::DPadRight}});
+          break;
+        default:
+          break;
+      }
+      return;
+    }
+
+    if (auto cUp = event.ptr<ControllerButtonUpEvent>()) {
+      if (cUp->controllerButton == ControllerButton::X || cUp->controllerButton == ControllerButton::A)
+        routeInputEvent(InputEvent{MouseButtonUpEvent{MouseButton::Left, m_input->mousePosition()}});
+      return;
+    }
+  }
 
   if (auto cDown = event.ptr<ControllerButtonDownEvent>()) {
     if (cDown->controllerButton == ControllerButton::RightStick) {
@@ -552,15 +756,122 @@ void ClientApplication::update() {
   ++m_framesSkipped;
 }
 
+bool ClientApplication::panelInteractionModeActive() const {
+  if (m_state == MainAppState::Title)
+    return true;
+
+  if (!m_mainInterface)
+    return false;
+
+  auto paneManager = m_mainInterface->paneManager();
+  if (!paneManager)
+    return false;
+
+  return (bool)paneManager->topPane({PaneLayer::ModalWindow, PaneLayer::Window});
+}
+
+void ClientApplication::centerCursorOnPanelTarget() {
+  if (!m_mainInterface)
+    return;
+
+  auto paneManager = m_mainInterface->paneManager();
+  if (!paneManager)
+    return;
+
+  auto topPane = paneManager->topPane({PaneLayer::ModalWindow, PaneLayer::Window});
+  if (!topPane)
+    return;
+
+  Vec2F cursorTarget = Vec2F(topPane->screenBoundRect().center()) * m_guiContext->interfaceScale();
+
+  List<PanePtr> inventoryLikePanes;
+  for (auto const& pane : paneManager->getAllPanes()) {
+    if (!pane)
+      continue;
+    if (as<InventoryPane>(pane) || as<ContainerPane>(pane))
+      inventoryLikePanes.append(pane);
+  }
+
+  if (!inventoryLikePanes.empty()) {
+    size_t index = m_panelInventoryFocusToggle && inventoryLikePanes.size() > 1 ? 1 : 0;
+    index = min(index, inventoryLikePanes.size() - 1);
+    auto pane = inventoryLikePanes.at(index);
+
+    List<WidgetPtr> stack = {pane};
+    while (!stack.empty()) {
+      auto child = stack.takeLast();
+      if (!child)
+        continue;
+
+      if (auto slot = as<ItemSlotWidget>(child)) {
+        cursorTarget = Vec2F(slot->screenBoundRect().center()) * m_guiContext->interfaceScale();
+        break;
+      }
+      if (auto list = as<ListWidget>(child)) {
+        cursorTarget = Vec2F(list->screenBoundRect().center()) * m_guiContext->interfaceScale();
+        break;
+      }
+
+      for (size_t i = 0; i < child->numChildren(); ++i)
+        stack.append(child->getChildNum(i));
+    }
+
+    if (inventoryLikePanes.size() > 1)
+      m_panelInventoryFocusToggle = !m_panelInventoryFocusToggle;
+  }
+
+  auto screenSize = Vec2F(renderer()->screenSize());
+  cursorTarget[0] = clamp(cursorTarget[0], 0.0f, screenSize[0] - 1.0f);
+  cursorTarget[1] = clamp(cursorTarget[1], 0.0f, screenSize[1] - 1.0f);
+
+  Vec2I cursorPosition = Vec2I::round(cursorTarget);
+  cursorPosition[1] = (int)screenSize[1] - 1 - cursorPosition[1];
+  appController()->setCursorPosition(cursorPosition);
+}
+
 void ClientApplication::updateControllerMouse(float dt) {
   if (!m_controllerInput)
     return;
 
+  auto configuration = m_root->configuration();
+  if (!configuration->get("controllerMouseEnabled").optBool().value(true))
+    return;
+
+  if (panelInteractionModeActive()) {
+    float baseSpeed = configuration->get("controllerMouseSpeed").optFloat().value(1400.0f);
+    if (baseSpeed <= 0.0f)
+      return;
+
+    bool slowOverInteractive = false;
+    if (m_mainInterface && m_guiContext) {
+      auto paneManager = m_mainInterface->paneManager();
+      Vec2I mousePosUi = Vec2I::round(m_input->mousePosition() / m_guiContext->interfaceScale());
+      if (auto pane = paneManager->getPaneAt({PaneLayer::ModalWindow, PaneLayer::Window}, mousePosUi)) {
+        if (pane->cursorOverride(mousePosUi))
+          slowOverInteractive = true;
+      }
+    }
+
+    float speedScale = slowOverInteractive ? 0.50f : 0.75f;
+    Vec2F mouseDelta = Vec2F(m_controllerLeftStick[0], -m_controllerLeftStick[1]) * (baseSpeed * speedScale) * dt;
+    if (mouseDelta.magnitudeSquared() <= 0.0f)
+      return;
+
+    Vec2F nextMousePosition = m_input->mousePosition() + mouseDelta;
+    Vec2F screenSize = Vec2F(renderer()->screenSize());
+    nextMousePosition[0] = clamp(nextMousePosition[0], 0.0f, screenSize[0] - 1.0f);
+    nextMousePosition[1] = clamp(nextMousePosition[1], 0.0f, screenSize[1] - 1.0f);
+
+    Vec2I cursorPosition = Vec2I::round(nextMousePosition);
+    cursorPosition[1] = (int)screenSize[1] - 1 - cursorPosition[1];
+    appController()->setCursorPosition(cursorPosition);
+    return;
+  }
+
   if (m_mainInterface && m_mainInterface->windowsOpen())
     return;
 
-  auto configuration = m_root->configuration();
-  if (!configuration->get("controllerMouseEnabled").optBool().value(true))
+  if (isActionTaken(InterfaceAction::InterfaceHotbarWheelHold) || isActionTaken(InterfaceAction::InterfacePanelWheelHold))
     return;
 
   float mouseSpeed = configuration->get("controllerMouseSpeed").optFloat().value(1400.0f);
@@ -569,14 +880,14 @@ void ClientApplication::updateControllerMouse(float dt) {
 
   float mouseDeadzone = configuration->get("controllerMouseDeadzone").optFloat().value(0.20f);
   float aimingDeadzone = mouseDeadzone * 2.0f;
+  bool lockAimDirection = isActionTaken(InterfaceAction::PlayerControllerMoveOnly);
 
   if (m_state > MainAppState::Title && m_player && m_universeClient && m_universeClient->worldClient()) {
     Vec2F rightStick;
     rightStick[0] = applyControllerAxisResponse(m_controllerRightStickRaw[0], mouseDeadzone, 1.0f);
     rightStick[1] = applyControllerAxisResponse(m_controllerRightStickRaw[1], mouseDeadzone, 1.0f);
 
-    float rightStickMagnitude = rightStick.magnitude();
-    if (rightStickMagnitude > 0.0f) {
+    if (stickAxisActive(rightStick)) {
       Vec2F mouseDelta = Vec2F(rightStick[0], -rightStick[1]) * mouseSpeed * dt;
       Vec2F nextMousePosition = m_input->mousePosition() + mouseDelta;
 
@@ -593,8 +904,22 @@ void ClientApplication::updateControllerMouse(float dt) {
     }
 
     float leftStickMagnitude = m_controllerLeftStick.magnitude();
-    if (leftStickMagnitude > aimingDeadzone) {
-      Vec2F stickDirection = Vec2F(m_controllerLeftStick[0], -m_controllerLeftStick[1]) / leftStickMagnitude;
+    if (stickAxisActive(m_controllerLeftStick, aimingDeadzone) || (lockAimDirection && m_controllerLockedAimDirectionValid)) {
+      Maybe<Vec2F> liveStickDirection;
+      if (stickAxisActive(m_controllerLeftStick, aimingDeadzone))
+        liveStickDirection = Vec2F(m_controllerLeftStick[0], -m_controllerLeftStick[1]) / leftStickMagnitude;
+
+      Vec2F stickDirection;
+      if (lockAimDirection && m_controllerLockedAimDirectionValid) {
+        stickDirection = m_controllerLockedAimDirection;
+      } else if (liveStickDirection) {
+        stickDirection = *liveStickDirection;
+        m_controllerLockedAimDirection = stickDirection;
+        m_controllerLockedAimDirectionValid = true;
+      } else {
+        return;
+      }
+
       Vec2F playerPosition = m_player->position();
       Vec2F castStart = playerPosition + stickDirection * 0.5f;
       Vec2F projectedCursorWorld = playerPosition + stickDirection * 12.0f;
@@ -618,6 +943,9 @@ void ClientApplication::updateControllerMouse(float dt) {
       appController()->setCursorPosition(cursorPosition);
       return;
     }
+
+    if (!lockAimDirection)
+      m_controllerLockedAimDirectionValid = false;
   }
 
   return;
@@ -679,12 +1007,79 @@ void ClientApplication::render() {
     auto start = Time::monotonicMicroseconds();
     m_mainInterface->renderInWorldElements();
     m_mainInterface->render();
+    renderHotbarWheelOverlay();
+    renderPanelWheelOverlay();
     m_cinematicOverlay->render();
     LogMap::set("client_render_interface", strf(u8"{:05d}\u00b5s", Time::monotonicMicroseconds() - start));
   }
 
   if (!m_errorScreen->accepted())
     m_errorScreen->render();
+}
+
+void ClientApplication::renderHotbarWheelOverlay() {
+  if (!m_hotbarWheelActive || !m_player || !m_guiContext)
+    return;
+
+  auto inventory = m_player->inventory();
+  int slotCount = hotbarWheelSlotCount(inventory);
+  if (slotCount <= 0)
+    return;
+
+  Vec2F center = Vec2F(m_guiContext->windowInterfaceSize()) / 2.0f;
+  float radius = 56.0f;
+  float slotSize = 20.0f;
+  float fullCircle = 6.28318530718f;
+
+  for (int index = 0; index < slotCount; ++index) {
+    float angle = ((index + 0.5f) / slotCount) * fullCircle;
+    Vec2F slotCenter = center + Vec2F(cos(angle), -sin(angle)) * radius;
+
+    auto slotSelection = hotbarWheelSelectionFromIndex(inventory, index);
+    bool selected = m_hotbarWheelSelection && *m_hotbarWheelSelection == slotSelection;
+
+    Vec4B bgColor = selected ? Vec4B(15, 15, 15, 220) : Vec4B(5, 5, 5, 170);
+    m_guiContext->drawInterfaceQuad(RectF::withCenter(slotCenter, Vec2F::filled(slotSize)), bgColor);
+
+    if (selected)
+      m_guiContext->drawInterfacePolyLines(PolyF(RectF::withCenter(slotCenter, Vec2F::filled(slotSize + 6.0f))), Vec4B(255, 236, 170, 255), 1.5f);
+
+    if (auto item = hotbarWheelItemForSelection(inventory, slotSelection)) {
+      Vec4B iconColor = selected ? Vec4B::filled(255) : Vec4B(220, 220, 220, 255);
+      for (auto const& drawable : item->iconDrawables())
+        m_guiContext->drawInterfaceDrawable(drawable, slotCenter, iconColor);
+    }
+  }
+}
+
+void ClientApplication::renderPanelWheelOverlay() {
+  if (!m_panelWheelActive || !m_guiContext)
+    return;
+
+  auto const& options = panelWheelOptions();
+  int optionCount = options.size();
+  if (optionCount <= 0)
+    return;
+
+  Vec2F center = Vec2F(m_guiContext->windowInterfaceSize()) / 2.0f;
+  float radius = 62.0f;
+  float slotSize = 24.0f;
+  float fullCircle = 6.28318530718f;
+
+  for (int index = 0; index < optionCount; ++index) {
+    auto option = options.at(index);
+    float angle = ((index + 0.5f) / optionCount) * fullCircle;
+    Vec2F slotCenter = center + Vec2F(cos(angle), -sin(angle)) * radius;
+
+    bool selected = m_panelWheelSelection && *m_panelWheelSelection == option;
+    Vec4B bgColor = selected ? Vec4B(25, 25, 25, 225) : Vec4B(5, 5, 5, 170);
+    m_guiContext->drawInterfaceQuad(RectF::withCenter(slotCenter, Vec2F::filled(slotSize)), bgColor);
+
+    if (selected)
+      m_guiContext->drawInterfacePolyLines(PolyF(RectF::withCenter(slotCenter, Vec2F::filled(slotSize + 6.0f))), Vec4B(170, 220, 255, 255), 1.5f);
+
+    m_guiContext->renderInterfaceText(panelWheelOptionLabel(option), {slotCenter, HorizontalAnchor::HMidAnchor, VerticalAnchor::VMidAnchor});
+  }
 }
 
 void ClientApplication::getAudioData(int16_t* sampleData, size_t frameCount) {
@@ -1272,6 +1667,101 @@ void ClientApplication::updateRunning(float dt) {
         }
       }
     }
+
+    bool movementLockedByAimOnly = isActionTaken(InterfaceAction::PlayerControllerAimOnly);
+    bool panelWheelHeld = isActionTaken(InterfaceAction::InterfacePanelWheelHold);
+    bool hotbarWheelHeld = isActionTaken(InterfaceAction::InterfaceHotbarWheelHold);
+
+    if (m_panelWheelActive && !panelWheelHeld) {
+      if (m_panelWheelSelection && m_mainInterface) {
+        switch (*m_panelWheelSelection) {
+          case PanelWheelOption::Inventory:
+            m_mainInterface->paneManager()->toggleRegisteredPane(MainInterfacePanes::Inventory);
+            break;
+          case PanelWheelOption::Crafting:
+            m_mainInterface->togglePlainCraftingWindow();
+            break;
+          case PanelWheelOption::Codex:
+            m_mainInterface->paneManager()->toggleRegisteredPane(MainInterfacePanes::Codex);
+            break;
+          case PanelWheelOption::QuestLog:
+            m_mainInterface->paneManager()->toggleRegisteredPane(MainInterfacePanes::QuestLog);
+            break;
+          case PanelWheelOption::MmUpgrade:
+            m_mainInterface->paneManager()->toggleRegisteredPane(MainInterfacePanes::MmUpgrade);
+            break;
+          case PanelWheelOption::Collections:
+            m_mainInterface->paneManager()->toggleRegisteredPane(MainInterfacePanes::Collections);
+            break;
+          case PanelWheelOption::EscapeMenu:
+            m_mainInterface->paneManager()->toggleRegisteredPane(MainInterfacePanes::EscapeDialog);
+            break;
+        }
+      }
+
+      m_panelWheelActive = false;
+      m_panelWheelSelection.reset();
+    } else if (!m_panelWheelActive && panelWheelHeld) {
+      m_panelWheelActive = true;
+      m_panelWheelSelection.reset();
+    }
+
+    if (m_panelWheelActive) {
+      float wheelDeadzone = m_root->configuration()->get("controllerMouseDeadzone").optFloat().value(0.20f);
+      Vec2F rightStick;
+      rightStick[0] = applyControllerAxisResponse(m_controllerRightStickRaw[0], wheelDeadzone, 1.0f);
+      rightStick[1] = applyControllerAxisResponse(m_controllerRightStickRaw[1], wheelDeadzone, 1.0f);
+
+      if (stickAxisActive(rightStick)) {
+        float fullCircle = 6.28318530718f;
+        float angle = atan2(rightStick[1], rightStick[0]);
+        if (angle < 0.0f)
+          angle += fullCircle;
+
+        int optionCount = panelWheelOptions().size();
+        int index = (int)floor((angle / fullCircle) * optionCount) % optionCount;
+        m_panelWheelSelection = panelWheelOptionFromIndex(index);
+      } else {
+        m_panelWheelSelection.reset();
+      }
+    }
+
+    if (m_panelWheelActive)
+      hotbarWheelHeld = false;
+
+    if (m_hotbarWheelActive && !hotbarWheelHeld) {
+      if (m_hotbarWheelSelection)
+        m_player->inventory()->selectActionBarLocation(*m_hotbarWheelSelection);
+
+      m_hotbarWheelActive = false;
+      m_hotbarWheelSelection.reset();
+    } else if (!m_hotbarWheelActive && hotbarWheelHeld) {
+      m_hotbarWheelActive = true;
+      m_hotbarWheelSelection.reset();
+    }
+
+    if (m_hotbarWheelActive) {
+      float wheelDeadzone = m_root->configuration()->get("controllerMouseDeadzone").optFloat().value(0.20f);
+      Vec2F rightStick;
+      rightStick[0] = applyControllerAxisResponse(m_controllerRightStickRaw[0], wheelDeadzone, 1.0f);
+      rightStick[1] = applyControllerAxisResponse(m_controllerRightStickRaw[1], wheelDeadzone, 1.0f);
+
+      if (stickAxisActive(rightStick)) {
+        auto inventory = m_player->inventory();
+        int slotCount = hotbarWheelSlotCount(inventory);
+        if (slotCount > 0) {
+          float fullCircle = 6.28318530718f;
+          float angle = atan2(rightStick[1], rightStick[0]);
+          if (angle < 0.0f)
+            angle += fullCircle;
+
+          int index = (int)floor((angle / fullCircle) * slotCount) % slotCount;
+          m_hotbarWheelSelection = hotbarWheelSelectionFromIndex(inventory, index);
+        }
+      } else {
+        m_hotbarWheelSelection.reset();
+      }
+    }
     
     if (p2pNetworkingService) {
       auto getActivityDetail = [&](String const& tag) -> String {
@@ -1322,15 +1812,28 @@ void ClientApplication::updateRunning(float dt) {
       p2pNetworkingService->setActivityData("In Game", finalDetails.utf8Ptr(), m_timeSinceJoin, party);
     }
 
-    if (!m_mainInterface->inputFocus() && !m_cinematicOverlay->suppressInput()) {
+    bool panelModeActive = panelInteractionModeActive();
+    if (m_lastPanelModeActive && !panelModeActive)
+      m_panelControlReenableTimer = max(m_panelControlReenableTimer, 0.1f);
+    m_lastPanelModeActive = panelModeActive;
 
-      if (isActionTaken(InterfaceAction::PlayerRight))
+    if (m_panelControlReenableTimer > 0.0f)
+      m_panelControlReenableTimer = max(0.0f, m_panelControlReenableTimer - dt);
+
+    if (m_panelFocusRecenterTimer > 0.0f)
+      m_panelFocusRecenterTimer = max(0.0f, m_panelFocusRecenterTimer - dt);
+
+    bool controlsSuppressed = panelModeActive || m_panelControlReenableTimer > 0.0f;
+
+    if (!controlsSuppressed && !m_mainInterface->inputFocus() && !m_cinematicOverlay->suppressInput()) {
+
+      if (!movementLockedByAimOnly && isActionTaken(InterfaceAction::PlayerRight))
         m_player->moveRight();
-      if (isActionTaken(InterfaceAction::PlayerLeft))
+      if (!movementLockedByAimOnly && isActionTaken(InterfaceAction::PlayerLeft))
         m_player->moveLeft();
-      if (isActionTaken(InterfaceAction::PlayerUp))
+      if (!movementLockedByAimOnly && isActionTaken(InterfaceAction::PlayerUp))
         m_player->moveUp();
-      if (isActionTaken(InterfaceAction::PlayerDown))
+      if (!movementLockedByAimOnly && isActionTaken(InterfaceAction::PlayerDown))
         m_player->moveDown();
       if (isActionTaken(InterfaceAction::PlayerJump))
         m_player->jump();
@@ -1403,14 +1906,26 @@ void ClientApplication::updateRunning(float dt) {
       config->set("zoomLevel", min(1000000.f, newZoom));
     }
 
-    if (!m_mainInterface || !m_mainInterface->windowsOpen()) {
+    if (m_player) {
+      float currentHealth = m_player->health();
+      if (panelModeActive && m_mainInterface && m_lastPlayerHealthValid && currentHealth < m_lastPlayerHealth - 0.001f)
+        m_mainInterface->paneManager()->dismissAllPanes({PaneLayer::ModalWindow, PaneLayer::Window});
+      m_lastPlayerHealth = currentHealth;
+      m_lastPlayerHealthValid = true;
+    }
+
+    if (!controlsSuppressed) {
+      m_panelFocusHeld = false;
+      m_panelInventoryFocusToggle = false;
+      m_panelDragMouseHeld = false;
+
       float leftStickMagnitude = m_controllerLeftStick.magnitude();
-      if (m_controllerInput && leftStickMagnitude > 0.01f)
+      if (m_controllerInput && stickAxisActive(m_controllerLeftStick) && !movementLockedByAimOnly)
         m_player->setMoveVector(m_controllerLeftStick);
       else
         m_player->setMoveVector(Vec2F());
 
-      bool controllerSoftWalk = m_controllerInput && leftStickMagnitude > 0.01f && leftStickMagnitude < 0.85f;
+      bool controllerSoftWalk = m_controllerInput && stickAxisActive(m_controllerLeftStick) && leftStickMagnitude < 0.85f && !movementLockedByAimOnly;
       m_player->setShifting(isActionTaken(InterfaceAction::PlayerShifting) || controllerSoftWalk);
     } else {
       m_player->setMoveVector(Vec2F());
