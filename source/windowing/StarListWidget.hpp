@@ -45,6 +45,8 @@ public:
 
 private:
   void updateSizeAndPosition();
+  bool moveSelection(int delta);
+  void snapCursorToSelection();
 
   Json m_schema;
   GuiReader m_reader;

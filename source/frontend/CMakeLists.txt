@@ -37,6 +37,7 @@ SET (star_frontend_HEADERS
     StarInterfaceLuaBindings.hpp
     StarItemTooltip.hpp
     StarJoinRequestDialog.hpp
+    
     StarKeybindingsMenu.hpp
     StarMainInterface.hpp
     StarMainInterfaceTypes.hpp
@@ -91,6 +92,7 @@ SET (star_frontend_SOURCES
     StarInterfaceLuaBindings.cpp
     StarItemTooltip.cpp
     StarJoinRequestDialog.cpp
+    
     StarKeybindingsMenu.cpp
     StarMainInterface.cpp
     StarMainInterfaceTypes.cpp

@@ -532,7 +532,7 @@ void MainInterface::handleInteractAction(InteractAction interactAction) {
 
 void MainInterface::preUpdate(float) {
   auto player = m_client->mainPlayer();
-  if (!m_client->paused())
+  if (!m_client->paused() && !windowsOpen())
     player->aim(cursorWorldPosition());
 
   if (m_paneManager.topPane({PaneLayer::Window, PaneLayer::ModalWindow}))

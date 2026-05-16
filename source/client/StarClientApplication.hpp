@@ -145,6 +145,8 @@ private:
   Vec2F m_controllerLeftStick;
   Vec2F m_controllerRightStick;
   Vec2F m_controllerRightStickRaw;
+  Vec2F m_controllerLockedAimDirection;
+  bool m_controllerLockedAimDirectionValid = false;
   List<KeyDownEvent> m_heldKeyEvents;
   List<KeyDownEvent> m_edgeKeyEvents;
   List<ControllerButtonDownEvent> m_heldControllerButtonEvents;

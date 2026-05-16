@@ -21,6 +21,7 @@ public:
 
 private:
   void buildListsFromConfig();
+  void selectTab(int delta);
   bool activateBinding(Widget* widget);
   void setKeybinding(InputDescriptor const& desc);
   void clearActive();

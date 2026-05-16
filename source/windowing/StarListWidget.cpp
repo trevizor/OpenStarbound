@@ -36,6 +36,25 @@ bool ListWidget::sendEvent(InputEvent const& event) {
   if (!m_visible)
     return false;
 
+  if (auto controllerButton = event.ptr<ControllerButtonDownEvent>()) {
+    int delta = 0;
+    switch (controllerButton->controllerButton) {
+      case ControllerButton::DPadLeft:
+      case ControllerButton::DPadUp:
+        delta = -1;
+        break;
+      case ControllerButton::DPadRight:
+      case ControllerButton::DPadDown:
+        delta = 1;
+        break;
+      default:
+        break;
+    }
+
+    if (delta != 0)
+      return moveSelection(delta);
+  }
+
   for (size_t i = m_members.size(); i != 0; --i) {
     auto child = m_members[i - 1];
     if (child->sendEvent(event)
@@ -169,6 +188,7 @@ void ListWidget::setSelected(size_t pos) {
   if (m_selectedItem != NPos) {
     if (auto bgWidget = selectedWidget()->fetchChild<ImageWidget>("background"))
       bgWidget->setImage(m_selectedBG);
+    snapCursorToSelection();
   }
 }
 
@@ -222,6 +242,34 @@ void ListWidget::clear() {
   setSelected(NPos);
   removeAllChildren();
   updateSizeAndPosition();
+}
+
+bool ListWidget::moveSelection(int delta) {
+  if (!m_members.size())
+    return false;
+
+  size_t current = (m_selectedItem == NPos) ? 0 : m_selectedItem;
+  size_t limit = m_members.size();
+  for (size_t step = 0; step < limit; ++step) {
+    int next = (int)current + delta;
+    if (next < 0 || next >= (int)limit)
+      return false;
+    current = (size_t)next;
+    if (!m_disabledItems.contains(current)) {
+      setSelected(current);
+      return true;
+    }
+  }
+
+  return false;
+}
+
+void ListWidget::snapCursorToSelection() {
+  if (!selectedWidget())
+    return;
+
+  if (auto appController = context()->applicationController())
+    appController->setCursorPosition(Vec2I::round(selectedWidget()->screenPosition() + selectedWidget()->size() / 2));
 }
 
 size_t ListWidget::selectedItem() const {

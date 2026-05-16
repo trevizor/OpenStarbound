@@ -57,6 +57,21 @@ static float applyControllerAxisResponse(float value, float deadzone, float sens
   return std::copysign(clamp(curved, 0.0f, 1.0f), value);
 }
 
+static void ensureBindingActionDefault(ConfigurationPtr const& configuration, InterfaceAction action) {
+  auto actionName = InterfaceActionNames.getRight(action);
+
+  bool hasAction = false;
+  for (auto const& bindingPair : configuration->get("bindings").iterateObject()) {
+    if (bindingPair.first == actionName) {
+      hasAction = true;
+      break;
+    }
+  }
+
+  if (!hasAction)
+    configuration->setPath(strf("bindings.{}", actionName), configuration->getDefault("bindings").get(actionName));
+}
+
 Json const AdditionalAssetsSettings = Json::parseJson(R"JSON(
     {
       "missingImage" : "/assetmissing.png",
@@ -113,11 +128,13 @@ Json const AdditionalDefaultConfiguration = Json::parseJson(R"JSON(
         "PlayerMainItem" : [ { "type" : "controllerAxis", "value" : "TriggerRight", "direction" : 1, "threshold" : 0.4 } ],
         "PlayerAltItem" : [ { "type" : "controllerAxis", "value" : "TriggerLeft", "direction" : 1, "threshold" : 0.4 } ],
         "PlayerDropItem" :  [ { "type" : "key", "value" : "Q", "mods" : [] } ],
-        "PlayerInteract" :  [ { "type" : "key", "value" : "E", "mods" : [] }, { "type" : "controller", "value" : "X" } ],
+        "PlayerInteract" :  [ { "type" : "key", "value" : "E", "mods" : [] } ],
         "PlayerShifting" :  [ { "type" : "key", "value" : "RShift", "mods" : [] }, { "type" : "key", "value" : "LShift", "mods" : [] }, { "type" : "controller", "value" : "LeftShoulder" } ],
-        "PlayerTechAction1" :  [ { "type" : "key", "value" : "F", "mods" : [] }, { "type" : "controller", "value" : "B" } ],
+        "PlayerTechAction1" :  [ { "type" : "key", "value" : "F", "mods" : [] } ],
         "PlayerTechAction2" :  [],
         "PlayerTechAction3" :  [],
+        "PlayerControllerAimOnly" : [ { "type" : "controllerAxis", "value" : "TriggerLeft", "direction" : 1, "threshold" : 0.4 } ],
+        "PlayerControllerMoveOnly" : [ { "type" : "controllerAxis", "value" : "TriggerRight", "direction" : 1, "threshold" : 0.4 } ],
         "EmoteBlabbering" :  [ { "type" : "key", "value" : "Right", "mods" : ["LCtrl", "LShift"] } ],
         "EmoteShouting" :  [ { "type" : "key", "value" : "Up", "mods" : ["LCtrl", "LAlt"] } ],
         "EmoteHappy" :  [ { "type" : "key", "value" : "Up", "mods" : [] } ],
@@ -137,6 +154,8 @@ Json const AdditionalDefaultConfiguration = Json::parseJson(R"JSON(
         "CinematicSkip" :  [ { "type" : "key", "value" : "Esc", "mods" : [] }, { "type" : "controller", "value" : "Back" } ],
         "CinematicNext" :  [ { "type" : "key", "value" : "Right", "mods" : [] }, { "type" : "key", "value" : "Return", "mods" : [] }, { "type" : "controller", "value" : "A" } ],
         "GuiClose" :  [ { "type" : "key", "value" : "Esc", "mods" : [] }, { "type" : "controller", "value" : "Back" } ],
+        "InterfaceToggleControllerMouse" :  [ { "type" : "controller", "value" : "RightStick" } ],
+        "InterfacePanelClose" :  [ { "type" : "controller", "value" : "B" } ],
         "GuiShifting" :  [ { "type" : "key", "value" : "RShift", "mods" : [] }, { "type" : "key", "value" : "LShift", "mods" : [] } ],
         "KeybindingCancel" :  [ { "type" : "key", "value" : "Esc", "mods" : [] }, { "type" : "controller", "value" : "Back" } ],
         "KeybindingClear" :  [ { "type" : "key", "value" : "Del", "mods" : [] }, { "type" : "key", "value" : "Backspace", "mods" : [] } ],
@@ -151,10 +170,12 @@ Json const AdditionalDefaultConfiguration = Json::parseJson(R"JSON(
         "InterfaceHideHud" :  [ { "type" : "key", "value" : "F1", "mods" : [] } ],
         "InterfaceChangeBarGroup" :  [ { "type" : "key", "value" : "X", "mods" : [] }, { "type" : "controller", "value" : "RightShoulder" } ],
         "InterfaceDeselectHands" :  [ { "type" : "key", "value" : "Z", "mods" : [] }, { "type" : "controller", "value" : "LeftShoulder" } ],
-        "InterfaceBar1" :  [ { "type" : "key", "value" : "1", "mods" : [] }, { "type" : "controller", "value" : "DPadUp" } ],
-        "InterfaceBar2" :  [ { "type" : "key", "value" : "2", "mods" : [] }, { "type" : "controller", "value" : "DPadRight" } ],
-        "InterfaceBar3" :  [ { "type" : "key", "value" : "3", "mods" : [] }, { "type" : "controller", "value" : "DPadDown" } ],
-        "InterfaceBar4" :  [ { "type" : "key", "value" : "4", "mods" : [] }, { "type" : "controller", "value" : "DPadLeft" } ],
+        "InterfaceBar1" :  [ { "type" : "key", "value" : "1", "mods" : [] } ],
+        "InterfaceBarPrevious" :  [ { "type" : "controller", "value" : "DPadLeft" } ],
+        "InterfaceBarNext" :  [ { "type" : "controller", "value" : "DPadRight" } ],
+        "InterfaceBar2" :  [ { "type" : "key", "value" : "2", "mods" : [] } ],
+        "InterfaceBar3" :  [ { "type" : "key", "value" : "3", "mods" : [] } ],
+        "InterfaceBar4" :  [ { "type" : "key", "value" : "4", "mods" : [] } ],
         "InterfaceBar5" :  [ { "type" : "key", "value" : "5", "mods" : [] } ],
         "InterfaceBar6" :  [ { "type" : "key", "value" : "6", "mods" : [] } ],
         "InterfaceBar7" :  [],
@@ -169,10 +190,10 @@ Json const AdditionalDefaultConfiguration = Json::parseJson(R"JSON(
         "InterfaceToggleFullscreen" :  [ { "type" : "key", "value" : "F11", "mods" : [] } ],
         "InterfaceReload" :  [],
         "InterfaceEscapeMenu" :  [ { "type" : "key", "value" : "Esc", "mods" : [] }, { "type" : "controller", "value" : "Start" } ],
-        "InterfaceInventory" :  [ { "type" : "key", "value" : "I", "mods" : [] }, { "type" : "controller", "value" : "Y" } ],
+        "InterfaceInventory" :  [ { "type" : "key", "value" : "I", "mods" : [] } ],
         "InterfaceCodex" :  [ { "type" : "key", "value" : "L", "mods" : [] } ],
         "InterfaceQuest" :  [ { "type" : "key", "value" : "J", "mods" : [] }, { "type" : "controller", "value" : "Guide" } ],
-        "InterfaceCrafting" :  [ { "type" : "key", "value" : "C", "mods" : [] }, { "type" : "controller", "value" : "X" } ]
+        "InterfaceCrafting" :  [ { "type" : "key", "value" : "C", "mods" : [] } ]
       }
     }
   )JSON");
@@ -214,6 +235,11 @@ void ClientApplication::applicationInit(ApplicationControllerPtr appController) 
   appController->setCursorVisible(true);
 
   auto configuration = m_root->configuration();
+  ensureBindingActionDefault(configuration, InterfaceAction::InterfacePanelClose);
+  ensureBindingActionDefault(configuration, InterfaceAction::InterfaceToggleControllerMouse);
+  ensureBindingActionDefault(configuration, InterfaceAction::PlayerControllerAimOnly);
+  ensureBindingActionDefault(configuration, InterfaceAction::PlayerControllerMoveOnly);
+
   bool vsync = configuration->get("vsync").toBool();
   Vec2U windowedSize = jsonToVec2U(configuration->get("windowedResolution"));
   Vec2U fullscreenSize = jsonToVec2U(configuration->get("fullscreenResolution"));
@@ -347,6 +373,26 @@ void ClientApplication::windowChanged(WindowMode windowMode, Vec2U screenSize) {
 }
 
 void ClientApplication::processInput(InputEvent const& event) {
+  auto routeInputEvent = [this](InputEvent const& routedEvent) {
+    bool processed = !m_errorScreen->accepted() && m_errorScreen->handleInputEvent(routedEvent);
+
+    if (!processed) {
+      if (m_state == MainAppState::Splash) {
+        processed = m_cinematicOverlay->handleInputEvent(routedEvent);
+      } else if (m_state == MainAppState::Title) {
+        if (!(processed = m_cinematicOverlay->handleInputEvent(routedEvent)))
+          processed = m_titleScreen->handleInputEvent(routedEvent);
+
+      } else if (m_state == MainAppState::SinglePlayer || m_state == MainAppState::MultiPlayer) {
+        if (!(processed = m_cinematicOverlay->handleInputEvent(routedEvent)))
+          processed = m_mainInterface->handleInputEvent(routedEvent);
+      }
+    }
+
+    m_input->handleInput(routedEvent, processed);
+    return processed;
+  };
+
   if (auto keyDown = event.ptr<KeyDownEvent>()) {
     m_heldKeyEvents.append(*keyDown);
     m_edgeKeyEvents.append(*keyDown);
@@ -412,22 +458,38 @@ void ClientApplication::processInput(InputEvent const& event) {
     }
   }
 
-  bool processed = !m_errorScreen->accepted() && m_errorScreen->handleInputEvent(event);
+  bool processed = routeInputEvent(event);
 
-  if (!processed) {
-    if (m_state == MainAppState::Splash) {
-      processed = m_cinematicOverlay->handleInputEvent(event);
-    } else if (m_state == MainAppState::Title) {
-      if (!(processed = m_cinematicOverlay->handleInputEvent(event)))
-        processed = m_titleScreen->handleInputEvent(event);
+  if (auto cDown = event.ptr<ControllerButtonDownEvent>()) {
+    if (cDown->controllerButton == ControllerButton::RightStick) {
+      auto configuration = m_root->configuration();
+      bool controllerMouseEnabled = configuration->get("controllerMouseEnabled").optBool().value(true);
+      configuration->set("controllerMouseEnabled", !controllerMouseEnabled);
+      processed = true;
+    }
 
-    } else if (m_state == MainAppState::SinglePlayer || m_state == MainAppState::MultiPlayer) {
-      if (!(processed = m_cinematicOverlay->handleInputEvent(event)))
-        processed = m_mainInterface->handleInputEvent(event);
+    Maybe<MouseButton> mouseButton;
+    if (cDown->controllerButton == ControllerButton::X)
+      mouseButton = MouseButton::Left;
+    else if (cDown->controllerButton == ControllerButton::Y)
+      mouseButton = MouseButton::Right;
+
+    if (mouseButton) {
+      InputEvent mouseEvent{MouseButtonDownEvent{*mouseButton, m_input->mousePosition()}};
+      processed |= routeInputEvent(mouseEvent);
+    }
+  } else if (auto cUp = event.ptr<ControllerButtonUpEvent>()) {
+    Maybe<MouseButton> mouseButton;
+    if (cUp->controllerButton == ControllerButton::X)
+      mouseButton = MouseButton::Left;
+    else if (cUp->controllerButton == ControllerButton::Y)
+      mouseButton = MouseButton::Right;
+
+    if (mouseButton) {
+      InputEvent mouseEvent{MouseButtonUpEvent{*mouseButton, m_input->mousePosition()}};
+      processed |= routeInputEvent(mouseEvent);
     }
   }
-
-  m_input->handleInput(event, processed);
 }
 
 void ClientApplication::update() {
@@ -494,6 +556,9 @@ void ClientApplication::updateControllerMouse(float dt) {
   if (!m_controllerInput)
     return;
 
+  if (m_mainInterface && m_mainInterface->windowsOpen())
+    return;
+
   auto configuration = m_root->configuration();
   if (!configuration->get("controllerMouseEnabled").optBool().value(true))
     return;
@@ -503,28 +568,59 @@ void ClientApplication::updateControllerMouse(float dt) {
     return;
 
   float mouseDeadzone = configuration->get("controllerMouseDeadzone").optFloat().value(0.20f);
-  Vec2F stick;
-  stick[0] = applyControllerAxisResponse(m_controllerRightStickRaw[0], mouseDeadzone, 1.0f);
-  stick[1] = applyControllerAxisResponse(m_controllerRightStickRaw[1], mouseDeadzone, 1.0f);
+  float aimingDeadzone = mouseDeadzone * 2.0f;
 
-  if (stick.magnitudeSquared() <= 0.0f)
-    return;
+  if (m_state > MainAppState::Title && m_player && m_universeClient && m_universeClient->worldClient()) {
+    Vec2F rightStick;
+    rightStick[0] = applyControllerAxisResponse(m_controllerRightStickRaw[0], mouseDeadzone, 1.0f);
+    rightStick[1] = applyControllerAxisResponse(m_controllerRightStickRaw[1], mouseDeadzone, 1.0f);
 
-  Vec2F screenSize = Vec2F(renderer()->screenSize());
-  if (screenSize[0] <= 0.0f || screenSize[1] <= 0.0f)
-    return;
+    float rightStickMagnitude = rightStick.magnitude();
+    if (rightStickMagnitude > 0.0f) {
+      Vec2F mouseDelta = Vec2F(rightStick[0], -rightStick[1]) * mouseSpeed * dt;
+      Vec2F nextMousePosition = m_input->mousePosition() + mouseDelta;
 
-  Vec2F mousePosition = m_input->mousePosition();
-  Vec2F mouseDelta = Vec2F(stick[0], -stick[1]) * mouseSpeed * dt;
-  Vec2F nextMousePosition = mousePosition + mouseDelta;
+      Vec2F screenSize = Vec2F(renderer()->screenSize());
+      nextMousePosition[0] = clamp(nextMousePosition[0], 0.0f, screenSize[0] - 1.0f);
+      nextMousePosition[1] = clamp(nextMousePosition[1], 0.0f, screenSize[1] - 1.0f);
 
-  nextMousePosition[0] = clamp(nextMousePosition[0], 0.0f, screenSize[0] - 1.0f);
-  nextMousePosition[1] = clamp(nextMousePosition[1], 0.0f, screenSize[1] - 1.0f);
+      if ((nextMousePosition - m_input->mousePosition()).magnitudeSquared() > 0.0f) {
+        Vec2I cursorPosition = Vec2I::round(nextMousePosition);
+        cursorPosition[1] = (int)screenSize[1] - 1 - cursorPosition[1];
+        appController()->setCursorPosition(cursorPosition);
+      }
+      return;
+    }
 
-  if ((nextMousePosition - mousePosition).magnitudeSquared() <= 0.0f)
-    return;
+    float leftStickMagnitude = m_controllerLeftStick.magnitude();
+    if (leftStickMagnitude > aimingDeadzone) {
+      Vec2F stickDirection = Vec2F(m_controllerLeftStick[0], -m_controllerLeftStick[1]) / leftStickMagnitude;
+      Vec2F playerPosition = m_player->position();
+      Vec2F castStart = playerPosition + stickDirection * 0.5f;
+      Vec2F projectedCursorWorld = playerPosition + stickDirection * 12.0f;
 
-  appController()->setCursorPosition(Vec2I::round(nextMousePosition));
+      if (auto collision = m_universeClient->worldClient()->lineCollision(Line2F(castStart, projectedCursorWorld))) {
+        auto geometry = m_universeClient->worldClient()->geometry();
+        Vec2F collisionPoint = geometry.nearestTo(castStart, collision->first);
+        Vec2F collisionDelta = geometry.diff(collisionPoint, castStart);
+        float forwardDistance = collisionDelta[0] * stickDirection[0] + collisionDelta[1] * stickDirection[1];
+        if (forwardDistance > 0.0f)
+          projectedCursorWorld = collisionPoint;
+      }
+
+      Vec2F screenCursor = m_worldPainter->camera().worldToScreen(projectedCursorWorld);
+      Vec2F screenSize = Vec2F(renderer()->screenSize());
+      screenCursor[0] = clamp(screenCursor[0], 0.0f, screenSize[0] - 1.0f);
+      screenCursor[1] = clamp(screenCursor[1], 0.0f, screenSize[1] - 1.0f);
+
+      Vec2I cursorPosition = Vec2I::round(screenCursor);
+      cursorPosition[1] = (int)screenSize[1] - 1 - cursorPosition[1];
+      appController()->setCursorPosition(cursorPosition);
+      return;
+    }
+  }
+
+  return;
 }
 
 void ClientApplication::render() {
@@ -1227,7 +1323,6 @@ void ClientApplication::updateRunning(float dt) {
     }
 
     if (!m_mainInterface->inputFocus() && !m_cinematicOverlay->suppressInput()) {
-      m_player->setShifting(isActionTaken(InterfaceAction::PlayerShifting));
 
       if (isActionTaken(InterfaceAction::PlayerRight))
         m_player->moveRight();
@@ -1282,6 +1377,12 @@ void ClientApplication::updateRunning(float dt) {
       if (isActionTakenEdge(InterfaceAction::EmoteSleep))
         m_player->addEmote(HumanoidEmote::Sleep);
 
+      if (isActionTakenEdge(InterfaceAction::InterfaceToggleControllerMouse)) {
+        auto configuration = m_root->configuration();
+        bool controllerMouseEnabled = configuration->get("controllerMouseEnabled").optBool().value(true);
+        configuration->set("controllerMouseEnabled", !controllerMouseEnabled);
+      }
+
       if (int newZoomDirection = (int)m_input->bindHeld("opensb", "zoomIn") - (int)m_input->bindHeld("opensb", "zoomOut"))
         m_cameraZoomDirection = newZoomDirection;
     }
@@ -1302,10 +1403,19 @@ void ClientApplication::updateRunning(float dt) {
       config->set("zoomLevel", min(1000000.f, newZoom));
     }
 
-    if (m_controllerInput && m_controllerLeftStick.magnitudeSquared() > 0.01f)
-      m_player->setMoveVector(m_controllerLeftStick);
-    else
+    if (!m_mainInterface || !m_mainInterface->windowsOpen()) {
+      float leftStickMagnitude = m_controllerLeftStick.magnitude();
+      if (m_controllerInput && leftStickMagnitude > 0.01f)
+        m_player->setMoveVector(m_controllerLeftStick);
+      else
+        m_player->setMoveVector(Vec2F());
+
+      bool controllerSoftWalk = m_controllerInput && leftStickMagnitude > 0.01f && leftStickMagnitude < 0.85f;
+      m_player->setShifting(isActionTaken(InterfaceAction::PlayerShifting) || controllerSoftWalk);
+    } else {
       m_player->setMoveVector(Vec2F());
+      m_player->setShifting(false);
+    }
 
     m_voice->setInput(m_input->bindHeld("opensb", "pushToTalk"));
     DataStreamBuffer voiceData;

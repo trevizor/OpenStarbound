@@ -123,39 +123,7 @@ bool ActionBar::sendEvent(InputEvent const& event) {
 
   auto customBarIndexes = inventory->customBarIndexes();
   if (auto mouseWheel = event.ptr<MouseWheelEvent>()) {
-    auto abl = inventory->selectedActionBarLocation();
-
-    int index = 0;
-    if (!abl) {
-      if (mouseWheel->mouseWheel == MouseWheel::Down)
-        index = 0;
-      else
-        index = customBarIndexes + EssentialItemCount - 1;
-    } else {
-      if (auto cbi = abl.ptr<CustomBarIndex>()) {
-        if (*cbi < customBarIndexes / 2)
-          index = *cbi;
-        else
-          index = *cbi + EssentialItemCount;
-      } else {
-        index = customBarIndexes / 2 + (int)abl.get<EssentialItem>();
-      }
-
-      if (mouseWheel->mouseWheel == MouseWheel::Down)
-        index = pmod(index + 1, customBarIndexes + EssentialItemCount);
-      else
-        index = pmod(index - 1, customBarIndexes + EssentialItemCount);
-    }
-
-    if (index < customBarIndexes / 2)
-      abl = (CustomBarIndex)index;
-    else if (index < customBarIndexes / 2 + EssentialItemCount)
-      abl = (EssentialItem)(index - customBarIndexes / 2);
-    else
-      abl = (CustomBarIndex)(index - EssentialItemCount);
-
-    inventory->selectActionBarLocation(abl);
-    context()->playAudio(RandomSource().randFrom(m_switchSounds));
+    cycleSelectedActionBar(mouseWheel->mouseWheel == MouseWheel::Down ? 1 : -1);
 
     return true;
   }
@@ -172,6 +140,12 @@ bool ActionBar::sendEvent(InputEvent const& event) {
   }
 
   for (auto action : context()->actions(event)) {
+    if (action == InterfaceAction::InterfaceBarPrevious)
+      cycleSelectedActionBar(-1);
+
+    if (action == InterfaceAction::InterfaceBarNext)
+      cycleSelectedActionBar(1);
+
     if (action >= InterfaceAction::InterfaceBar1 && action <= InterfaceAction::InterfaceBar10
       && ((int)action - (int)InterfaceAction::InterfaceBar1) < inventory->customBarIndexes())
       inventory->selectActionBarLocation((CustomBarIndex)((int)action - (int)InterfaceAction::InterfaceBar1));
@@ -193,6 +167,40 @@ bool ActionBar::sendEvent(InputEvent const& event) {
   }
 
   return false;
+}
+
+void ActionBar::cycleSelectedActionBar(int direction) {
+  auto inventory = m_player->inventory();
+  auto abl = inventory->selectedActionBarLocation();
+  auto customBarIndexes = inventory->customBarIndexes();
+
+  int index = 0;
+  if (!abl) {
+    index = direction > 0 ? 0 : customBarIndexes + EssentialItemCount - 1;
+  } else {
+    if (auto cbi = abl.ptr<CustomBarIndex>()) {
+      if (*cbi < customBarIndexes / 2)
+        index = *cbi;
+      else
+        index = *cbi + EssentialItemCount;
+    } else {
+      index = customBarIndexes / 2 + (int)abl.get<EssentialItem>();
+    }
+
+    index = pmod(index + direction, customBarIndexes + EssentialItemCount);
+  }
+
+  if (index < customBarIndexes / 2)
+    abl = (CustomBarIndex)index;
+  else if (index < customBarIndexes / 2 + EssentialItemCount)
+    abl = (EssentialItem)(index - customBarIndexes / 2);
+  else
+    abl = (CustomBarIndex)(index - EssentialItemCount);
+
+  if (abl != inventory->selectedActionBarLocation()) {
+    inventory->selectActionBarLocation(abl);
+    context()->playAudio(RandomSource().randFrom(m_switchSounds));
+  }
 }
 
 void ActionBar::update(float) {

@@ -29,10 +29,17 @@ void StdoutLogSink::log(char const* msg, LogLevel level) {
 }
 
 FileLogSink::FileLogSink(String const& filename, LogLevel level, bool truncate) {
-  if (truncate)
-    m_output = File::open(filename, IOMode::Write | IOMode::Append | IOMode::Truncate);
-  else
+  if (truncate) {
+    try {
+      m_output = File::open(filename, IOMode::Write | IOMode::Append | IOMode::Truncate);
+    } catch (IOException const&) {
+      // Some Windows setups keep the log file mapped or otherwise locked long enough
+      // that truncation fails even though appending still works.
+      m_output = File::open(filename, IOMode::Write | IOMode::Append);
+    }
+  } else {
     m_output = File::open(filename, IOMode::Write | IOMode::Append);
+  }
   setLevel(level);
 }
 

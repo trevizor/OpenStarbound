@@ -3,6 +3,10 @@
     "panefeature" : {
       "anchor" : "center"
     },
+    "background" : {
+      "fileBody" : "/interface/opensb/bindings/body.png",
+      "fileFooter" : "/interface/opensb/bindings/footer.png"
+    },
     "voiceLabel" : {
       "type" : "label",
       "position" : [119, 202],
@@ -72,60 +76,6 @@
       "hoverImageChecked" : "/interface/optionsmenu/checkboxcheckhover.png",
       "checkable" : true,
       "checked" : true
-    },
-
-    "controllerMouseEnabledLabel" : {
-      "type" : "label",
-      "position" : [25, 38],
-      "hAnchor" : "left",
-      "value" : "STICK MOUSE"
-    },
-    "controllerMouseEnabledCheckbox" : {
-      "type" : "button",
-      "pressedOffset" : [0, 0],
-      "position" : [104, 38],
-      "base" : "/interface/optionsmenu/checkboxnocheck.png",
-      "hover" : "/interface/optionsmenu/checkboxnocheckhover.png",
-      "baseImageChecked" : "/interface/optionsmenu/checkboxcheck.png",
-      "hoverImageChecked" : "/interface/optionsmenu/checkboxcheckhover.png",
-      "checkable" : true,
-      "checked" : true
-    },
-
-    "controllerMouseSpeedLabel" : {
-      "type" : "label",
-      "position" : [25, 25],
-      "hAnchor" : "left",
-      "value" : "STICK MOUSE SPEED"
-    },
-    "controllerMouseSpeedSlider" : {
-      "type" : "slider",
-      "position" : [122, 25],
-      "gridImage" : "/interface/optionsmenu/smallselection.png"
-    },
-    "controllerMouseSpeedValueLabel" : {
-      "type" : "label",
-      "position" : [214, 25],
-      "hAnchor" : "right",
-      "value" : "1400"
-    },
-
-    "controllerMouseDeadzoneLabel" : {
-      "type" : "label",
-      "position" : [25, 12],
-      "hAnchor" : "left",
-      "value" : "STICK MOUSE DEADZONE"
-    },
-    "controllerMouseDeadzoneSlider" : {
-      "type" : "slider",
-      "position" : [122, 12],
-      "gridImage" : "/interface/optionsmenu/smallselection.png"
-    },
-    "controllerMouseDeadzoneValueLabel" : {
-      "type" : "label",
-      "position" : [214, 12],
-      "hAnchor" : "right",
-      "value" : "20%"
     }
   }
 }

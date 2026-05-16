@@ -8,6 +8,7 @@
 #include "StarButtonWidget.hpp"
 #include "StarOrderedSet.hpp"
 #include "StarJsonExtra.hpp"
+#include "StarTabSet.hpp"
 
 namespace Star {
 
@@ -31,6 +32,8 @@ KeybindingsMenu::KeybindingsMenu() : m_activeKeybinding(nullptr) {
 
   Json paneLayout = assets->json("/interface/windowconfig/keybindingsmenu.config:paneLayout");
   reader.construct(paneLayout, this);
+
+  m_tabSet = fetchChild<TabSetWidget>("categories");
 
   buildListsFromConfig();
 
@@ -90,6 +93,18 @@ bool KeybindingsMenu::sendEvent(InputEvent const& event) {
             0.5f});
         return true;
       }
+    }
+  }
+
+  if (!m_activeKeybinding && m_tabSet && event.is<ControllerButtonDownEvent>()) {
+    auto controllerButton = event.get<ControllerButtonDownEvent>().controllerButton;
+    if (controllerButton == ControllerButton::LeftShoulder || controllerButton == ControllerButton::DPadLeft) {
+      selectTab(-1);
+      return true;
+    }
+    if (controllerButton == ControllerButton::RightShoulder || controllerButton == ControllerButton::DPadRight) {
+      selectTab(1);
+      return true;
     }
   }
 
@@ -154,6 +169,24 @@ void KeybindingsMenu::buildListsFromConfig() {
   doKeybindingsFor(m_playerList, assets->json("/interface/windowconfig/keybindingsmenu.config:keyActions.player"));
   doKeybindingsFor(m_toolBarList, assets->json("/interface/windowconfig/keybindingsmenu.config:keyActions.toolbar"));
   doKeybindingsFor(m_gameList, assets->json("/interface/windowconfig/keybindingsmenu.config:keyActions.game"));
+}
+
+void KeybindingsMenu::selectTab(int delta) {
+  if (!m_tabSet || m_tabSet->tabCount() == 0)
+    return;
+
+  int currentTab = (int)m_tabSet->selectedTab();
+  if (currentTab < 0)
+    currentTab = 0;
+
+  int nextTab = currentTab + delta;
+  int tabCount = (int)m_tabSet->tabCount();
+  if (nextTab < 0)
+    nextTab = tabCount - 1;
+  else if (nextTab >= tabCount)
+    nextTab = 0;
+
+  m_tabSet->tabSelect((size_t)nextTab);
 }
 
 bool KeybindingsMenu::activateBinding(Widget* widget) {

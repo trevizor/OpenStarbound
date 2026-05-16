@@ -37,9 +37,6 @@ private:
   void updateClientP2PJoinable();
   void updateAllowAssetsMismatch();
   void updateHeadRotation();
-  void updateControllerMouseEnabled();
-  void updateControllerMouseSpeed();
-  void updateControllerMouseDeadzone();
 
   void syncGuiToConf();
 
@@ -57,22 +54,15 @@ private:
   ButtonWidgetPtr m_clientP2PJoinableButton;
   ButtonWidgetPtr m_allowAssetsMismatchButton;
   ButtonWidgetPtr m_headRotationButton;
-  ButtonWidgetPtr m_controllerMouseEnabledButton;
-  SliderBarWidgetPtr m_controllerMouseSpeedSlider;
-  SliderBarWidgetPtr m_controllerMouseDeadzoneSlider;
 
   LabelWidgetPtr m_instrumentLabel;
   LabelWidgetPtr m_sfxLabel;
   LabelWidgetPtr m_musicLabel;
   LabelWidgetPtr m_p2pJoinableLabel;
-  LabelWidgetPtr m_controllerMouseSpeedValueLabel;
-  LabelWidgetPtr m_controllerMouseDeadzoneValueLabel;
 
   //TODO: add instrument range (or just use one range for all 3, it's kinda silly.)
   Vec2I m_sfxRange;
   Vec2I m_musicRange;
-  Vec2I m_controllerMouseSpeedRange;
-  Vec2I m_controllerMouseDeadzoneRange;
 
   JsonObject m_origConfig;
   JsonObject m_localChanges;

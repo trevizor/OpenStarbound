@@ -69,6 +69,8 @@ protected:
 
 private:
   Vec2I locOfItemSlot(unsigned slot) const;
+  bool moveSelection(Vec2I delta);
+  void snapCursorToSelection();
 
   ItemBagConstPtr m_bag;
   List<ItemSlotWidgetPtr> m_slots;

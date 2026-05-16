@@ -33,6 +33,7 @@ private:
     ImageWidgetPtr rightOverlay;
   };
 
+  void cycleSelectedActionBar(int direction);
   void customBarClick(uint8_t index, bool primary);
   void customBarClickRight(uint8_t index, bool primary);
   void essentialBarClick(uint8_t index);

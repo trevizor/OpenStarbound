@@ -105,6 +105,30 @@ Vec2I ItemGridWidget::positionOfSlot(size_t slotNumber) {
 
 bool ItemGridWidget::sendEvent(InputEvent const& event) {
   if (m_visible) {
+    if (auto controllerButton = event.ptr<ControllerButtonDownEvent>()) {
+      Vec2I delta;
+      switch (controllerButton->controllerButton) {
+        case ControllerButton::DPadLeft:
+          delta = Vec2I(-1, 0);
+          break;
+        case ControllerButton::DPadRight:
+          delta = Vec2I(1, 0);
+          break;
+        case ControllerButton::DPadUp:
+          delta = Vec2I(0, 1);
+          break;
+        case ControllerButton::DPadDown:
+          delta = Vec2I(0, -1);
+          break;
+        default:
+          delta = Vec2I();
+          break;
+      }
+
+      if (delta != Vec2I())
+        return moveSelection(delta);
+    }
+
     if (auto mouseButton = event.ptr<MouseButtonDownEvent>()) {
       if (mouseButton->mouseButton == MouseButton::Left
         || (m_rightClickCallback && mouseButton->mouseButton == MouseButton::Right)
@@ -116,6 +140,7 @@ bool ItemGridWidget::sendEvent(InputEvent const& event) {
 
           if (bagItemArea.contains(mousePos)) {
             m_selectedIndex = i;
+            snapCursorToSelection();
             if (mouseButton->mouseButton == MouseButton::Right)
               m_rightClickCallback(this);
             else if (mouseButton->mouseButton == MouseButton::Middle)
@@ -188,6 +213,33 @@ void ItemGridWidget::setProgress(float progress) {
 
 size_t ItemGridWidget::selectedIndex() const {
   return m_selectedIndex + m_bagOffset;
+}
+
+bool ItemGridWidget::moveSelection(Vec2I delta) {
+  if (!m_bag || !m_slots.size())
+    return false;
+
+  Vec2I current = Vec2I((int)m_selectedIndex % m_dimensions[0], (int)m_selectedIndex / m_dimensions[0]);
+  Vec2I target = current + delta;
+  if (target[0] < 0 || target[0] >= m_dimensions[0] || target[1] < 0 || target[1] >= m_dimensions[1])
+    return false;
+
+  size_t index = (size_t)target[1] * m_dimensions[0] + (size_t)target[0];
+  if (index >= effectiveSize())
+    return false;
+
+  m_selectedIndex = (unsigned)index;
+  snapCursorToSelection();
+  return true;
+}
+
+void ItemGridWidget::snapCursorToSelection() {
+  if (!m_slots.size() || m_selectedIndex >= m_slots.size())
+    return;
+
+  auto slot = m_slots.at(m_selectedIndex);
+  if (auto appController = context()->applicationController())
+    appController->setCursorPosition(Vec2I::round(slot->screenPosition() + slot->size() / 2));
 }
 
 void ItemGridWidget::updateAllItemSlots() {

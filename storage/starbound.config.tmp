@@ -239,6 +239,9 @@
         "mods" : [],
         "type" : "key",
         "value" : "C"
+      }, {
+        "type" : "controller",
+        "value" : "DPadDown"
       }],
     "InterfaceDeselectHands" : [{
         "mods" : [],
@@ -265,10 +268,9 @@
         "mods" : [],
         "type" : "key",
         "value" : "I"
-      }],
-    "InterfacePanelClose" : [{
+      }, {
         "type" : "controller",
-        "value" : "B"
+        "value" : "DPadUp"
       }],
     "InterfaceQuest" : [{
         "mods" : [],
@@ -283,10 +285,6 @@
         "mods" : [],
         "type" : "key",
         "value" : "P"
-      }],
-    "InterfaceToggleControllerMouse" : [{
-        "type" : "controller",
-        "value" : "RightStick"
       }],
     "InterfaceToggleFullscreen" : [{
         "mods" : [],
@@ -335,6 +333,9 @@
         "mods" : [],
         "type" : "key",
         "value" : "E"
+      }, {
+        "type" : "controller",
+        "value" : "B"
       }],
     "PlayerJump" : [{
         "mods" : [],
@@ -386,6 +387,9 @@
         "mods" : [],
         "type" : "key",
         "value" : "F"
+      }, {
+        "type" : "controller",
+        "value" : "B"
       }],
     "PlayerTechAction2" : [],
     "PlayerTechAction3" : [],

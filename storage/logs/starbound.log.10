@@ -1,0 +1,115 @@
+[22:10:02.178] [Info] Root: Preparing...
+[22:10:02.179] [Info] Root: Done preparing Root.
+[22:10:02.179] [Info] OpenStarbound Client v0.1.14.1 for v1.4.4 (windows x86_64) Source ID: 99901c495ef4b95672edada5c786e5001f95a40b Protocol: 747
+[22:10:02.179] [Info] Application: Initializing SDL Video
+[22:10:02.464] [Info] Application: using Video Driver 'windows'
+[22:10:02.464] [Info] Application: Initializing SDL Controller
+[22:10:03.174] [Info] Application: Initializing SDL Audio
+[22:10:03.186] [Info] Application: using Audio Driver 'wasapi'
+[22:10:03.233] [Info] Failed to initialize Steam platform services: No appID found.  Either launch the game from Steam, or put the file steam_appid.txt containing the correct appID in your game folder.
+[22:10:03.235] [Info] Initialized Discord platform services
+[22:10:03.237] [Info] Application: Creating SDL window
+[22:10:03.491] [Info] Application: Creating SDL OpenGL context
+[22:10:03.496] [Info] Application: Enabling adaptive VSync
+[22:10:03.622] [Info] Application: Opening audio device
+[22:10:03.673] [Info] Application: Opened default audio device with 44.1khz / 16 bit stereo audio
+[22:10:03.676] [Info] OpenGL version: '3.2.0 NVIDIA 596.36' vendor: 'NVIDIA Corporation' renderer: 'NVIDIA GeForce RTX 5070/PCIe/SSE2' shader: '1.50 NVIDIA via Cg compiler'
+[22:10:03.680] [Info] Application: initialization...
+[22:10:03.680] [Info] Root: Loaded Configuration in 0.0005100999987917021 seconds
+[22:10:03.682] [Info] Root: Scanning for asset sources in directory '../assets/'
+[22:10:04.047] [Info] Root: Skipping asset directory '../mods/', directory not found
+[22:10:04.047] [Info] Root: Detected asset source named 'base' at '..\assets\packed.pak'
+[22:10:04.047] [Info] Root: Detected asset source named 'opensb_base' version '0.1.14.1' at '..\assets\opensb'
+[22:10:04.047] [Info] Root: Detected unnamed asset source at '..\assets\user'
+[22:10:04.047] [Info] Loading assets from: '..\assets\packed.pak'
+[22:10:04.499] [Info] Loading assets from: '..\assets\opensb'
+[22:10:04.515] [Info] Loading assets from: '..\assets\user'
+[22:10:04.518] [Info] Running postLoad scripts ["/scripts/opensb/assets/postload.lua"]
+[22:10:04.559] [Info] Took 0.04055059999518562 seconds to run postLoad scripts ["/scripts/opensb/assets/postload.lua"]
+[22:10:05.408] [Info] Preloading assets
+[22:10:05.408] [Info] Assets digest is d4365ba7b748f0c6a33899d54e73c3ba1898ed34e610006ee1ba2a0301f8b2a3
+[22:10:05.408] [Info] Root: Loaded Assets in 1.726593800005503 seconds
+[22:10:05.409] [Info] Binds: Loaded 10 binds
+[22:10:05.410] [Info] Application: renderer initialization...
+[22:10:05.410] [Info] Creating framebuffer main
+[22:10:05.412] [Info] detected supported OpenGL texture size 32768, using atlasNumCells 128
+[22:10:05.417] [Info] Root: Loaded ImageMetadataDatabase in 6.880000000819564e-05 seconds
+[22:10:05.419] [Info] detected supported OpenGL texture size 32768, using atlasNumCells 256
+[22:10:05.419] [Info] detected supported OpenGL texture size 32768, using atlasNumCells 256
+[22:10:05.425] [Info] Root: Loaded ParticleDatabase in 0.006727799991494976 seconds
+[22:10:05.460] [Info] Root: Loaded MaterialDatabase in 0.04180969999288209 seconds
+[22:10:05.461] [Info] Root: Loaded LiquidsDatabase in 0.042029400006867945 seconds
+[22:10:05.465] [Info] detected supported OpenGL texture size 32768, using atlasNumCells 256
+[22:10:05.465] [Info] Application: main update loop...
+[22:10:05.466] [Info] Controller device 'DualSense Wireless Controller' added
+[22:10:05.469] [Info] Root: Loaded AiDatabase in 0.0009145000076387078 seconds
+[22:10:05.469] [Info] Root: Loaded TechDatabase in 0.001224399995408021 seconds
+[22:10:05.469] [Info] Root: Loaded EmoteProcessor in 8.260000322479755e-05 seconds
+[22:10:05.471] [Info] Root: Loaded CodexDatabase in 0.003072099993005395 seconds
+[22:10:05.472] [Info] Root: Loaded VersioningDatabase in 0.0005872000037925318 seconds
+[22:10:05.472] [Info] Root: Loaded TerrainDatabase in 0.0025822000025073066 seconds
+[22:10:05.473] [Info] Root: Loaded FunctionDatabase in 0.0012642999936360866 seconds
+[22:10:05.476] [Info] Root: Loaded TenantDatabase in 0.0034558999905129895 seconds
+[22:10:05.476] [Info] Root: Loaded NameGenerator in 0.003439699998125434 seconds
+[22:10:05.477] [Info] Root: Loaded DanceDatabase in 0.0009162000060314313 seconds
+[22:10:05.477] [Info] Root: Loaded QuestTemplateDatabase in 0.0076902000000700355 seconds
+[22:10:05.480] [Info] Root: Loaded RadioMessageDatabase in 0.003236100004869513 seconds
+[22:10:05.480] [Info] Root: Loaded SpawnTypeDatabase in 0.003499099999316968 seconds
+[22:10:05.482] [Info] Root: Loaded StatisticsDatabase in 0.0020967000018572435 seconds
+[22:10:05.485] [Info] Root: Loaded SpeciesDatabase in 0.004658699996070936 seconds
+[22:10:05.485] [Info] Root: Loaded StagehandDatabase in 0.0007279000128619373 seconds
+[22:10:05.532] [Info] Root: Loaded ProjectileDatabase in 0.05004479999479372 seconds
+[22:10:05.536] [Info] Root: Loaded EffectSourceDatabase in 0.003702100002556108 seconds
+[22:10:05.542] [Info] Root: Loaded StatusEffectDatabase in 0.00588860000425484 seconds
+[22:10:05.558] [Info] Root: Loaded TreasureDatabase in 0.015981500007910654 seconds
+[22:10:05.569] [Info] Root: Loaded DamageDatabase in 0.08322369999950752 seconds
+[22:10:05.587] [Info] Root: Loaded BehaviorDatabase in 0.11881350001203828 seconds
+[22:10:05.592] [Info] Root: Loaded NpcDatabase in 0.02293449999706354 seconds
+[22:10:05.609] [Info] Root: Loaded PlantDatabase in 0.0221468000090681 seconds
+[22:10:05.675] [Info] Root: Loaded MonsterDatabase in 0.06627060000027996 seconds
+[22:10:05.677] [Info] Root: Loaded VehicleDatabase in 0.001370199999655597 seconds
+[22:10:05.677] [Info] Root: Loaded PlayerFactory in 0.00022900001204106957 seconds
+[22:10:05.828] [Info] Root: Loaded ObjectDatabase in 0.2830407000001287 seconds
+[22:10:05.828] [Info] Root: Loaded EntityFactory in 0.1514615999913076 seconds
+[22:10:05.837] [Info] Root: Loaded BiomeDatabase in 0.008225199999287724 seconds
+[22:10:05.837] [Info] Root: Loaded TilesetDatabase in 2.7700007194653153e-05 seconds
+[22:10:05.896] [Info] Root: Loaded DungeonDefinitions in 0.06730650000099558 seconds
+[22:10:06.706] [Info] Root: Loaded ItemDatabase in 1.2296609000040917 seconds
+[22:10:06.754] [Info] Root: Loaded CollectionDatabase in 1.2771854999882635 seconds
+[22:10:06.754] [Info] Root: Loaded everything in 1.2860564000002341 seconds
+[22:10:07.180] [Info] Root: Writing runtime configuration to '../storage\starbound.config'
+[22:10:09.048] [Info] Title world is Muscida Stream I @ CelestialWorld:-27255970:919135064:-280774184:5
+[22:10:09.088] [Info] detected supported OpenGL texture size 32768, using atlasNumCells 256
+[22:10:32.036] [Info] Available OpenStarbound server commands:
+openhelp
+[22:10:32.036] [Info] UniverseServer: Acquiring universe lock file
+[22:10:32.037] [Info] UniverseServer: Loading settings
+[22:10:32.038] [Info] UniverseConnectionServer: Starting 4 network worker threads
+[22:10:32.038] [Info] UniverseClient: Connecting to server, packet timeout is 20000ms
+[22:10:32.038] [Info] UniverseServer: Starting UniverseServer with UUID: fdb384fdc38c2664b30c94db793175db
+[22:10:32.040] [Info] UniverseServer: Awaiting connection info from local (custom client)
+[22:10:32.044] [Info] UniverseServer: Logged in player 'Ming' locally
+[22:10:32.044] [Info] UniverseServer: Logged in account '<anonymous>' as player 'Ming' from address local (OpenStarbound client)
+[22:10:32.047] [Info] UniverseServer: Loading system world [75760440, 923804924, -17542955] from disk storage
+[22:10:32.048] [Info] UniverseClient: Joined OpenStarbound server as client 1
+[22:10:32.058] [Info] UniverseServer: Reviving player at CelestialWorld:75760440:923804924:-17542955:6:2
+[22:10:32.071] [Info] UniverseServer: Client 'Ming' <1> (local) connected
+[22:10:32.094] [Info] detected supported OpenGL texture size 32768, using atlasNumCells 256
+[22:10:32.100] [Info] detected supported OpenGL texture size 32768, using atlasNumCells 256
+[22:10:32.103] [Info] detected supported OpenGL texture size 32768, using atlasNumCells 256
+[22:10:32.115] [Error] Failed to create Discord lobby (err 6)
+[22:10:32.152] [Info] UniverseServer: Loading celestial world 75760440:923804924:-17542955:6:2
+[22:10:32.354] [Info] UniverseServer: Warping player 1 to CelestialWorld:75760440:923804924:-17542955:6:2=20.525.716.4625
+[22:11:21.030] [Info] Chat: <SAIL> I am detecting a variety of life signs in this mine. If you are intending to search it for core fragments, I may advise adequately arming yourself first.
+[22:11:31.342] [Info] Chat: <SAIL> If you are not sufficiently confident in your personal combat capabilities, an alternative solution would be to dig closer to the planet's center to find the core fragments.
+[22:12:06.335] [Info] Application: quit requested
+[22:12:06.335] [Info] Application: quitting...
+[22:12:06.335] [Info] Application: shutdown...
+[22:12:06.336] [Info] UniverseClient: Client disconnecting...
+[22:12:06.406] [Info] Client received world stop packet, leaving: Removed
+[22:12:06.409] [Info] UniverseServer: Client 'Ming' <1> (local) disconnected for reason: 
+[22:12:06.409] [Info] UniverseServer: Stopping idle world CelestialWorld:75760440:923804924:-17542955:6:2
+[22:12:06.678] [Info] UniverseServer: Stopping UniverseServer
+[22:12:06.733] [Info] Root: Shutting down Root
+[22:12:06.811] [Info] Application: Destroying SDL Window
+[22:12:06.865] [Info] Application: stopped gracefully
