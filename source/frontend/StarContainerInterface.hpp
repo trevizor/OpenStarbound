@@ -24,6 +24,7 @@ public:
   PanePtr createTooltip(Vec2I const& screenPosition) override;
 
   bool giveContainerResult(ContainerResult result);
+  bool triggerTakeAll();
 
 protected:
   void update(float dt) override;

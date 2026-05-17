@@ -208,6 +208,18 @@ bool ContainerPane::giveContainerResult(ContainerResult result) {
   return true;
 }
 
+bool ContainerPane::triggerTakeAll() {
+  if (!m_containerInteractor->containerOpen())
+    return false;
+
+  auto container = m_containerInteractor->openContainer();
+  if (!container || !container->isInteractive())
+    return false;
+
+  m_containerInteractor->clearContainer();
+  return true;
+}
+
 PanePtr ContainerPane::createTooltip(Vec2I const& screenPosition) {
   ItemPtr item;
   if (auto child = getChildAt(screenPosition)) {

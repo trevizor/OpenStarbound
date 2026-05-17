@@ -66,6 +66,22 @@ static bool stickAxisActive(Vec2F const& stick, float threshold = 0.0f) {
   return std::abs(stick[0]) > threshold || std::abs(stick[1]) > threshold;
 }
 
+static bool playerIsSleeping(PlayerPtr const& player, WorldClientPtr const& worldClient) {
+  if (!player || !worldClient)
+    return false;
+
+  auto loungeState = player->loungingIn();
+  if (!loungeState)
+    return false;
+
+  auto loungeable = worldClient->get<LoungeableEntity>(loungeState->entityId);
+  if (!loungeable)
+    return false;
+
+  auto anchor = loungeable->loungeAnchor(loungeState->positionIndex);
+  return anchor && anchor->orientation == LoungeOrientation::Lay;
+}
+
 static int hotbarWheelSlotCount(PlayerInventoryPtr const& inventory) {
   return inventory ? (int)inventory->customBarIndexes() + EssentialItemCount : 0;
 }
@@ -687,6 +703,19 @@ void ClientApplication::processInput(InputEvent const& event) {
   }
 
   if (auto cDown = event.ptr<ControllerButtonDownEvent>()) {
+    if (cDown->controllerButton == ControllerButton::X && m_mainInterface) {
+      auto paneManager = m_mainInterface->paneManager();
+      if (paneManager) {
+        auto topPane = paneManager->topPane({PaneLayer::ModalWindow, PaneLayer::Window});
+        if (auto containerPane = as<ContainerPane>(topPane)) {
+          if (containerPane->triggerTakeAll()) {
+            processed = true;
+            return;
+          }
+        }
+      }
+    }
+
     if (cDown->controllerButton == ControllerButton::RightStick) {
       auto configuration = m_root->configuration();
       bool controllerMouseEnabled = configuration->get("controllerMouseEnabled").optBool().value(true);
