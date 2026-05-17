@@ -604,18 +604,58 @@ void ClientApplication::processInput(InputEvent const& event) {
     }
   }
 
+  bool waitingForKeybindingCapture = false;
+  auto paneCapturingKeyEvents = [&](PaneManagerPtr const& paneManager) {
+    if (!paneManager)
+      return false;
+    if (auto capturedWidget = paneManager->keyboardCapturedWidget())
+      return capturedWidget->keyboardCaptureMode() == KeyboardCaptureMode::KeyEvents;
+    return false;
+  };
+
+  if (m_mainInterface)
+    waitingForKeybindingCapture = waitingForKeybindingCapture || paneCapturingKeyEvents(m_mainInterface->paneManager());
+  if (m_titleScreen)
+    waitingForKeybindingCapture = waitingForKeybindingCapture || paneCapturingKeyEvents(m_titleScreen->paneManager());
+
   bool panelMode = panelInteractionModeActive();
   bool suppressHorizontalStripButton = false;
-  if (!panelMode && m_state > MainAppState::Title) {
+  if (!panelMode && !waitingForKeybindingCapture && m_state > MainAppState::Title) {
     if (auto cDown = event.ptr<ControllerButtonDownEvent>())
       suppressHorizontalStripButton = cDown->controllerButton == ControllerButton::DPadDown;
     else if (auto cUp = event.ptr<ControllerButtonUpEvent>())
       suppressHorizontalStripButton = cUp->controllerButton == ControllerButton::DPadDown;
   }
 
-  bool shouldRouteOriginal = !(panelMode && (event.is<ControllerButtonDownEvent>() || event.is<ControllerButtonUpEvent>() || event.is<ControllerAxisEvent>()))
+  bool shouldRouteOriginal = !(panelMode && !waitingForKeybindingCapture && (event.is<ControllerButtonDownEvent>() || event.is<ControllerButtonUpEvent>() || event.is<ControllerAxisEvent>()))
       && !suppressHorizontalStripButton;
   bool processed = shouldRouteOriginal ? routeInputEvent(event) : false;
+
+  auto performHotbarSwap = [&]() {
+    if (!m_player)
+      return false;
+
+    auto inventory = m_player->inventory();
+    if (!inventory)
+      return false;
+
+    auto groupCount = inventory->customBarGroups();
+    if (groupCount <= 1)
+      return false;
+
+    inventory->setCustomBarGroup((inventory->customBarGroup() + 1) % groupCount);
+    return true;
+  };
+
+  if (auto cDown = event.ptr<ControllerButtonDownEvent>()) {
+    bool swallowMode = (panelMode || m_hotbarWheelActive || m_hotbarStripActive) && !waitingForKeybindingCapture;
+    if (swallowMode && m_guiContext->actions(cDown->controllerButton).contains(InterfaceAction::InterfaceChangeBarGroup)) {
+      if (performHotbarSwap()) {
+        processed = true;
+        return;
+      }
+    }
+  }
 
   if (panelMode) {
     auto panelHasList = [&](PanePtr const& pane) {
