@@ -31,6 +31,20 @@ OptionsMenu::OptionsMenu(PaneManager* manager, UniverseClientPtr client)
   reader.registerCallback("musicSlider", [=](Widget*) {
       updateMusicVol();
     });
+  // Compatibility callbacks: some merged optionsmenu layouts still route these
+  // widget names through callbacks, and missing registrations are fatal.
+  reader.registerCallback("controllerMouseEnabledCheckbox", [=](Widget*) {
+
+    });
+  reader.registerCallback("controllerMouseSpeedSlider", [=](Widget*) {
+
+    });
+  reader.registerCallback("controllerMouseDeadzoneSlider", [=](Widget*) {
+
+    });
+  reader.registerCallback("inventoryBuildFromInventoryCheckbox", [=](Widget*) {
+
+    });
   reader.registerCallback("acceptButton", [=](Widget*) {
       for (auto k : ConfigKeys)
         root->configuration()->set(k, m_localChanges.get(k));
@@ -62,7 +76,7 @@ OptionsMenu::OptionsMenu(PaneManager* manager, UniverseClientPtr client)
       displayVoiceSettings();
     });
   reader.registerCallback("showVoicePlayers", [=](Widget*) {
-
+      displayControllerBuild();
     });
   reader.registerCallback("showModBindings", [=](Widget*) {
       displayModBindings();
@@ -158,7 +172,6 @@ void OptionsMenu::updateMusicVol() {
   Root::singleton().configuration()->set("musicVol", m_musicSlider->val());
   m_musicLabel->setText(toString(m_musicSlider->val()));
 }
-
 
 void OptionsMenu::updateTutorialMessages() {
   m_localChanges.set("tutorialMessages", m_tutorialMessagesButton->isChecked());

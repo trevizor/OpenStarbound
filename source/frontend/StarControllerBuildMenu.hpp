@@ -26,13 +26,16 @@ private:
   void updateInventoryBuildFromInventory();
   void updateControllerMouseSpeed();
   void updateControllerMouseDeadzone();
+  void updateGameSpeed();
 
   SliderBarWidgetPtr m_controllerMouseSpeedSlider;
   SliderBarWidgetPtr m_controllerMouseDeadzoneSlider;
+  SliderBarWidgetPtr m_gameSpeedSlider;
   ButtonWidgetPtr m_controllerMouseEnabledButton;
   ButtonWidgetPtr m_inventoryBuildFromInventoryButton;
   LabelWidgetPtr m_controllerMouseSpeedLabel;
   LabelWidgetPtr m_controllerMouseDeadzoneLabel;
+  LabelWidgetPtr m_gameSpeedLabel;
 
   JsonObject m_localChanges;
 };

@@ -227,6 +227,7 @@ Json const AdditionalDefaultConfiguration = Json::parseJson(R"JSON(
       "controllerMouseEnabled" : true,
       "controllerMouseSpeed" : 1400.0,
       "controllerMouseDeadzone" : 0.20,
+      "gameSpeed" : 1.0,
       "inventoryBuildFromInventory" : true,
 
       "title" : {
@@ -718,6 +719,9 @@ void ClientApplication::processInput(InputEvent const& event) {
 }
 
 void ClientApplication::update() {
+  auto configuration = m_root->configuration();
+  GlobalTimescale = clamp(configuration->get("gameSpeed").optFloat().value(1.0f), 0.5f, 1.5f);
+
   float dt = GlobalTimestep * GlobalTimescale;
   auto& app = appController();
   if (m_state >= MainAppState::Title) {

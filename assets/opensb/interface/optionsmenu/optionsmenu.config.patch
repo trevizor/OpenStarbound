@@ -19,9 +19,8 @@
     },
     "showVoicePlayers" : {
       "type" : "button",
-      "disabled" : true,
       "position" : [133, 185],
-      "caption" : "^#a0a000,font=iosevka-semiboldoblique;TODO^#aa7;:^reset; Players",
+      "caption" : "Controller",
       "base" : "/interface/optionsmenu/controlsbutton.png",
       "hover" : "/interface/optionsmenu/controlsbuttonhover.png"
     },
@@ -46,14 +45,6 @@
       "base" : "/interface/optionsmenu/controlsbutton.png",
       "hover" : "/interface/optionsmenu/controlsbuttonhover.png"
     },
-    "showControllerBuild" : {
-      "type" : "button",
-      "position" : [21, 79],
-      "caption" : "Controller",
-      "base" : "/interface/optionsmenu/controlsbutton.png",
-      "hover" : "/interface/optionsmenu/controlsbuttonhover.png"
-    },
-
     "volumeLabel" : { "position" : [119, 173] },
     "musicSlider" : { "position" : [62, 126] },
     
@@ -80,60 +71,6 @@
       "hoverImageChecked" : "/interface/optionsmenu/checkboxcheckhover.png",
       "checkable" : true,
       "checked" : true
-    },
-
-    "controllerMouseEnabledLabel" : {
-      "type" : "label",
-      "position" : [25, 38],
-      "hAnchor" : "left",
-      "value" : "STICK MOUSE"
-    },
-    "controllerMouseEnabledCheckbox" : {
-      "type" : "button",
-      "pressedOffset" : [0, 0],
-      "position" : [104, 38],
-      "base" : "/interface/optionsmenu/checkboxnocheck.png",
-      "hover" : "/interface/optionsmenu/checkboxnocheckhover.png",
-      "baseImageChecked" : "/interface/optionsmenu/checkboxcheck.png",
-      "hoverImageChecked" : "/interface/optionsmenu/checkboxcheckhover.png",
-      "checkable" : true,
-      "checked" : true
-    },
-
-    "controllerMouseSpeedLabel" : {
-      "type" : "label",
-      "position" : [25, 25],
-      "hAnchor" : "left",
-      "value" : "STICK MOUSE SPEED"
-    },
-    "controllerMouseSpeedSlider" : {
-      "type" : "slider",
-      "position" : [122, 25],
-      "gridImage" : "/interface/optionsmenu/smallselection.png"
-    },
-    "controllerMouseSpeedValueLabel" : {
-      "type" : "label",
-      "position" : [214, 25],
-      "hAnchor" : "right",
-      "value" : "1400"
-    },
-
-    "controllerMouseDeadzoneLabel" : {
-      "type" : "label",
-      "position" : [25, 12],
-      "hAnchor" : "left",
-      "value" : "STICK MOUSE DEADZONE"
-    },
-    "controllerMouseDeadzoneSlider" : {
-      "type" : "slider",
-      "position" : [122, 12],
-      "gridImage" : "/interface/optionsmenu/smallselection.png"
-    },
-    "controllerMouseDeadzoneValueLabel" : {
-      "type" : "label",
-      "position" : [214, 12],
-      "hAnchor" : "right",
-      "value" : "20%"
     }
   }
 }

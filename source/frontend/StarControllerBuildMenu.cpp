@@ -39,17 +39,24 @@ ControllerBuildMenu::ControllerBuildMenu(Json const& config) {
     updateControllerMouseDeadzone();
   });
 
+  reader.registerCallback("gameSpeedSlider", [&](Widget*) {
+    updateGameSpeed();
+  });
+
   reader.construct(config.get("paneLayout"), this);
 
   m_controllerMouseEnabledButton = fetchChild<ButtonWidget>("controllerMouseEnabledCheckbox");
   m_inventoryBuildFromInventoryButton = fetchChild<ButtonWidget>("inventoryBuildFromInventoryCheckbox");
   m_controllerMouseSpeedSlider = fetchChild<SliderBarWidget>("controllerMouseSpeedSlider");
   m_controllerMouseDeadzoneSlider = fetchChild<SliderBarWidget>("controllerMouseDeadzoneSlider");
+  m_gameSpeedSlider = fetchChild<SliderBarWidget>("gameSpeedSlider");
   m_controllerMouseSpeedLabel = fetchChild<LabelWidget>("controllerMouseSpeedValueLabel");
   m_controllerMouseDeadzoneLabel = fetchChild<LabelWidget>("controllerMouseDeadzoneValueLabel");
+  m_gameSpeedLabel = fetchChild<LabelWidget>("gameSpeedValueLabel");
 
   m_controllerMouseSpeedSlider->setRange(200, 3000, 50);
   m_controllerMouseDeadzoneSlider->setRange(0, 95, 1);
+  m_gameSpeedSlider->setRange(50, 150, 5);
 
   initConfig();
   syncGui();
@@ -65,6 +72,7 @@ StringList const ControllerBuildMenu::ConfigKeys = {
   "controllerMouseEnabled",
   "controllerMouseSpeed",
   "controllerMouseDeadzone",
+  "gameSpeed",
   "inventoryBuildFromInventory"
 };
 
@@ -78,6 +86,7 @@ void ControllerBuildMenu::syncGui() {
   bool enabled = m_localChanges.get("controllerMouseEnabled").optBool().value(true);
   int speed = (int)std::round(m_localChanges.get("controllerMouseSpeed").optFloat().value(1400.0f));
   int deadzonePercent = (int)std::round(m_localChanges.get("controllerMouseDeadzone").optFloat().value(0.20f) * 100.0f);
+  int gameSpeedPercent = (int)std::round(clamp(m_localChanges.get("gameSpeed").optFloat().value(1.0f), 0.5f, 1.5f) * 100.0f);
   bool buildFromInventory = m_localChanges.get("inventoryBuildFromInventory").optBool().value(true);
 
   m_controllerMouseEnabledButton->setChecked(enabled);
@@ -89,6 +98,9 @@ void ControllerBuildMenu::syncGui() {
   deadzonePercent = clamp(deadzonePercent, 0, 95);
   m_controllerMouseDeadzoneSlider->setVal(deadzonePercent, false);
   m_controllerMouseDeadzoneLabel->setText(strf("{}%", deadzonePercent));
+
+  m_gameSpeedSlider->setVal(gameSpeedPercent, false);
+  m_gameSpeedLabel->setText(strf("{:.2f}x", gameSpeedPercent / 100.0f));
 }
 
 void ControllerBuildMenu::apply() {
@@ -121,6 +133,13 @@ void ControllerBuildMenu::updateControllerMouseDeadzone() {
   m_localChanges.set("controllerMouseDeadzone", deadzone);
   Root::singleton().configuration()->set("controllerMouseDeadzone", deadzone);
   m_controllerMouseDeadzoneLabel->setText(strf("{}%", m_controllerMouseDeadzoneSlider->val()));
+}
+
+void ControllerBuildMenu::updateGameSpeed() {
+  float speed = m_gameSpeedSlider->val() / 100.0f;
+  m_localChanges.set("gameSpeed", speed);
+  Root::singleton().configuration()->set("gameSpeed", speed);
+  m_gameSpeedLabel->setText(strf("{:.2f}x", speed));
 }
 
 }
