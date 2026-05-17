@@ -1053,6 +1053,7 @@ void ClientApplication::updateControllerMouse(float dt) {
       return;
     }
 
+    auto worldClient = m_universeClient->worldClient();
     Vec2F playerPosition = m_player->position();
     if (lockAimDirection && !m_controllerLockedAimDirectionValid) {
       Vec2F cursorWorld = m_mainInterface->cursorWorldPosition();
@@ -1060,6 +1061,7 @@ void ClientApplication::updateControllerMouse(float dt) {
       float cursorDirectionMagnitude = cursorDirection.magnitude();
       if (cursorDirectionMagnitude > 0.001f) {
         m_controllerLockedAimDirection = cursorDirection / cursorDirectionMagnitude;
+        m_controllerLockedAimDistance = min(cursorDirectionMagnitude, 10.0f);
         m_controllerLockedAimDirectionValid = true;
       }
     }
