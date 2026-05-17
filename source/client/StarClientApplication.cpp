@@ -1039,8 +1039,8 @@ void ClientApplication::updateControllerMouse(float dt) {
 
   float mouseDeadzone = configuration->get("controllerMouseDeadzone").optFloat().value(0.20f);
   float aimingDeadzone = mouseDeadzone * 2.0f;
-  bool lockAimDirection = isActionTaken(InterfaceAction::PlayerControllerMoveOnly);
   bool forcedAimOnly = isActionTaken(InterfaceAction::PlayerControllerAimOnly);
+  bool lockAimDirection = !forcedAimOnly && isActionTaken(InterfaceAction::PlayerControllerMoveOnly);
 
   if (m_state > MainAppState::Title && m_player && m_universeClient && m_universeClient->worldClient()) {
     Vec2F rightStick;
@@ -2337,7 +2337,10 @@ void ClientApplication::updateCamera(float dt) {
 
   auto playerCameraPosition = m_player->cameraPosition();
 
-  if (isActionTaken(InterfaceAction::CameraShift)) {
+  bool cameraShiftActive = isActionTaken(InterfaceAction::CameraShift)
+      || isActionTaken(InterfaceAction::PlayerControllerAimOnly);
+
+  if (cameraShiftActive) {
     m_snapBackCameraOffset = false;
     m_cameraOffsetDownTime += dt;
     Vec2F aim = m_universeClient->worldClient()->geometry().diff(m_mainInterface->cursorWorldPosition(), playerCameraPosition);
