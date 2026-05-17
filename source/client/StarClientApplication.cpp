@@ -272,6 +272,8 @@ Json const AdditionalDefaultConfiguration = Json::parseJson(R"JSON(
         "PlayerDropItem" :  [ { "type" : "key", "value" : "Q", "mods" : [] } ],
         "PlayerInteract" :  [ { "type" : "key", "value" : "E", "mods" : [] }, { "type" : "controller", "value" : "B" } ],
         "PlayerShifting" :  [ { "type" : "key", "value" : "RShift", "mods" : [] }, { "type" : "key", "value" : "LShift", "mods" : [] }],
+        "InterfacePlaceTorchAtCursor" : [ { "type" : "key", "value" : "G", "mods" : [] } ],
+        "InterfaceUseFirstHealingItem" : [ { "type" : "key", "value" : "H", "mods" : [] } ],
         "PlayerTechAction1" :  [ { "type" : "key", "value" : "F", "mods" : [] } ],
         "PlayerTechAction2" :  [],
         "PlayerTechAction3" :  [],
@@ -385,6 +387,8 @@ void ClientApplication::applicationInit(ApplicationControllerPtr appController) 
   ensureBindingActionDefault(configuration, InterfaceAction::InterfacePanelWheelHold);
   ensureBindingActionDefault(configuration, InterfaceAction::PlayerControllerAimOnly);
   ensureBindingActionDefault(configuration, InterfaceAction::PlayerControllerMoveOnly);
+  ensureBindingActionDefault(configuration, InterfaceAction::InterfacePlaceTorchAtCursor);
+  ensureBindingActionDefault(configuration, InterfaceAction::InterfaceUseFirstHealingItem);
 
   bool vsync = configuration->get("vsync").toBool();
   Vec2U windowedSize = jsonToVec2U(configuration->get("windowedResolution"));
@@ -605,7 +609,7 @@ void ClientApplication::processInput(InputEvent const& event) {
   }
 
   bool waitingForKeybindingCapture = false;
-  auto paneCapturingKeyEvents = [&](PaneManagerPtr const& paneManager) {
+  auto paneCapturingKeyEvents = [&](auto* paneManager) {
     if (!paneManager)
       return false;
     if (auto capturedWidget = paneManager->keyboardCapturedWidget())
@@ -2371,6 +2375,12 @@ void ClientApplication::updateRunning(float dt) {
 
       if (isActionTakenEdge(InterfaceAction::PlayerDropItem))
         m_player->dropItem();
+
+      if (isActionTakenEdge(InterfaceAction::InterfacePlaceTorchAtCursor))
+        m_player->placeTorchAtAimPosition();
+
+      if (isActionTakenEdge(InterfaceAction::InterfaceUseFirstHealingItem))
+        m_player->useFirstHealingItem();
 
       if (isActionTakenEdge(InterfaceAction::EmoteBlabbering))
         m_player->addEmote(HumanoidEmote::Blabbering);

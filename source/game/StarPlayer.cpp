@@ -40,8 +40,35 @@
 #include "StarScriptedAnimatorLuaBindings.hpp"
 #include "StarEntityLuaBindings.hpp"
 #include "StarDanceDatabase.hpp"
+#include "StarObjectItem.hpp"
+#include "StarConsumableItem.hpp"
 
 namespace Star {
+
+namespace {
+bool isTorchObjectItem(ObjectItemPtr const& objectItem) {
+  if (!objectItem)
+    return false;
+
+  return objectItem->name().find("torch", 0, String::CaseInsensitive) != NPos
+      || objectItem->objectName().find("torch", 0, String::CaseInsensitive) != NPos;
+}
+
+bool looksLikeHealingConsumable(ItemPtr const& item) {
+  if (!item)
+    return false;
+
+  if (item->hasItemTag("healingitem") || item->hasItemTag("healing") || item->hasItemTag("medical"))
+    return true;
+
+  String const& name = item->name();
+  return name.find("heal", 0, String::CaseInsensitive) != NPos
+      || name.find("med", 0, String::CaseInsensitive) != NPos
+      || name.find("bandage", 0, String::CaseInsensitive) != NPos
+      || name.find("salve", 0, String::CaseInsensitive) != NPos
+      || name.find("stim", 0, String::CaseInsensitive) != NPos;
+}
+}
 
 EnumMap<Player::State> const Player::StateNames{
   {Player::State::Idle, "idle"},
@@ -1630,6 +1657,88 @@ void Player::beginTrigger() {
 
 void Player::endTrigger() {
   m_useDown = false;
+}
+
+bool Player::placeTorchAtAimPosition() {
+  if (!world() || !canUseTool())
+    return false;
+
+  ObjectItemPtr torchItem;
+  m_inventory->forEveryItem([&](InventorySlot const&, ItemPtr& item) {
+      if (torchItem || !item || item->count() == 0)
+        return;
+
+      if (auto objectItem = as<ObjectItem>(item)) {
+        if (isTorchObjectItem(objectItem))
+          torchItem = objectItem;
+      }
+    });
+
+  if (!torchItem)
+    return false;
+
+  bool wasInitialized = torchItem->initialized();
+  if (!wasInitialized)
+    torchItem->init(this, ToolHand::Primary);
+
+  bool placed = torchItem->placeInWorld(FireMode::Primary, m_shifting);
+
+  if (!wasInitialized)
+    torchItem->uninit();
+
+  if (placed)
+    m_inventory->cleanup();
+
+  return placed;
+}
+
+bool Player::useFirstHealingItem() {
+  if (!world() || !canUseTool())
+    return false;
+
+  auto tryUseConsumable = [&](auto const& consumable) {
+    if (!consumable || consumable->count() == 0)
+      return false;
+
+    bool wasInitialized = consumable->initialized();
+    if (!wasInitialized)
+      consumable->init(this, ToolHand::Primary);
+
+    uint64_t previousCount = consumable->count();
+    consumable->fire(FireMode::Primary, m_shifting, true);
+    consumable->uninit();
+
+    if (wasInitialized)
+      consumable->init(this, ToolHand::Primary);
+
+    return consumable->count() < previousCount;
+  };
+
+  bool used = false;
+  m_inventory->forEveryItem([&](InventorySlot const&, ItemPtr& item) {
+      if (used || !item)
+        return;
+
+      if (auto consumable = as<ConsumableItem>(item)) {
+        if (looksLikeHealingConsumable(consumable))
+          used = tryUseConsumable(consumable);
+      }
+    });
+
+  if (!used) {
+    m_inventory->forEveryItem([&](InventorySlot const&, ItemPtr& item) {
+        if (used || !item)
+          return;
+
+        if (auto consumable = as<ConsumableItem>(item))
+          used = tryUseConsumable(consumable);
+      });
+  }
+
+  if (used)
+    m_inventory->cleanup();
+
+  return used;
 }
 
 float Player::toolRadius() const {

@@ -13,6 +13,8 @@
 			{ "action": "PlayerJump", "label": "Jump" },
 			{ "action": "PlayerInteract", "label": "Interact" },
 			{ "action": "PlayerDropItem", "label": "Drop Item" },
+			{ "action": "InterfacePlaceTorchAtCursor", "label": "Place Torch At Cursor" },
+			{ "action": "InterfaceUseFirstHealingItem", "label": "Use First Healing Item" },
 			{ "action": "PlayerShifting", "label": "Walk / Shift" },
 			{ "action": "PlayerTechAction1", "label": "Tech 1" },
 			{ "action": "PlayerTechAction2", "label": "Tech 2" },

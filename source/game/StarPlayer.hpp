@@ -297,6 +297,9 @@ public:
   void beginTrigger();
   void endTrigger();
 
+  bool placeTorchAtAimPosition();
+  bool useFirstHealingItem();
+
   ItemPtr primaryHandItem() const;
   ItemPtr altHandItem() const;
 
