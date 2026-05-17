@@ -42,6 +42,9 @@ private:
 
   size_t m_maxBindings;
   KeyMod m_currentMods;
+
+  Maybe<uint64_t> m_clearHoldStartMs;
+  bool m_clearHoldFromController;
 };
 
 }

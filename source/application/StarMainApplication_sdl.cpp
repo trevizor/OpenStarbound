@@ -1056,6 +1056,7 @@ private:
     }
 
     void quit() override {
+      Logger::info("Application: quit requested by application controller");
       parent->m_quitRequested = true;
     }
 

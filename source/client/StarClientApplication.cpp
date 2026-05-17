@@ -129,6 +129,22 @@ static int hotbarWheelIndexFromSelection(PlayerInventoryPtr const& inventory, Se
   return 0;
 }
 
+static bool paneManagerWaitingForKeybindingCapture(PaneManager* paneManager) {
+  if (!paneManager)
+    return false;
+
+  if (auto capturedWidget = paneManager->keyboardCapturedWidget()) {
+    if (capturedWidget->keyboardCaptureMode() == KeyboardCaptureMode::KeyEvents)
+      return true;
+  }
+
+  // Some panes (for example, keybindings) capture directly at pane level.
+  if (auto topPane = paneManager->topPane({PaneLayer::ModalWindow, PaneLayer::Window}))
+    return topPane->keyboardCaptureMode() == KeyboardCaptureMode::KeyEvents;
+
+  return false;
+}
+
 static List<ClientApplication::PanelWheelOption> panelWheelOptions(bool canBeamUp, bool canBeamDown) {
   List<ClientApplication::PanelWheelOption> options = {
     ClientApplication::PanelWheelOption::Inventory,
@@ -301,7 +317,7 @@ Json const AdditionalDefaultConfiguration = Json::parseJson(R"JSON(
         "InterfaceToggleControllerMouse" :  [ { "type" : "controller", "value" : "RightStick" } ],
         "InterfacePanelClose" :  [ { "type" : "controller", "value" : "B" } ],
         "GuiShifting" :  [ { "type" : "key", "value" : "RShift", "mods" : [] }, { "type" : "key", "value" : "LShift", "mods" : [] } ],
-        "KeybindingCancel" :  [ { "type" : "key", "value" : "Esc", "mods" : [] }, { "type" : "controller", "value" : "Back" } ],
+        "KeybindingCancel" :  [ { "type" : "key", "value" : "Esc", "mods" : [] }, { "type" : "controller", "value" : "Start" } ],
         "KeybindingClear" :  [ { "type" : "key", "value" : "Del", "mods" : [] }, { "type" : "key", "value" : "Backspace", "mods" : [] } ],
         "ChatPageUp" :  [ { "type" : "key", "value" : "PageUp", "mods" : [] } ],
         "ChatPageDown" :  [ { "type" : "key", "value" : "PageDown", "mods" : [] } ],
@@ -314,7 +330,23 @@ Json const AdditionalDefaultConfiguration = Json::parseJson(R"JSON(
         "InterfaceHideHud" :  [ { "type" : "key", "value" : "F1", "mods" : [] } ],
         "InterfaceChangeBarGroup" :  [ { "type" : "key", "value" : "X", "mods" : [] }, { "type" : "controller", "value" : "RightShoulder" } ],
         "InterfaceHotbarWheelHold" : [],
+        "InterfaceHotbarStripHold" : [ { "type" : "controller", "value" : "DPadDown" } ],
         "InterfacePanelWheelHold" : [ { "type" : "controller", "value" : "DPadUp" } ],
+        "InterfacePanelSelect" : [ { "type" : "controller", "value" : "A" } ],
+        "InterfacePanelBack" : [ { "type" : "controller", "value" : "B" } ],
+        "InterfacePanelCursorCenter" : [ { "type" : "controller", "value" : "LeftStick" } ],
+        "InterfacePanelCursorLeft" : [ { "type" : "controller", "value" : "DPadLeft" } ],
+        "InterfacePanelCursorRight" : [ { "type" : "controller", "value" : "DPadRight" } ],
+        "InterfacePanelCursorUp" : [ { "type" : "controller", "value" : "DPadUp" } ],
+        "InterfacePanelCursorDown" : [ { "type" : "controller", "value" : "DPadDown" } ],
+        "InterfacePanelScrollUp" : [ { "type" : "controllerAxis", "value" : "RightY", "direction" : -1, "threshold" : 0.35 } ],
+        "InterfacePanelScrollDown" : [ { "type" : "controllerAxis", "value" : "RightY", "direction" : 1, "threshold" : 0.35 } ],
+        "InterfacePanelDragHold" : [ { "type" : "controllerAxis", "value" : "TriggerLeft", "direction" : 1, "threshold" : 0.6 } ],
+        "InterfaceControllerMouseLeft" : [ { "type" : "controller", "value" : "X" } ],
+        "InterfaceControllerMouseRight" : [ { "type" : "controller", "value" : "Y" } ],
+        "InterfaceKeybindingsTabPrevious" : [ { "type" : "controller", "value" : "LeftShoulder" }, { "type" : "controller", "value" : "DPadLeft" } ],
+        "InterfaceKeybindingsTabNext" : [ { "type" : "controller", "value" : "RightShoulder" }, { "type" : "controller", "value" : "DPadRight" } ],
+        "InterfaceTakeAllItems" : [ { "type" : "controller", "value" : "X" } ],
         "InterfaceDeselectHands" :  [ { "type" : "key", "value" : "Z", "mods" : [] } ],
         "InterfaceBar1" :  [ { "type" : "key", "value" : "1", "mods" : [] } ],
         "InterfaceBarPrevious" :  [ { "type" : "controller", "value" : "DPadLeft" } ],
@@ -384,11 +416,30 @@ void ClientApplication::applicationInit(ApplicationControllerPtr appController) 
   ensureBindingActionDefault(configuration, InterfaceAction::InterfacePanelClose);
   ensureBindingActionDefault(configuration, InterfaceAction::InterfaceToggleControllerMouse);
   ensureBindingActionDefault(configuration, InterfaceAction::InterfaceHotbarWheelHold);
+  ensureBindingActionDefault(configuration, InterfaceAction::InterfaceHotbarStripHold);
   ensureBindingActionDefault(configuration, InterfaceAction::InterfacePanelWheelHold);
+  ensureBindingActionDefault(configuration, InterfaceAction::InterfacePanelSelect);
+  ensureBindingActionDefault(configuration, InterfaceAction::InterfacePanelBack);
+  ensureBindingActionDefault(configuration, InterfaceAction::InterfacePanelCursorCenter);
+  ensureBindingActionDefault(configuration, InterfaceAction::InterfacePanelCursorLeft);
+  ensureBindingActionDefault(configuration, InterfaceAction::InterfacePanelCursorRight);
+  ensureBindingActionDefault(configuration, InterfaceAction::InterfacePanelCursorUp);
+  ensureBindingActionDefault(configuration, InterfaceAction::InterfacePanelCursorDown);
+  ensureBindingActionDefault(configuration, InterfaceAction::InterfacePanelScrollUp);
+  ensureBindingActionDefault(configuration, InterfaceAction::InterfacePanelScrollDown);
+  ensureBindingActionDefault(configuration, InterfaceAction::InterfacePanelDragHold);
+  ensureBindingActionDefault(configuration, InterfaceAction::InterfaceControllerMouseLeft);
+  ensureBindingActionDefault(configuration, InterfaceAction::InterfaceControllerMouseRight);
+  ensureBindingActionDefault(configuration, InterfaceAction::InterfaceKeybindingsTabPrevious);
+  ensureBindingActionDefault(configuration, InterfaceAction::InterfaceKeybindingsTabNext);
+  ensureBindingActionDefault(configuration, InterfaceAction::InterfaceTakeAllItems);
   ensureBindingActionDefault(configuration, InterfaceAction::PlayerControllerAimOnly);
   ensureBindingActionDefault(configuration, InterfaceAction::PlayerControllerMoveOnly);
   ensureBindingActionDefault(configuration, InterfaceAction::InterfacePlaceTorchAtCursor);
   ensureBindingActionDefault(configuration, InterfaceAction::InterfaceUseFirstHealingItem);
+
+  // Rebind capture cancellation is intentionally restricted to Esc / Start.
+  configuration->setPath("bindings.KeybindingCancel", configuration->getDefault("bindings").get("KeybindingCancel"));
 
   bool vsync = configuration->get("vsync").toBool();
   Vec2U windowedSize = jsonToVec2U(configuration->get("windowedResolution"));
@@ -543,6 +594,17 @@ void ClientApplication::processInput(InputEvent const& event) {
     return processed;
   };
 
+  bool waitingForKeybindingCapture = false;
+  if (m_mainInterface)
+    waitingForKeybindingCapture = waitingForKeybindingCapture || paneManagerWaitingForKeybindingCapture(m_mainInterface->paneManager());
+  if (m_titleScreen)
+    waitingForKeybindingCapture = waitingForKeybindingCapture || paneManagerWaitingForKeybindingCapture(m_titleScreen->paneManager());
+
+  if (waitingForKeybindingCapture) {
+    routeInputEvent(event);
+    return;
+  }
+
   if (auto keyDown = event.ptr<KeyDownEvent>()) {
     m_heldKeyEvents.append(*keyDown);
     m_edgeKeyEvents.append(*keyDown);
@@ -608,27 +670,13 @@ void ClientApplication::processInput(InputEvent const& event) {
     }
   }
 
-  bool waitingForKeybindingCapture = false;
-  auto paneCapturingKeyEvents = [&](auto* paneManager) {
-    if (!paneManager)
-      return false;
-    if (auto capturedWidget = paneManager->keyboardCapturedWidget())
-      return capturedWidget->keyboardCaptureMode() == KeyboardCaptureMode::KeyEvents;
-    return false;
-  };
-
-  if (m_mainInterface)
-    waitingForKeybindingCapture = waitingForKeybindingCapture || paneCapturingKeyEvents(m_mainInterface->paneManager());
-  if (m_titleScreen)
-    waitingForKeybindingCapture = waitingForKeybindingCapture || paneCapturingKeyEvents(m_titleScreen->paneManager());
-
   bool panelMode = panelInteractionModeActive();
   bool suppressHorizontalStripButton = false;
   if (!panelMode && !waitingForKeybindingCapture && m_state > MainAppState::Title) {
     if (auto cDown = event.ptr<ControllerButtonDownEvent>())
-      suppressHorizontalStripButton = cDown->controllerButton == ControllerButton::DPadDown;
+      suppressHorizontalStripButton = m_guiContext->actions(cDown->controllerButton).contains(InterfaceAction::InterfaceHotbarStripHold);
     else if (auto cUp = event.ptr<ControllerButtonUpEvent>())
-      suppressHorizontalStripButton = cUp->controllerButton == ControllerButton::DPadDown;
+      suppressHorizontalStripButton = m_guiContext->actions(cUp->controllerButton).contains(InterfaceAction::InterfaceHotbarStripHold);
   }
 
   bool shouldRouteOriginal = !(panelMode && !waitingForKeybindingCapture && (event.is<ControllerButtonDownEvent>() || event.is<ControllerButtonUpEvent>() || event.is<ControllerAxisEvent>()))
@@ -681,7 +729,9 @@ void ClientApplication::processInput(InputEvent const& event) {
     };
 
     if (auto cAxis = event.ptr<ControllerAxisEvent>()) {
-      if (cAxis->controllerAxis == ControllerAxis::RightY) {
+      auto axisActions = m_guiContext->actions(cAxis->controllerAxis, m_controllerAxisValues.value(cAxis->controllerAxis, 0.0f));
+
+      if (axisActions.contains(InterfaceAction::InterfacePanelScrollUp) || axisActions.contains(InterfaceAction::InterfacePanelScrollDown)) {
         PanePtr topPane;
         if (m_mainInterface) {
           if (auto paneManager = m_mainInterface->paneManager())
@@ -710,8 +760,8 @@ void ClientApplication::processInput(InputEvent const& event) {
         }
       }
 
-      if (cAxis->controllerAxis == ControllerAxis::TriggerLeft) {
-        bool triggerHeld = cAxis->controllerAxisValue > 0.6f;
+      if (axisActions.contains(InterfaceAction::InterfacePanelDragHold) || m_panelDragMouseHeld) {
+        bool triggerHeld = isActionTaken(InterfaceAction::InterfacePanelDragHold);
         if (triggerHeld && !m_panelDragMouseHeld) {
           m_panelDragMouseHeld = true;
           routeInputEvent(InputEvent{MouseButtonDownEvent{MouseButton::Left, m_input->mousePosition()}});
@@ -725,7 +775,9 @@ void ClientApplication::processInput(InputEvent const& event) {
     }
 
     if (auto cDown = event.ptr<ControllerButtonDownEvent>()) {
-      if (cDown->controllerButton == ControllerButton::X && m_mainInterface) {
+      auto buttonActions = m_guiContext->actions(cDown->controllerButton);
+
+      if (buttonActions.contains(InterfaceAction::InterfaceTakeAllItems) && m_mainInterface) {
         auto paneManager = m_mainInterface->paneManager();
         if (paneManager) {
           auto topPane = paneManager->topPane({PaneLayer::ModalWindow, PaneLayer::Window});
@@ -736,57 +788,45 @@ void ClientApplication::processInput(InputEvent const& event) {
         }
       }
 
-      switch (cDown->controllerButton) {
-        case ControllerButton::A: {
-          InputEvent mouseEvent{MouseButtonDownEvent{MouseButton::Left, m_input->mousePosition()}};
-          routeInputEvent(mouseEvent);
-          break;
-        }
-        case ControllerButton::B: {
-          if (m_state > MainAppState::Title && m_mainInterface)
-            m_mainInterface->paneManager()->dismissAllPanes({PaneLayer::ModalWindow, PaneLayer::Window});
-          else {
-            routeInputEvent(InputEvent{KeyDownEvent{Key::Escape, KeyMod::NoMod}});
-            routeInputEvent(InputEvent{KeyUpEvent{Key::Escape}});
-          }
-          break;
-        }
-        case ControllerButton::LeftStick:
-          centerCursorOnPanelTarget();
-          break;
-        case ControllerButton::DPadLeft:
-          movePanelCursorByStep(Vec2I(-1, 0));
-          break;
-        case ControllerButton::DPadRight:
-          movePanelCursorByStep(Vec2I(1, 0));
-          break;
-        case ControllerButton::DPadUp:
-          movePanelCursorByStep(Vec2I(0, -1));
-          break;
-        case ControllerButton::DPadDown:
-          movePanelCursorByStep(Vec2I(0, 1));
-          break;
-        case ControllerButton::LeftShoulder:
-          routeInputEvent(InputEvent{ControllerButtonDownEvent{cDown->controller, ControllerButton::DPadLeft}});
-          break;
-        case ControllerButton::RightShoulder:
-          routeInputEvent(InputEvent{ControllerButtonDownEvent{cDown->controller, ControllerButton::DPadRight}});
-          break;
-        default:
-          break;
+      if (buttonActions.contains(InterfaceAction::InterfacePanelSelect)) {
+        InputEvent mouseEvent{MouseButtonDownEvent{MouseButton::Left, m_input->mousePosition()}};
+        routeInputEvent(mouseEvent);
       }
+
+      if (buttonActions.contains(InterfaceAction::InterfacePanelBack)) {
+        if (m_state > MainAppState::Title && m_mainInterface)
+          m_mainInterface->paneManager()->dismissAllPanes({PaneLayer::ModalWindow, PaneLayer::Window});
+        else {
+          routeInputEvent(InputEvent{KeyDownEvent{Key::Escape, KeyMod::NoMod}});
+          routeInputEvent(InputEvent{KeyUpEvent{Key::Escape}});
+        }
+      }
+
+      if (buttonActions.contains(InterfaceAction::InterfacePanelCursorCenter))
+        centerCursorOnPanelTarget();
+      if (buttonActions.contains(InterfaceAction::InterfacePanelCursorLeft))
+        movePanelCursorByStep(Vec2I(-1, 0));
+      if (buttonActions.contains(InterfaceAction::InterfacePanelCursorRight))
+        movePanelCursorByStep(Vec2I(1, 0));
+      if (buttonActions.contains(InterfaceAction::InterfacePanelCursorUp))
+        movePanelCursorByStep(Vec2I(0, -1));
+      if (buttonActions.contains(InterfaceAction::InterfacePanelCursorDown))
+        movePanelCursorByStep(Vec2I(0, 1));
+
       return;
     }
 
     if (auto cUp = event.ptr<ControllerButtonUpEvent>()) {
-      if (cUp->controllerButton == ControllerButton::A)
+      if (m_guiContext->actions(cUp->controllerButton).contains(InterfaceAction::InterfacePanelSelect))
         routeInputEvent(InputEvent{MouseButtonUpEvent{MouseButton::Left, m_input->mousePosition()}});
       return;
     }
   }
 
   if (auto cDown = event.ptr<ControllerButtonDownEvent>()) {
-    if (cDown->controllerButton == ControllerButton::X && m_mainInterface) {
+    auto buttonActions = m_guiContext->actions(cDown->controllerButton);
+
+    if (buttonActions.contains(InterfaceAction::InterfaceTakeAllItems) && m_mainInterface) {
       auto paneManager = m_mainInterface->paneManager();
       if (paneManager) {
         auto topPane = paneManager->topPane({PaneLayer::ModalWindow, PaneLayer::Window});
@@ -799,32 +839,17 @@ void ClientApplication::processInput(InputEvent const& event) {
       }
     }
 
-    if (cDown->controllerButton == ControllerButton::RightStick) {
+    if (buttonActions.contains(InterfaceAction::InterfaceToggleControllerMouse)) {
       auto configuration = m_root->configuration();
       bool controllerMouseEnabled = configuration->get("controllerMouseEnabled").optBool().value(true);
       configuration->set("controllerMouseEnabled", !controllerMouseEnabled);
       processed = true;
     }
 
-    if (cDown->controllerButton == ControllerButton::DPadDown && m_state > MainAppState::Title && m_player) {
-      auto inventory = m_player->inventory();
-      int slotCount = hotbarWheelSlotCount(inventory);
-      if (slotCount > 0) {
-        m_hotbarStripActive = true;
-        m_hotbarStripScrollAccumulator = 0.0f;
-        m_hotbarStripEdgeLatchDirection = 0;
-        m_hotbarStripIndex = clamp(hotbarWheelIndexFromSelection(inventory, inventory->selectedActionBarLocation()), 0, slotCount - 1);
-        m_hotbarWheelActive = false;
-        m_panelWheelActive = false;
-        processed = true;
-        return;
-      }
-    }
-
     Maybe<MouseButton> mouseButton;
-    if (cDown->controllerButton == ControllerButton::X)
+    if (buttonActions.contains(InterfaceAction::InterfaceControllerMouseLeft))
       mouseButton = MouseButton::Left;
-    else if (cDown->controllerButton == ControllerButton::Y)
+    else if (buttonActions.contains(InterfaceAction::InterfaceControllerMouseRight))
       mouseButton = MouseButton::Right;
 
     if (mouseButton) {
@@ -832,26 +857,12 @@ void ClientApplication::processInput(InputEvent const& event) {
       processed |= routeInputEvent(mouseEvent);
     }
   } else if (auto cUp = event.ptr<ControllerButtonUpEvent>()) {
-    if (cUp->controllerButton == ControllerButton::DPadDown && m_hotbarStripActive && m_player) {
-      if (auto inventory = m_player->inventory()) {
-        int slotCount = hotbarWheelSlotCount(inventory);
-        if (slotCount > 0) {
-          int index = pmod(m_hotbarStripIndex, slotCount);
-          inventory->selectActionBarLocation(hotbarWheelSelectionFromIndex(inventory, index));
-        }
-      }
-
-      m_hotbarStripActive = false;
-      m_hotbarStripScrollAccumulator = 0.0f;
-      m_hotbarStripEdgeLatchDirection = 0;
-      processed = true;
-      return;
-    }
+    auto buttonActions = m_guiContext->actions(cUp->controllerButton);
 
     Maybe<MouseButton> mouseButton;
-    if (cUp->controllerButton == ControllerButton::X)
+    if (buttonActions.contains(InterfaceAction::InterfaceControllerMouseLeft))
       mouseButton = MouseButton::Left;
-    else if (cUp->controllerButton == ControllerButton::Y)
+    else if (buttonActions.contains(InterfaceAction::InterfaceControllerMouseRight))
       mouseButton = MouseButton::Right;
 
     if (mouseButton) {
@@ -2110,6 +2121,7 @@ void ClientApplication::updateTitle(float dt) {
     }
 
   } else if (m_titleScreen->currentState() == TitleState::Quit) {
+    Logger::info("ClientApplication: title state requested quit");
     changeState(MainAppState::Quit);
   }
 }
@@ -2148,6 +2160,7 @@ void ClientApplication::updateRunning(float dt) {
     bool panelModeActive = panelInteractionModeActive();
     bool panelWheelHeld = !panelModeActive && isActionTaken(InterfaceAction::InterfacePanelWheelHold);
     bool hotbarWheelHeld = !panelModeActive && isActionTaken(InterfaceAction::InterfaceHotbarWheelHold);
+    bool hotbarStripHeld = !panelModeActive && isActionTaken(InterfaceAction::InterfaceHotbarStripHold);
     bool canBeamUp = m_universeClient && m_universeClient->canBeamUp();
     bool canBeamDown = m_universeClient && m_universeClient->canBeamDown();
 
@@ -2159,6 +2172,31 @@ void ClientApplication::updateRunning(float dt) {
       m_hotbarStripActive = false;
       m_hotbarStripScrollAccumulator = 0.0f;
       m_hotbarStripEdgeLatchDirection = 0;
+    }
+
+    if (m_hotbarStripActive && !hotbarStripHeld) {
+      if (auto inventory = m_player->inventory()) {
+        int slotCount = hotbarWheelSlotCount(inventory);
+        if (slotCount > 0) {
+          int index = pmod(m_hotbarStripIndex, slotCount);
+          inventory->selectActionBarLocation(hotbarWheelSelectionFromIndex(inventory, index));
+        }
+      }
+
+      m_hotbarStripActive = false;
+      m_hotbarStripScrollAccumulator = 0.0f;
+      m_hotbarStripEdgeLatchDirection = 0;
+    } else if (!m_hotbarStripActive && hotbarStripHeld && m_state > MainAppState::Title) {
+      auto inventory = m_player->inventory();
+      int slotCount = hotbarWheelSlotCount(inventory);
+      if (slotCount > 0) {
+        m_hotbarStripActive = true;
+        m_hotbarStripScrollAccumulator = 0.0f;
+        m_hotbarStripEdgeLatchDirection = 0;
+        m_hotbarStripIndex = clamp(hotbarWheelIndexFromSelection(inventory, inventory->selectedActionBarLocation()), 0, slotCount - 1);
+        m_hotbarWheelActive = false;
+        m_panelWheelActive = false;
+      }
     }
 
     if (m_hotbarStripActive) {
@@ -2563,7 +2601,7 @@ void ClientApplication::updateRunning(float dt) {
       }
 
       bool wheelPause = m_state == MainAppState::SinglePlayer &&
-          (m_hotbarWheelActive || m_hotbarStripActive || m_panelWheelActive || hotbarWheelHeld || panelWheelHeld);
+          (m_hotbarWheelActive || m_hotbarStripActive || m_panelWheelActive || hotbarWheelHeld || hotbarStripHeld || panelWheelHeld);
       m_universeServer->setPause(m_mainInterface->escapeDialogOpen() || wheelPause);
     }
 
