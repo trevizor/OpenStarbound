@@ -68,10 +68,24 @@ Vec2F LuaBindings::EntityCallbacks::distanceToEntity(Entity const* entity, Entit
 }
 
 bool LuaBindings::EntityCallbacks::entityInSight(Entity const* entity, EntityId entityId) {
-  if (auto target = entity->world()->entity(entityId))
-    return !entity->world()->lineTileCollision(target->position(), entity->position());
-  else
+  auto target = entity->world()->entity(entityId);
+  if (!target)
     return false;
+
+  if (is<Player>(target) && (is<Monster>(entity) || is<Npc>(entity))) {
+    auto const toTarget = entity->world()->geometry().diff(target->position(), entity->position());
+
+    Direction facingDirection = Direction::Right;
+    if (auto monster = as<Monster>(entity))
+      facingDirection = const_cast<Monster*>(monster)->movementController()->facingDirection();
+    else if (auto npc = as<Npc>(entity))
+      facingDirection = const_cast<Npc*>(npc)->movementController()->facingDirection();
+
+    if (toTarget[0] * numericalDirection(facingDirection) < 0)
+      return false;
+  }
+
+  return !entity->world()->lineTileCollision(target->position(), entity->position());
 }
 
 }

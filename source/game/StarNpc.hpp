@@ -272,6 +272,7 @@ private:
   EffectEmitterPtr m_effectEmitter;
 
   NetElementBool m_aggressive;
+  float m_alertBroadcastDelayTimer = 0.0f;
 
   List<BehaviorStatePtr> m_behaviors;
   mutable LuaMessageHandlingComponent<LuaStorableComponent<LuaActorMovementComponent<LuaUpdatableComponent<LuaWorldComponent<LuaBaseComponent>>>>> m_scriptComponent;

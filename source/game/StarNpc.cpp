@@ -32,6 +32,12 @@
 
 namespace Star {
 
+namespace {
+constexpr float StealthUnawareDamageMultiplier = 2.0f;
+constexpr float StealthAlertBroadcastDelay = 2.0f;
+constexpr float EnemyDirectionChangeSuppressionChance = 0.5f;
+}
+
 Npc::Npc(NpcVariant const& npcVariant) {
 
   m_netHumanoid.addNetElement(make_shared<NetHumanoid>(npcVariant.humanoidIdentity, npcVariant.humanoidParameters, npcVariant.uniqueHumanoidConfig ? npcVariant.humanoidConfig : Json()));
@@ -346,7 +352,11 @@ List<DamageNotification> Npc::applyDamage(DamageRequest const& damage) {
   if (!inWorld())
     return {};
 
-  auto notifications = m_statusController->applyDamageRequest(damage);
+  DamageRequest adjustedDamage = damage;
+  if (!m_aggressive.get())
+    adjustedDamage.damage *= StealthUnawareDamageMultiplier;
+
+  auto notifications = m_statusController->applyDamageRequest(adjustedDamage);
 
   float totalDamage = 0.0f;
   for (auto const& notification : notifications)
@@ -354,10 +364,10 @@ List<DamageNotification> Npc::applyDamage(DamageRequest const& damage) {
 
   if (totalDamage > 0 && m_hitDamageNotificationLimiter < m_hitDamageNotificationLimit) {
     m_scriptComponent.invoke("damage", JsonObject{
-        {"sourceId", damage.sourceEntityId},
+        {"sourceId", adjustedDamage.sourceEntityId},
         {"damage", totalDamage},
-        {"sourceDamage", damage.damage},
-        {"sourceKind", damage.damageSourceKind}
+        {"sourceDamage", adjustedDamage.damage},
+        {"sourceKind", adjustedDamage.damageSourceKind}
       });
     m_hitDamageNotificationLimiter++;
   }
@@ -406,7 +416,12 @@ void Npc::update(float dt, uint64_t) {
   m_movementController->setTimestep(dt);
 
   if (isMaster()) {
+    Direction facingBeforeAi = m_movementController->facingDirection();
+
     m_scriptComponent.update(m_scriptComponent.updateDt(dt));
+
+    if (Random::randf() < EnemyDirectionChangeSuppressionChance)
+      m_movementController->controlFace(facingBeforeAi);
 
     if (inConflictingLoungeAnchor())
       m_movementController->resetAnchorState();
@@ -592,7 +607,7 @@ String Npc::nametag() const {
 }
 
 bool Npc::aggressive() const {
-  return m_aggressive.get();
+  return m_aggressive.get() && m_alertBroadcastDelayTimer <= 0.0f;
 }
 
 Maybe<LuaValue> Npc::callScript(String const& func, LuaVariadic<LuaValue> const& args) {
@@ -612,6 +627,9 @@ Vec2F Npc::getAbsolutePosition(Vec2F relativePosition) const {
 void Npc::tickShared(float dt) {
   if (m_hitDamageNotificationLimiter)
     m_hitDamageNotificationLimiter--;
+
+  if (m_alertBroadcastDelayTimer > 0.0f)
+    m_alertBroadcastDelayTimer = max(0.0f, m_alertBroadcastDelayTimer - dt);
 
   m_songbook->update(*entityMode(), world());
 
@@ -896,7 +914,13 @@ LuaCallbacks Npc::makeNpcCallbacks() {
 
   callbacks.registerCallback("setDamageTeam", [this](Json const& team) { setTeam(EntityDamageTeam(team)); });
 
-  callbacks.registerCallback("setAggressive", [this](bool aggressive) { m_aggressive.set(aggressive); });
+  callbacks.registerCallback("setAggressive", [this](bool aggressive) {
+      if (aggressive && !m_aggressive.get())
+        m_alertBroadcastDelayTimer = StealthAlertBroadcastDelay;
+      else if (!aggressive)
+        m_alertBroadcastDelayTimer = 0.0f;
+      m_aggressive.set(aggressive);
+    });
 
   callbacks.registerCallback("setUniqueId", [this](Maybe<String> uniqueId) { setUniqueId(uniqueId); });
 

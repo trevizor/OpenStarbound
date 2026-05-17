@@ -171,6 +171,7 @@ private:
 
   bool m_damageOnTouch;
   bool m_aggressive;
+  float m_alertBroadcastDelayTimer = 0.0f;
 
   bool m_knockedOut;
   double m_knockoutTimer;

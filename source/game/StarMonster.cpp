@@ -22,6 +22,12 @@
 
 namespace Star {
 
+namespace {
+constexpr float StealthUnawareDamageMultiplier = 2.0f;
+constexpr float StealthAlertBroadcastDelay = 2.0f;
+constexpr float EnemyDirectionChangeSuppressionChance = 0.5f;
+}
+
 Monster::Monster(MonsterVariant const& monsterVariant, Maybe<float> level) {
   m_monsterLevel = level;
 
@@ -97,7 +103,7 @@ Json Monster::diskStore() const {
     {"movementState", m_movementController->storeState()},
     {"statusController", m_statusController->diskStore()},
     {"damageOnTouch", m_damageOnTouch},
-    {"aggressive", aggressive()},
+    {"aggressive", m_aggressive},
     {"deathParticleBurst", m_deathParticleBurst},
     {"deathSound", m_deathSound},
     {"activeSkillName", m_activeSkillName},
@@ -255,7 +261,11 @@ List<DamageNotification> Monster::applyDamage(DamageRequest const& damage) {
   if (!inWorld())
     return {};
 
-  auto notifications = m_statusController->applyDamageRequest(damage);
+  DamageRequest adjustedDamage = damage;
+  if (!m_aggressive)
+    adjustedDamage.damage *= StealthUnawareDamageMultiplier;
+
+  auto notifications = m_statusController->applyDamageRequest(adjustedDamage);
 
   float totalDamage = 0.0f;
   for (auto const& notification : notifications)
@@ -263,15 +273,15 @@ List<DamageNotification> Monster::applyDamage(DamageRequest const& damage) {
 
   if (totalDamage > 0.0f) {
     m_scriptComponent.invoke("damage", JsonObject{
-        {"sourceId", damage.sourceEntityId},
+        {"sourceId", adjustedDamage.sourceEntityId},
         {"damage", totalDamage},
-        {"sourceDamage", damage.damage},
-        {"sourceKind", damage.damageSourceKind}
+        {"sourceDamage", adjustedDamage.damage},
+        {"sourceKind", adjustedDamage.damageSourceKind}
       });
   }
 
   if (!m_statusController->resourcePositive("health"))
-    m_deathDamageSourceKinds.add(damage.damageSourceKind);
+    m_deathDamageSourceKinds.add(adjustedDamage.damageSourceKind);
 
   return notifications;
 }
@@ -449,9 +459,14 @@ void Monster::update(float dt, uint64_t) {
   if (!inWorld())
     return;
 
+  if (m_alertBroadcastDelayTimer > 0.0f)
+    m_alertBroadcastDelayTimer = max(0.0f, m_alertBroadcastDelayTimer - dt);
+
   m_movementController->setTimestep(dt);
 
   if (isMaster()) {
+    Direction facingBeforeAi = m_movementController->facingDirection();
+
     m_networkedAnimator.setFlipped((m_movementController->facingDirection() == Direction::Left) != m_monsterVariant.reversed);
 
     if (m_knockedOut) {
@@ -460,6 +475,9 @@ void Monster::update(float dt, uint64_t) {
       if (m_scriptComponent.updateReady())
         m_physicsForces.set({});
       m_scriptComponent.update(m_scriptComponent.updateDt(dt));
+
+      if (Random::randf() < EnemyDirectionChangeSuppressionChance)
+        m_movementController->controlFace(facingBeforeAi);
 
       if (shouldDie())
         knockout();
@@ -589,6 +607,10 @@ LuaCallbacks Monster::makeMonsterCallbacks() {
     });
 
   callbacks.registerCallback("setAggressive", [this](bool arg1) {
+      if (arg1 && !m_aggressive)
+        m_alertBroadcastDelayTimer = StealthAlertBroadcastDelay;
+      else if (!arg1)
+        m_alertBroadcastDelayTimer = 0.0f;
       m_aggressive = arg1;
     });
 
@@ -823,7 +845,7 @@ String Monster::nametag() const {
 }
 
 bool Monster::aggressive() const {
-  return m_aggressive;
+  return m_aggressive && m_alertBroadcastDelayTimer <= 0.0f;
 }
 
 Maybe<LuaValue> Monster::callScript(String const& func, LuaVariadic<LuaValue> const& args) {
