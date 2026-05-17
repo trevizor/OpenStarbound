@@ -109,6 +109,7 @@ private:
   bool applyVirtualCursorVelocity(Vec2F const& desiredVelocity, float dt);
   void updateControllerMouse(float dt);
   void renderHotbarWheelOverlay();
+  void renderHotbarStripOverlay();
   void renderPanelWheelOverlay();
 
   void updateCamera(float dt);
@@ -167,12 +168,17 @@ private:
   Vec2F m_controllerRightStickRaw;
   Vec2F m_controllerLockedAimDirection;
   float m_controllerLockedAimDistance = 0.0f;
+  bool m_controllerMoveOnlyWasActive = false;
   bool m_controllerLockedAimDirectionValid = false;
   Maybe<Vec2F> m_controllerAimOnlyLockedWorld;
   bool m_controllerAimOnlyHadInput = false;
   Maybe<Vec2F> m_controllerMoveOnlyLockedCursorWorld;
   bool m_hotbarWheelActive = false;
   Maybe<SelectedActionBarLocation> m_hotbarWheelSelection;
+  bool m_hotbarStripActive = false;
+  int m_hotbarStripIndex = 0;
+  float m_hotbarStripScrollAccumulator = 0.0f;
+  int m_hotbarStripEdgeLatchDirection = 0;
   bool m_panelWheelActive = false;
   Maybe<PanelWheelOption> m_panelWheelSelection;
   Vec2F m_virtualCursorVelocity;

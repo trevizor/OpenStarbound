@@ -18,6 +18,7 @@
 #include "StarRootLoader.hpp"
 #include "StarInput.hpp"
 #include "StarListWidget.hpp"
+#include "StarScrollArea.hpp"
 #include "StarItemSlotWidget.hpp"
 #include "StarButtonWidget.hpp"
 #include "StarVoice.hpp"
@@ -117,6 +118,15 @@ static ItemPtr hotbarWheelItemForSelection(PlayerInventoryPtr const& inventory, 
     return inventory->essentialItem(selection.get<EssentialItem>());
 
   return {};
+}
+
+static int hotbarWheelIndexFromSelection(PlayerInventoryPtr const& inventory, SelectedActionBarLocation const& selection) {
+  int slotCount = hotbarWheelSlotCount(inventory);
+  for (int i = 0; i < slotCount; ++i) {
+    if (hotbarWheelSelectionFromIndex(inventory, i) == selection)
+      return i;
+  }
+  return 0;
 }
 
 static List<ClientApplication::PanelWheelOption> panelWheelOptions(bool canBeamUp, bool canBeamDown) {
@@ -301,7 +311,7 @@ Json const AdditionalDefaultConfiguration = Json::parseJson(R"JSON(
         "ChatStop" :  [ { "type" : "key", "value" : "Esc", "mods" : [] } ],
         "InterfaceHideHud" :  [ { "type" : "key", "value" : "F1", "mods" : [] } ],
         "InterfaceChangeBarGroup" :  [ { "type" : "key", "value" : "X", "mods" : [] }, { "type" : "controller", "value" : "RightShoulder" } ],
-        "InterfaceHotbarWheelHold" : [ { "type" : "controller", "value" : "DPadDown" } ],
+        "InterfaceHotbarWheelHold" : [],
         "InterfacePanelWheelHold" : [ { "type" : "controller", "value" : "DPadUp" } ],
         "InterfaceDeselectHands" :  [ { "type" : "key", "value" : "Z", "mods" : [] } ],
         "InterfaceBar1" :  [ { "type" : "key", "value" : "1", "mods" : [] } ],
@@ -595,7 +605,16 @@ void ClientApplication::processInput(InputEvent const& event) {
   }
 
   bool panelMode = panelInteractionModeActive();
-  bool shouldRouteOriginal = !(panelMode && (event.is<ControllerButtonDownEvent>() || event.is<ControllerButtonUpEvent>() || event.is<ControllerAxisEvent>()));
+  bool suppressHorizontalStripButton = false;
+  if (!panelMode && m_state > MainAppState::Title) {
+    if (auto cDown = event.ptr<ControllerButtonDownEvent>())
+      suppressHorizontalStripButton = cDown->controllerButton == ControllerButton::DPadDown;
+    else if (auto cUp = event.ptr<ControllerButtonUpEvent>())
+      suppressHorizontalStripButton = cUp->controllerButton == ControllerButton::DPadDown;
+  }
+
+  bool shouldRouteOriginal = !(panelMode && (event.is<ControllerButtonDownEvent>() || event.is<ControllerButtonUpEvent>() || event.is<ControllerAxisEvent>()))
+      && !suppressHorizontalStripButton;
   bool processed = shouldRouteOriginal ? routeInputEvent(event) : false;
 
   if (panelMode) {
@@ -608,7 +627,7 @@ void ClientApplication::processInput(InputEvent const& event) {
         auto widget = stack.takeLast();
         if (!widget)
           continue;
-        if (as<ListWidget>(widget))
+        if (as<ListWidget>(widget) || as<ScrollArea>(widget))
           return true;
         for (size_t i = 0; i < widget->numChildren(); ++i)
           stack.append(widget->getChildNum(i));
@@ -618,10 +637,19 @@ void ClientApplication::processInput(InputEvent const& event) {
     };
 
     if (auto cAxis = event.ptr<ControllerAxisEvent>()) {
-      if (cAxis->controllerAxis == ControllerAxis::RightY && m_mainInterface) {
-        auto topPane = m_mainInterface->paneManager()->topPane({PaneLayer::ModalWindow, PaneLayer::Window});
+      if (cAxis->controllerAxis == ControllerAxis::RightY) {
+        PanePtr topPane;
+        if (m_mainInterface) {
+          if (auto paneManager = m_mainInterface->paneManager())
+            topPane = paneManager->topPane({PaneLayer::ModalWindow, PaneLayer::Window});
+        }
+        if (!topPane && m_titleScreen) {
+          if (auto paneManager = m_titleScreen->paneManager())
+            topPane = paneManager->topPane({PaneLayer::ModalWindow, PaneLayer::Window});
+        }
+
         float axisY = m_controllerRightStick[1];
-        if (topPane && panelHasList(topPane) && std::abs(axisY) > 0.55f) {
+        if (topPane && panelHasList(topPane) && std::abs(axisY) > 0.35f) {
           m_panelScrollAccumulator += axisY * 6.0f * GlobalTimestep;
           while (m_panelScrollAccumulator >= 1.0f) {
             InputEvent mouseEvent{MouseWheelEvent{MouseWheel::Up, m_input->mousePosition()}};
@@ -734,6 +762,21 @@ void ClientApplication::processInput(InputEvent const& event) {
       processed = true;
     }
 
+    if (cDown->controllerButton == ControllerButton::DPadDown && m_state > MainAppState::Title && m_player) {
+      auto inventory = m_player->inventory();
+      int slotCount = hotbarWheelSlotCount(inventory);
+      if (slotCount > 0) {
+        m_hotbarStripActive = true;
+        m_hotbarStripScrollAccumulator = 0.0f;
+        m_hotbarStripEdgeLatchDirection = 0;
+        m_hotbarStripIndex = clamp(hotbarWheelIndexFromSelection(inventory, inventory->selectedActionBarLocation()), 0, slotCount - 1);
+        m_hotbarWheelActive = false;
+        m_panelWheelActive = false;
+        processed = true;
+        return;
+      }
+    }
+
     Maybe<MouseButton> mouseButton;
     if (cDown->controllerButton == ControllerButton::X)
       mouseButton = MouseButton::Left;
@@ -745,6 +788,22 @@ void ClientApplication::processInput(InputEvent const& event) {
       processed |= routeInputEvent(mouseEvent);
     }
   } else if (auto cUp = event.ptr<ControllerButtonUpEvent>()) {
+    if (cUp->controllerButton == ControllerButton::DPadDown && m_hotbarStripActive && m_player) {
+      if (auto inventory = m_player->inventory()) {
+        int slotCount = hotbarWheelSlotCount(inventory);
+        if (slotCount > 0) {
+          int index = pmod(m_hotbarStripIndex, slotCount);
+          inventory->selectActionBarLocation(hotbarWheelSelectionFromIndex(inventory, index));
+        }
+      }
+
+      m_hotbarStripActive = false;
+      m_hotbarStripScrollAccumulator = 0.0f;
+      m_hotbarStripEdgeLatchDirection = 0;
+      processed = true;
+      return;
+    }
+
     Maybe<MouseButton> mouseButton;
     if (cUp->controllerButton == ControllerButton::X)
       mouseButton = MouseButton::Left;
@@ -1013,7 +1072,14 @@ void ClientApplication::updateControllerMouse(float dt) {
     return;
   }
 
+  if (m_hotbarStripActive) {
+    m_virtualCursorVelocity = {};
+    return;
+  }
+
   if (panelInteractionModeActive()) {
+    appController()->setCursorVisible(true);
+
     float baseSpeed = configuration->get("controllerMouseSpeed").optFloat().value(1400.0f) * 1.25f;
     if (baseSpeed <= 0.0f)
       return;
@@ -1066,6 +1132,8 @@ void ClientApplication::updateControllerMouse(float dt) {
   float aimingDeadzone = mouseDeadzone * 2.0f;
   bool forcedAimOnly = isActionTaken(InterfaceAction::PlayerControllerAimOnly);
   bool lockAimDirection = !forcedAimOnly && isActionTaken(InterfaceAction::PlayerControllerMoveOnly);
+  bool moveOnlyJustPressed = lockAimDirection && !m_controllerMoveOnlyWasActive;
+  m_controllerMoveOnlyWasActive = lockAimDirection;
 
   if (m_state > MainAppState::Title && m_player && m_universeClient && m_universeClient->worldClient()) {
     Vec2F rightStick;
@@ -1082,6 +1150,22 @@ void ClientApplication::updateControllerMouse(float dt) {
     Vec2F playerPosition = m_player->position();
     float leftStickMagnitude = m_controllerLeftStick.magnitude();
     bool leftStickActive = stickAxisActive(m_controllerLeftStick, aimingDeadzone);
+
+    if (moveOnlyJustPressed) {
+      m_controllerLockedAimDirectionValid = false;
+      Vec2F cursorWorld = m_mainInterface->cursorWorldPosition();
+      Vec2F cursorDirection = worldClient->geometry().diff(cursorWorld, playerPosition);
+      float cursorDirectionMagnitude = cursorDirection.magnitude();
+      if (cursorDirectionMagnitude > 0.001f) {
+        m_controllerLockedAimDirection = cursorDirection / cursorDirectionMagnitude;
+        m_controllerLockedAimDistance = min(cursorDirectionMagnitude, 10.0f);
+        m_controllerLockedAimDirectionValid = true;
+      } else if (leftStickActive) {
+        m_controllerLockedAimDirection = Vec2F(m_controllerLeftStick[0], -m_controllerLeftStick[1]) / leftStickMagnitude;
+        m_controllerLockedAimDistance = 10.0f;
+        m_controllerLockedAimDirectionValid = true;
+      }
+    }
 
     if ((lockAimDirection || forcedAimOnly) && !m_controllerLockedAimDirectionValid) {
       Vec2F cursorWorld = m_mainInterface->cursorWorldPosition();
@@ -1183,6 +1267,10 @@ void ClientApplication::updateControllerMouse(float dt) {
       }
 
       m_virtualCursorVelocity = {};
+
+      Vec2F currentMouse = m_input->mousePosition();
+      if ((screenCursor - currentMouse).magnitudeSquared() <= 0.25f)
+        return;
 
       Vec2I cursorPosition = Vec2I::round(screenCursor);
       cursorPosition[1] = (int)screenSize[1] - 1 - cursorPosition[1];
@@ -1300,6 +1388,7 @@ void ClientApplication::render() {
     m_mainInterface->renderInWorldElements();
     m_mainInterface->render();
     renderHotbarWheelOverlay();
+    renderHotbarStripOverlay();
     renderPanelWheelOverlay();
     m_cinematicOverlay->render();
     LogMap::set("client_render_interface", strf(u8"{:05d}\u00b5s", Time::monotonicMicroseconds() - start));
@@ -1338,6 +1427,46 @@ void ClientApplication::renderHotbarWheelOverlay() {
 
     if (auto item = hotbarWheelItemForSelection(inventory, slotSelection)) {
       Vec4B iconColor = selected ? Vec4B::filled(255) : Vec4B(220, 220, 220, 255);
+      for (auto const& drawable : item->iconDrawables())
+        m_guiContext->drawInterfaceDrawable(drawable, slotCenter, iconColor);
+    }
+  }
+}
+
+void ClientApplication::renderHotbarStripOverlay() {
+  if (!m_hotbarStripActive || !m_player || !m_guiContext)
+    return;
+
+  auto inventory = m_player->inventory();
+  int slotCount = hotbarWheelSlotCount(inventory);
+  if (slotCount <= 0)
+    return;
+
+  Vec2F center = Vec2F(m_guiContext->windowInterfaceSize()) / 2.0f;
+  float spacing = 38.0f;
+  float slotSize = 26.0f;
+  int visibleRange = 4;
+
+  for (int offset = -visibleRange; offset <= visibleRange; ++offset) {
+    int index = pmod(m_hotbarStripIndex + offset, slotCount);
+    auto selection = hotbarWheelSelectionFromIndex(inventory, index);
+    bool selected = offset == 0;
+
+    float xOffset = offset * spacing;
+    float yOffset = selected ? 0.0f : std::abs((float)offset) * 2.0f;
+    Vec2F slotCenter = center + Vec2F(xOffset, yOffset);
+
+    float sizeScale = selected ? 1.20f : max(0.72f, 1.0f - std::abs((float)offset) * 0.08f);
+    float finalSize = slotSize * sizeScale;
+    Vec4B bgColor = selected ? Vec4B(20, 20, 20, 235) : Vec4B(8, 8, 8, 170);
+    m_guiContext->drawInterfaceQuad(RectF::withCenter(slotCenter, Vec2F::filled(finalSize)), bgColor);
+
+    if (selected)
+      m_guiContext->drawInterfacePolyLines(PolyF(RectF::withCenter(slotCenter, Vec2F::filled(finalSize + 6.0f))), Vec4B(255, 236, 170, 255), 1.5f);
+
+    if (auto item = hotbarWheelItemForSelection(inventory, selection)) {
+      uint8_t alpha = (uint8_t)clamp(255.0f - std::abs((float)offset) * 28.0f, 120.0f, 255.0f);
+      Vec4B iconColor = selected ? Vec4B::filled(255) : Vec4B(230, 230, 230, alpha);
       for (auto const& drawable : item->iconDrawables())
         m_guiContext->drawInterfaceDrawable(drawable, slotCenter, iconColor);
     }
@@ -1972,6 +2101,51 @@ void ClientApplication::updateRunning(float dt) {
       m_panelWheelSelection.reset();
       m_hotbarWheelActive = false;
       m_hotbarWheelSelection.reset();
+      m_hotbarStripActive = false;
+      m_hotbarStripScrollAccumulator = 0.0f;
+      m_hotbarStripEdgeLatchDirection = 0;
+    }
+
+    if (m_hotbarStripActive) {
+      auto inventory = m_player->inventory();
+      int slotCount = hotbarWheelSlotCount(inventory);
+      if (slotCount > 0) {
+        float wheelDeadzone = m_root->configuration()->get("controllerMouseDeadzone").optFloat().value(0.20f);
+        float rightX = applyControllerAxisResponse(m_controllerRightStickRaw[0], wheelDeadzone, 1.0f);
+
+        if (std::abs(rightX) > 0.05f) {
+          int edgeDirection = 0;
+          if (rightX >= 0.90f)
+            edgeDirection = 1;
+          else if (rightX <= -0.90f)
+            edgeDirection = -1;
+
+          if (edgeDirection != 0 && edgeDirection != m_hotbarStripEdgeLatchDirection) {
+            m_hotbarStripIndex = pmod(m_hotbarStripIndex + edgeDirection, slotCount);
+            m_hotbarStripScrollAccumulator = 0.0f;
+          }
+
+          m_hotbarStripEdgeLatchDirection = edgeDirection;
+
+          m_hotbarStripScrollAccumulator += rightX * 9.0f * dt;
+          while (m_hotbarStripScrollAccumulator >= 1.0f) {
+            m_hotbarStripIndex = pmod(m_hotbarStripIndex + 1, slotCount);
+            m_hotbarStripScrollAccumulator -= 1.0f;
+          }
+          while (m_hotbarStripScrollAccumulator <= -1.0f) {
+            m_hotbarStripIndex = pmod(m_hotbarStripIndex - 1, slotCount);
+            m_hotbarStripScrollAccumulator += 1.0f;
+          }
+        } else {
+          m_hotbarStripScrollAccumulator = 0.0f;
+          m_hotbarStripEdgeLatchDirection = 0;
+        }
+      }
+
+      m_hotbarWheelActive = false;
+      m_hotbarWheelSelection.reset();
+      m_panelWheelActive = false;
+      m_panelWheelSelection.reset();
     }
 
     if (m_panelWheelActive && !panelWheelHeld) {
@@ -2328,7 +2502,7 @@ void ClientApplication::updateRunning(float dt) {
       }
 
       bool wheelPause = m_state == MainAppState::SinglePlayer &&
-          (m_hotbarWheelActive || m_panelWheelActive || hotbarWheelHeld || panelWheelHeld);
+          (m_hotbarWheelActive || m_hotbarStripActive || m_panelWheelActive || hotbarWheelHeld || panelWheelHeld);
       m_universeServer->setPause(m_mainInterface->escapeDialogOpen() || wheelPause);
     }
 
