@@ -749,7 +749,9 @@ void ClientApplication::processInput(InputEvent const& event) {
 
 void ClientApplication::update() {
   auto configuration = m_root->configuration();
-  GlobalTimescale = clamp(configuration->get("gameSpeed").optFloat().value(1.0f), 0.5f, 1.5f);
+  float configuredGameSpeed = clamp(configuration->get("gameSpeed").optFloat().value(1.0f), 0.5f, 1.5f);
+  bool sleeping = m_state > MainAppState::Title && playerIsSleeping(m_player, m_universeClient ? m_universeClient->worldClient() : nullptr);
+  GlobalTimescale = sleeping ? 2.0f : configuredGameSpeed;
 
   float dt = GlobalTimestep * GlobalTimescale;
   auto& app = appController();
