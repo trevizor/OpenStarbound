@@ -1121,6 +1121,17 @@ void ClientApplication::updateControllerMouse(float dt) {
     return;
   }
 
+  bool waitingForKeybindingCapture = false;
+  if (m_mainInterface)
+    waitingForKeybindingCapture = waitingForKeybindingCapture || paneManagerWaitingForKeybindingCapture(m_mainInterface->paneManager());
+  if (m_titleScreen)
+    waitingForKeybindingCapture = waitingForKeybindingCapture || paneManagerWaitingForKeybindingCapture(m_titleScreen->paneManager());
+
+  if (waitingForKeybindingCapture) {
+    m_virtualCursorVelocity = {};
+    return;
+  }
+
   if (panelInteractionModeActive()) {
     appController()->setCursorVisible(true);
 

@@ -1145,6 +1145,11 @@ private:
           m_SdlControllers.erase(event.gdevice.which);
         }
       } else if (event.type == SDL_EVENT_QUIT) {
+        Logger::info("Application: received SDL_EVENT_QUIT");
+        m_quitRequested = true;
+        starEvent.reset();
+      } else if (event.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED) {
+        Logger::info("Application: received SDL_EVENT_WINDOW_CLOSE_REQUESTED for window {}", event.window.windowID);
         m_quitRequested = true;
         starEvent.reset();
       }

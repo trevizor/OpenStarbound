@@ -9,9 +9,11 @@
 #include "StarOrderedSet.hpp"
 #include "StarJsonExtra.hpp"
 #include "StarTabSet.hpp"
+#include "StarTime.hpp"
 
 namespace Star {
 
+KeybindingsMenu::KeybindingsMenu() : m_activeKeybinding(nullptr), m_clearHoldFromController(false) {
 KeybindingsMenu::KeybindingsMenu() : m_activeKeybinding(nullptr) {
   GuiReader reader;
   reader.registerCallback("cancel",
@@ -49,6 +51,43 @@ bool KeybindingsMenu::sendEvent(InputEvent const& event) {
     return false;
 
   if (m_activeKeybinding) {
+    constexpr uint64_t ClearHoldThresholdMs = 500;
+
+    if (auto keyDown = event.ptr<KeyDownEvent>()) {
+      if (keyDown->key == Key::Escape) {
+        m_clearHoldStartMs = Time::monotonicMilliseconds();
+        m_clearHoldFromController = false;
+        return true;
+      }
+    } else if (auto keyUp = event.ptr<KeyUpEvent>()) {
+      if (keyUp->key == Key::Escape && m_clearHoldStartMs && !m_clearHoldFromController) {
+        uint64_t heldFor = Time::monotonicMilliseconds() - *m_clearHoldStartMs;
+        if (heldFor >= ClearHoldThresholdMs)
+          clearActive();
+        else
+          exitActiveMode();
+        return true;
+      }
+    } else if (auto controllerDown = event.ptr<ControllerButtonDownEvent>()) {
+      if (controllerDown->controllerButton == ControllerButton::Start) {
+        m_clearHoldStartMs = Time::monotonicMilliseconds();
+        m_clearHoldFromController = true;
+        return true;
+      }
+    } else if (auto controllerUp = event.ptr<ControllerButtonUpEvent>()) {
+      if (controllerUp->controllerButton == ControllerButton::Start && m_clearHoldStartMs && m_clearHoldFromController) {
+        uint64_t heldFor = Time::monotonicMilliseconds() - *m_clearHoldStartMs;
+        if (heldFor >= ClearHoldThresholdMs)
+          clearActive();
+        else
+          exitActiveMode();
+        return true;
+      }
+    }
+
+    if (m_clearHoldStartMs)
+      return true;
+
     if (m_context->actions(event).contains(InterfaceAction::KeybindingClear)) {
       clearActive();
       return true;
@@ -97,12 +136,11 @@ bool KeybindingsMenu::sendEvent(InputEvent const& event) {
   }
 
   if (!m_activeKeybinding && m_tabSet && event.is<ControllerButtonDownEvent>()) {
-    auto controllerButton = event.get<ControllerButtonDownEvent>().controllerButton;
-    if (controllerButton == ControllerButton::LeftShoulder || controllerButton == ControllerButton::DPadLeft) {
+    if (m_context->actions(event).contains(InterfaceAction::InterfaceKeybindingsTabPrevious)) {
       selectTab(-1);
       return true;
     }
-    if (controllerButton == ControllerButton::RightShoulder || controllerButton == ControllerButton::DPadRight) {
+    if (m_context->actions(event).contains(InterfaceAction::InterfaceKeybindingsTabNext)) {
       selectTab(1);
       return true;
     }
@@ -158,10 +196,23 @@ void KeybindingsMenu::buildListsFromConfig() {
         Logger::warn("Could not load keybinding for {}. {}\n", actionString, e.what());
       }
 
-      m_childToAction.insert({newListMember->fetchChild<ButtonWidget>("boundKeys").get(), action});
+      auto boundKeysButton = newListMember->fetchChild<ButtonWidget>("boundKeys");
+      auto deleteButton = newListMember->fetchChild<ButtonWidget>("deleteBinding");
+
+      // Give more room for long controller/axis chord labels in the rebind field.
+      Vec2I boundSize = boundKeysButton->size();
+      int widthDelta = 72;
+      boundSize[0] += widthDelta;
+      boundKeysButton->setSize(boundSize);
+
+      Vec2I deletePos = deleteButton->position();
+      deletePos[0] += widthDelta;
+      deleteButton->setPosition(deletePos);
+
+      m_childToAction.insert({boundKeysButton.get(), action});
       newListMember->fetchChild<LabelWidget>("actionName")->setText(keybind.getString("label"));
-      newListMember->fetchChild<ButtonWidget>("boundKeys")->setText(StringList(inputDesc.transformed(printInputDescriptor)).join(", "));
-      newListMember->fetchChild<ButtonWidget>("deleteBinding")->hide();
+      boundKeysButton->setText(StringList(inputDesc.transformed(printInputDescriptor)).join(", "));
+      deleteButton->hide();
     }
   };
 
@@ -181,6 +232,27 @@ void KeybindingsMenu::buildListsFromConfig() {
   collectConfiguredActions(gameActions);
 
   JsonArray mergedGameActions = gameActions.toArray();
+
+  // Include any enum actions not explicitly listed in the keybindings config.
+  for (int actionValue = (int)InterfaceAction::PlayerUp; actionValue <= (int)InterfaceAction::InterfaceCrafting; ++actionValue) {
+    auto action = (InterfaceAction)actionValue;
+    if (action == InterfaceAction::None)
+      continue;
+
+    String actionName;
+    try {
+      actionName = InterfaceActionNames.getRight(action);
+    } catch (std::exception const&) {
+      continue;
+    }
+
+    if (configuredActions.contains(actionName))
+      continue;
+
+    mergedGameActions.append(JsonObject{{"action", actionName}, {"label", actionName}});
+    configuredActions.add(actionName);
+  }
+
   for (auto const& bindingPair : Root::singleton().configuration()->get("bindings").iterateObject()) {
     if (configuredActions.contains(bindingPair.first))
       continue;
@@ -300,6 +372,8 @@ void KeybindingsMenu::exitActiveMode() {
   convert<ButtonWidget>(m_activeKeybinding)->setHighlighted(false);
   m_activeKeybinding = nullptr;
   m_currentMods = KeyMod::NoMod;
+  m_clearHoldStartMs.reset();
+  m_clearHoldFromController = false;
 }
 
 void KeybindingsMenu::apply() {
