@@ -1113,16 +1113,16 @@ private:
       } else if (event.type == SDL_EVENT_MOUSE_MOTION) {
         starEvent.set(MouseMoveEvent{
           {event.motion.xrel, -event.motion.yrel},
-          {event.motion.x, (int)m_windowSize[1] - event.motion.y}});
+          {event.motion.x, ((int)m_windowSize[1] - 1) - event.motion.y}});
       } else if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN && !io.WantCaptureMouse) {
         starEvent.set(MouseButtonDownEvent{mouseButtonFromSdlMouseButton(event.button.button),
-          {event.button.x, (int)m_windowSize[1] - event.button.y}});
+          {event.button.x, ((int)m_windowSize[1] - 1) - event.button.y}});
       } else if (event.type == SDL_EVENT_MOUSE_BUTTON_UP && !io.WantCaptureMouse) {
         starEvent.set(MouseButtonUpEvent{mouseButtonFromSdlMouseButton(event.button.button),
-          {event.button.x, (int)m_windowSize[1] - event.button.y}});
+          {event.button.x, ((int)m_windowSize[1] - 1) - event.button.y}});
       } else if (event.type == SDL_EVENT_MOUSE_WHEEL && !io.WantCaptureMouse) {
         starEvent.set(MouseWheelEvent{event.wheel.y < 0 ? MouseWheel::Down : MouseWheel::Up,
-          {event.wheel.mouse_x, (int)m_windowSize[1] - event.wheel.mouse_y}});
+          {event.wheel.mouse_x, ((int)m_windowSize[1] - 1) - event.wheel.mouse_y}});
       } else if (event.type == SDL_EVENT_GAMEPAD_AXIS_MOTION) {
         starEvent.set(ControllerAxisEvent{
           (ControllerId)event.gaxis.which,

@@ -653,6 +653,17 @@ void ClientApplication::processInput(InputEvent const& event) {
     }
 
     if (auto cDown = event.ptr<ControllerButtonDownEvent>()) {
+      if (cDown->controllerButton == ControllerButton::X && m_mainInterface) {
+        auto paneManager = m_mainInterface->paneManager();
+        if (paneManager) {
+          auto topPane = paneManager->topPane({PaneLayer::ModalWindow, PaneLayer::Window});
+          if (auto containerPane = as<ContainerPane>(topPane)) {
+            if (containerPane->triggerTakeAll())
+              return;
+          }
+        }
+      }
+
       switch (cDown->controllerButton) {
         case ControllerButton::A: {
           InputEvent mouseEvent{MouseButtonDownEvent{MouseButton::Left, m_input->mousePosition()}};
@@ -1003,9 +1014,23 @@ void ClientApplication::updateControllerMouse(float dt) {
   }
 
   if (panelInteractionModeActive()) {
-    float baseSpeed = configuration->get("controllerMouseSpeed").optFloat().value(1400.0f);
+    float baseSpeed = configuration->get("controllerMouseSpeed").optFloat().value(1400.0f) * 1.25f;
     if (baseSpeed <= 0.0f)
       return;
+
+    float panelMouseDeadzone = configuration->get("controllerMouseDeadzone").optFloat().value(0.20f) * 1.5f;
+    Vec2F panelStick = m_controllerLeftStick;
+
+    if (std::abs(panelStick[0]) <= panelMouseDeadzone)
+      panelStick[0] = 0.0f;
+    else
+      panelStick[0] = std::copysign(std::abs(panelStick[0]) - panelMouseDeadzone, panelStick[0]);
+
+    if (std::abs(panelStick[1]) <= panelMouseDeadzone)
+      panelStick[1] = 0.0f;
+    else
+      panelStick[1] = std::copysign(std::abs(panelStick[1]) - panelMouseDeadzone, panelStick[1]);
+      
 
     bool slowOverInteractive = false;
     if (m_mainInterface && m_guiContext) {
@@ -1018,7 +1043,7 @@ void ClientApplication::updateControllerMouse(float dt) {
     }
 
     float speedScale = slowOverInteractive ? 0.30f : 0.50f;
-    Vec2F desiredVelocity = Vec2F(m_controllerLeftStick[0], -m_controllerLeftStick[1]) * (baseSpeed * speedScale);
+    Vec2F desiredVelocity = Vec2F(panelStick[0], -panelStick[1]) * (baseSpeed * speedScale);
     applyVirtualCursorVelocity(desiredVelocity, dt);
     return;
   }
@@ -1055,53 +1080,84 @@ void ClientApplication::updateControllerMouse(float dt) {
 
     auto worldClient = m_universeClient->worldClient();
     Vec2F playerPosition = m_player->position();
-    if (lockAimDirection && !m_controllerLockedAimDirectionValid) {
+    float leftStickMagnitude = m_controllerLeftStick.magnitude();
+    bool leftStickActive = stickAxisActive(m_controllerLeftStick, aimingDeadzone);
+
+    if ((lockAimDirection || forcedAimOnly) && !m_controllerLockedAimDirectionValid) {
       Vec2F cursorWorld = m_mainInterface->cursorWorldPosition();
       Vec2F cursorDirection = m_universeClient->worldClient()->geometry().diff(cursorWorld, playerPosition);
       float cursorDirectionMagnitude = cursorDirection.magnitude();
       if (cursorDirectionMagnitude > 0.001f) {
         m_controllerLockedAimDirection = cursorDirection / cursorDirectionMagnitude;
-        m_controllerLockedAimDistance = min(cursorDirectionMagnitude, 10.0f);
+        if (lockAimDirection)
+          m_controllerLockedAimDistance = min(cursorDirectionMagnitude, 10.0f);
+        m_controllerLockedAimDirectionValid = true;
+      } else if (lockAimDirection && leftStickActive) {
+        // Fallback for MoveOnly if cursor direction cannot be derived when RT is first held.
+        m_controllerLockedAimDirection = Vec2F(m_controllerLeftStick[0], -m_controllerLeftStick[1]) / leftStickMagnitude;
+        m_controllerLockedAimDistance = 10.0f;
         m_controllerLockedAimDirectionValid = true;
       }
     }
 
-    float leftStickMagnitude = m_controllerLeftStick.magnitude();
-    if (stickAxisActive(m_controllerLeftStick, aimingDeadzone) || (lockAimDirection && m_controllerLockedAimDirectionValid)) {
+    if (leftStickActive
+      || ((lockAimDirection || forcedAimOnly) && m_controllerLockedAimDirectionValid)) {
       Maybe<Vec2F> liveStickDirection;
-      if (stickAxisActive(m_controllerLeftStick, aimingDeadzone))
+      if (leftStickActive)
         liveStickDirection = Vec2F(m_controllerLeftStick[0], -m_controllerLeftStick[1]) / leftStickMagnitude;
 
       Vec2F stickDirection;
       if (lockAimDirection && m_controllerLockedAimDirectionValid) {
         stickDirection = m_controllerLockedAimDirection;
+      } else if (forcedAimOnly && m_controllerLockedAimDirectionValid && !liveStickDirection) {
+        stickDirection = m_controllerLockedAimDirection;
       } else if (liveStickDirection) {
         stickDirection = *liveStickDirection;
-        m_controllerLockedAimDirection = stickDirection;
-        m_controllerLockedAimDirectionValid = true;
+        if (!lockAimDirection) {
+          m_controllerLockedAimDirection = stickDirection;
+          m_controllerLockedAimDirectionValid = true;
+        }
       } else {
         return;
       }
 
-      float aimRange = 5.0f;
-      if (forcedAimOnly)
-        aimRange = 15.0f;
-      else if (lockAimDirection)
-        aimRange = m_controllerLockedAimDistance;
-      Vec2F castStart = playerPosition + stickDirection * 0.5f;
-      Vec2F projectedCursorWorld = playerPosition + stickDirection * aimRange;
+      Vec2F projectedCursorWorld;
 
-      // Walking and AimOnly should only collide against terrain; MoveOnly keeps no collision adjustment.
-      if (forcedAimOnly || !lockAimDirection) {
-        CollisionSet terrainCollisionSet{CollisionKind::Block, CollisionKind::Slippery};
-        if (auto collision = worldClient->lineTileCollisionPoint(castStart, projectedCursorWorld, terrainCollisionSet)) {
-          auto geometry = worldClient->geometry();
-          Vec2F collisionPoint = geometry.nearestTo(castStart, collision->first);
-          Vec2F collisionDelta = geometry.diff(collisionPoint, castStart);
-          float forwardDistance = collisionDelta[0] * stickDirection[0] + collisionDelta[1] * stickDirection[1];
-          if (forwardDistance > 0.0f)
-            projectedCursorWorld = collisionPoint;
+      // In AimOnly, if the stick is neutral, keep the cursor anchored in world space.
+      if (forcedAimOnly && !liveStickDirection) {
+        if (!m_controllerAimOnlyLockedWorld || m_controllerAimOnlyHadInput)
+          m_controllerAimOnlyLockedWorld = m_mainInterface->cursorWorldPosition();
+        m_controllerAimOnlyHadInput = false;
+        projectedCursorWorld = *m_controllerAimOnlyLockedWorld;
+      } else {
+        float aimRange = 5.0f;
+        if (forcedAimOnly)
+          aimRange = 15.0f;
+        else if (lockAimDirection)
+          aimRange = m_controllerLockedAimDistance;
+
+        Vec2F castStart = playerPosition + stickDirection * 0.5f;
+        projectedCursorWorld = playerPosition + stickDirection * aimRange;
+
+        // Walking and AimOnly should only collide against terrain; MoveOnly keeps no collision adjustment.
+        if (forcedAimOnly || !lockAimDirection) {
+          CollisionSet terrainCollisionSet{CollisionKind::Block, CollisionKind::Slippery};
+          float tempAimRange = min(aimRange, worldClient->geometry().diff(m_mainInterface->cursorWorldPosition(), playerPosition).magnitude());
+          Vec2F tempProjectedCursorWorld = playerPosition + stickDirection * tempAimRange;
+          if (auto collision = worldClient->lineTileCollisionPoint(castStart, tempProjectedCursorWorld, terrainCollisionSet)) {
+            auto geometry = worldClient->geometry();
+            Vec2F collisionPoint = geometry.nearestTo(castStart, collision->first);
+            Vec2F collisionDelta = geometry.diff(collisionPoint, castStart);
+            float forwardDistance = collisionDelta[0] * stickDirection[0] + collisionDelta[1] * stickDirection[1];
+            if (forwardDistance > 0.0f)
+              projectedCursorWorld = collisionPoint;
+          }
         }
+
+        if (forcedAimOnly)
+          m_controllerAimOnlyLockedWorld = projectedCursorWorld;
+        if (forcedAimOnly && liveStickDirection)
+          m_controllerAimOnlyHadInput = true;
       }
 
       Vec2F screenCursor = m_worldPainter->camera().worldToScreen(projectedCursorWorld);
@@ -1134,8 +1190,13 @@ void ClientApplication::updateControllerMouse(float dt) {
       return;
     }
 
-    if (!lockAimDirection)
+    if (!lockAimDirection && !forcedAimOnly)
       m_controllerLockedAimDirectionValid = false;
+
+    if (!forcedAimOnly)
+      m_controllerAimOnlyLockedWorld.reset();
+    if (!forcedAimOnly)
+      m_controllerAimOnlyHadInput = false;
   }
 
   m_virtualCursorVelocity = {};
@@ -2348,8 +2409,9 @@ void ClientApplication::updateCamera(float dt) {
 
   auto playerCameraPosition = m_player->cameraPosition();
 
-  bool cameraShiftActive = isActionTaken(InterfaceAction::CameraShift)
-      || isActionTaken(InterfaceAction::PlayerControllerAimOnly);
+    bool cameraShiftActive = isActionTaken(InterfaceAction::CameraShift)
+      || isActionTaken(InterfaceAction::PlayerControllerAimOnly)
+      || isActionTaken(InterfaceAction::PlayerControllerMoveOnly);
 
   if (cameraShiftActive) {
     m_snapBackCameraOffset = false;
@@ -2369,11 +2431,15 @@ void ClientApplication::updateCamera(float dt) {
       m_cameraYOffset = (m_cameraYOffset * (cameraSpeedFactor - 1.0) + cameraYOffset) / cameraSpeedFactor;
     }
   } else {
-    if (m_cameraOffsetDownTime > 0.0f && m_cameraOffsetDownTime < 0.333333f)
-      m_snapBackCameraOffset = true;
+    m_snapBackCameraOffset = true;
     if (m_snapBackCameraOffset) {
       m_cameraXOffset = (m_cameraXOffset * (cameraSpeedFactor - 1.0)) / cameraSpeedFactor;
       m_cameraYOffset = (m_cameraYOffset * (cameraSpeedFactor - 1.0)) / cameraSpeedFactor;
+      if (abs(m_cameraXOffset) < 0.01f && abs(m_cameraYOffset) < 0.01f) {
+        m_cameraXOffset = 0.0f;
+        m_cameraYOffset = 0.0f;
+        m_snapBackCameraOffset = false;
+      }
     }
     m_cameraOffsetDownTime = 0.f;
   }

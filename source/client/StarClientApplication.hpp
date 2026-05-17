@@ -168,6 +168,8 @@ private:
   Vec2F m_controllerLockedAimDirection;
   float m_controllerLockedAimDistance = 0.0f;
   bool m_controllerLockedAimDirectionValid = false;
+  Maybe<Vec2F> m_controllerAimOnlyLockedWorld;
+  bool m_controllerAimOnlyHadInput = false;
   Maybe<Vec2F> m_controllerMoveOnlyLockedCursorWorld;
   bool m_hotbarWheelActive = false;
   Maybe<SelectedActionBarLocation> m_hotbarWheelSelection;
