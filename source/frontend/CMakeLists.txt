@@ -29,6 +29,7 @@ SET (star_frontend_HEADERS
     StarHttpTrustDialog.hpp
     StarContainerInterface.hpp
     StarContainerInteractor.hpp
+    StarControllerBuildMenu.hpp
     StarCraftingInterface.hpp
     StarErrorScreen.hpp
     StarGraphicsMenu.hpp
@@ -84,6 +85,7 @@ SET (star_frontend_SOURCES
     StarHttpTrustDialog.cpp
     StarContainerInterface.cpp
     StarContainerInteractor.cpp
+    StarControllerBuildMenu.cpp
     StarCraftingInterface.cpp
     StarErrorScreen.cpp
     StarGraphicsMenu.cpp

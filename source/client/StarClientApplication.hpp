@@ -106,6 +106,7 @@ private:
   bool trySnapPanelCursor(Vec2F& targetScreenPos, float snapRadiusUi) const;
   void movePanelCursorByStep(Vec2I const& direction);
   void centerCursorOnPanelTarget();
+  bool applyVirtualCursorVelocity(Vec2F const& desiredVelocity, float dt);
   void updateControllerMouse(float dt);
   void renderHotbarWheelOverlay();
   void renderPanelWheelOverlay();
@@ -170,6 +171,7 @@ private:
   Maybe<SelectedActionBarLocation> m_hotbarWheelSelection;
   bool m_panelWheelActive = false;
   Maybe<PanelWheelOption> m_panelWheelSelection;
+  Vec2F m_virtualCursorVelocity;
   bool m_panelDragMouseHeld = false;
   bool m_panelInventoryFocusToggle = false;
   bool m_lastPanelModeActive = false;

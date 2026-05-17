@@ -117,8 +117,6 @@ static List<ClientApplication::PanelWheelOption> panelWheelOptions(bool canBeamU
     options.append(ClientApplication::PanelWheelOption::BeamUp);
   else if (canBeamDown)
     options.append(ClientApplication::PanelWheelOption::BeamDown);
-
-  options.append(ClientApplication::PanelWheelOption::EscapeMenu);
   return options;
 }
 
@@ -229,6 +227,7 @@ Json const AdditionalDefaultConfiguration = Json::parseJson(R"JSON(
       "controllerMouseEnabled" : true,
       "controllerMouseSpeed" : 1400.0,
       "controllerMouseDeadzone" : 0.20,
+      "inventoryBuildFromInventory" : true,
 
       "title" : {
         "multiPlayerAddress" : "",
@@ -876,6 +875,8 @@ void ClientApplication::movePanelCursorByStep(Vec2I const& direction) {
   if (!m_guiContext)
     return;
 
+  m_virtualCursorVelocity = {};
+
   Vec2F step = panelCursorStepSize();
   Vec2F targetPos = m_input->mousePosition();
   targetPos += Vec2F((float)direction[0] * step[0], (float)-direction[1] * step[1]);
@@ -896,6 +897,8 @@ void ClientApplication::movePanelCursorByStep(Vec2I const& direction) {
 void ClientApplication::centerCursorOnPanelTarget() {
   if (!m_mainInterface)
     return;
+
+  m_virtualCursorVelocity = {};
 
   auto paneManager = m_mainInterface->paneManager();
   if (!paneManager)
@@ -953,12 +956,16 @@ void ClientApplication::centerCursorOnPanelTarget() {
 }
 
 void ClientApplication::updateControllerMouse(float dt) {
-  if (!m_controllerInput)
+  if (!m_controllerInput) {
+    m_virtualCursorVelocity = {};
     return;
+  }
 
   auto configuration = m_root->configuration();
-  if (!configuration->get("controllerMouseEnabled").optBool().value(true))
+  if (!configuration->get("controllerMouseEnabled").optBool().value(true)) {
+    m_virtualCursorVelocity = {};
     return;
+  }
 
   if (panelInteractionModeActive()) {
     float baseSpeed = configuration->get("controllerMouseSpeed").optFloat().value(1400.0f);
@@ -976,26 +983,20 @@ void ClientApplication::updateControllerMouse(float dt) {
     }
 
     float speedScale = slowOverInteractive ? 0.30f : 0.50f;
-    Vec2F mouseDelta = Vec2F(m_controllerLeftStick[0], -m_controllerLeftStick[1]) * (baseSpeed * speedScale) * dt;
-    if (mouseDelta.magnitudeSquared() <= 0.0f)
-      return;
-
-    Vec2F nextMousePosition = m_input->mousePosition() + mouseDelta;
-    Vec2F screenSize = Vec2F(renderer()->screenSize());
-    nextMousePosition[0] = clamp(nextMousePosition[0], 0.0f, screenSize[0] - 1.0f);
-    nextMousePosition[1] = clamp(nextMousePosition[1], 0.0f, screenSize[1] - 1.0f);
-
-    Vec2I cursorPosition = Vec2I::round(nextMousePosition);
-    cursorPosition[1] = (int)screenSize[1] - 1 - cursorPosition[1];
-    appController()->setCursorPosition(cursorPosition);
+    Vec2F desiredVelocity = Vec2F(m_controllerLeftStick[0], -m_controllerLeftStick[1]) * (baseSpeed * speedScale);
+    applyVirtualCursorVelocity(desiredVelocity, dt);
     return;
   }
 
-  if (m_mainInterface && m_mainInterface->windowsOpen())
+  if (m_mainInterface && m_mainInterface->windowsOpen()) {
+    m_virtualCursorVelocity = {};
     return;
+  }
 
-  if (isActionTaken(InterfaceAction::InterfaceHotbarWheelHold) || isActionTaken(InterfaceAction::InterfacePanelWheelHold))
+  if (isActionTaken(InterfaceAction::InterfaceHotbarWheelHold) || isActionTaken(InterfaceAction::InterfacePanelWheelHold)) {
+    m_virtualCursorVelocity = {};
     return;
+  }
 
   float mouseSpeed = configuration->get("controllerMouseSpeed").optFloat().value(1400.0f);
   if (mouseSpeed <= 0.0f)
@@ -1012,18 +1013,8 @@ void ClientApplication::updateControllerMouse(float dt) {
     rightStick[1] = applyControllerAxisResponse(m_controllerRightStickRaw[1], mouseDeadzone, 1.0f);
 
     if (stickAxisActive(rightStick)) {
-      Vec2F mouseDelta = Vec2F(rightStick[0], -rightStick[1]) * mouseSpeed * dt;
-      Vec2F nextMousePosition = m_input->mousePosition() + mouseDelta;
-
-      Vec2F screenSize = Vec2F(renderer()->screenSize());
-      nextMousePosition[0] = clamp(nextMousePosition[0], 0.0f, screenSize[0] - 1.0f);
-      nextMousePosition[1] = clamp(nextMousePosition[1], 0.0f, screenSize[1] - 1.0f);
-
-      if ((nextMousePosition - m_input->mousePosition()).magnitudeSquared() > 0.0f) {
-        Vec2I cursorPosition = Vec2I::round(nextMousePosition);
-        cursorPosition[1] = (int)screenSize[1] - 1 - cursorPosition[1];
-        appController()->setCursorPosition(cursorPosition);
-      }
+      Vec2F desiredVelocity = Vec2F(rightStick[0], -rightStick[1]) * mouseSpeed;
+      applyVirtualCursorVelocity(desiredVelocity, dt);
       return;
     }
 
@@ -1075,11 +1066,21 @@ void ClientApplication::updateControllerMouse(float dt) {
       if (forcedAimOnly) {
         Vec2F currentMouse = m_input->mousePosition();
         Vec2F toTarget = screenCursor - currentMouse;
-        float maxStep = mouseSpeed * 0.5f * dt;
         float distance = toTarget.magnitude();
-        if (distance > maxStep && distance > 0.0f)
-          screenCursor = currentMouse + toTarget / distance * maxStep;
+
+        Vec2F desiredVelocity;
+        if (distance > 0.0f) {
+          float maxSpeed = mouseSpeed * 0.5f;
+          float frameLimitedSpeed = distance / max(dt, 0.0001f);
+          float desiredSpeed = min(maxSpeed, frameLimitedSpeed);
+          desiredVelocity = toTarget / distance * desiredSpeed;
+        }
+
+        applyVirtualCursorVelocity(desiredVelocity, dt);
+        return;
       }
+
+      m_virtualCursorVelocity = {};
 
       Vec2I cursorPosition = Vec2I::round(screenCursor);
       cursorPosition[1] = (int)screenSize[1] - 1 - cursorPosition[1];
@@ -1091,7 +1092,48 @@ void ClientApplication::updateControllerMouse(float dt) {
       m_controllerLockedAimDirectionValid = false;
   }
 
+  m_virtualCursorVelocity = {};
+
   return;
+}
+
+bool ClientApplication::applyVirtualCursorVelocity(Vec2F const& desiredVelocity, float dt) {
+  if (dt <= 0.0f || !m_guiContext)
+    return false;
+
+  float desiredSpeed = desiredVelocity.magnitude();
+  if (desiredSpeed <= 0.0f) {
+    m_virtualCursorVelocity = {};
+    return false;
+  }
+
+  float lastSpeed = m_virtualCursorVelocity.magnitude();
+  Vec2F direction = desiredVelocity / desiredSpeed;
+
+  // Accelerate into higher speeds across multiple frames, but apply slowdown immediately.
+  constexpr float CursorAcceleration = 10000.0f;
+  float appliedSpeed = desiredSpeed;
+  if (desiredSpeed > lastSpeed)
+    appliedSpeed = min(desiredSpeed, lastSpeed + CursorAcceleration * dt);
+
+  m_virtualCursorVelocity = direction * appliedSpeed;
+  Vec2F mouseDelta = m_virtualCursorVelocity * dt;
+  if (mouseDelta.magnitudeSquared() <= 0.0f)
+    return false;
+
+  Vec2F currentMousePosition = m_input->mousePosition();
+  Vec2F nextMousePosition = currentMousePosition + mouseDelta;
+  Vec2F screenSize = Vec2F(renderer()->screenSize());
+  nextMousePosition[0] = clamp(nextMousePosition[0], 0.0f, screenSize[0] - 1.0f);
+  nextMousePosition[1] = clamp(nextMousePosition[1], 0.0f, screenSize[1] - 1.0f);
+
+  if ((nextMousePosition - currentMousePosition).magnitudeSquared() <= 0.0f)
+    return false;
+
+  Vec2I cursorPosition = Vec2I::round(nextMousePosition);
+  cursorPosition[1] = (int)screenSize[1] - 1 - cursorPosition[1];
+  appController()->setCursorPosition(cursorPosition);
+  return true;
 }
 
 void ClientApplication::render() {

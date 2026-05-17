@@ -21,6 +21,8 @@
 #include "StarStatistics.hpp"
 #include "StarAugmentItem.hpp"
 #include "StarObjectItem.hpp"
+#include "StarMaterialItem.hpp"
+#include "StarLiquidItem.hpp"
 #include "StarInteractionTypes.hpp"
 
 namespace Star {
@@ -38,6 +40,7 @@ InventoryPane::InventoryPane(MainInterface* parent, PlayerPtr player, ContainerI
     InventorySlot inventorySlot = BagSlot(bagType, itemGrid->selectedIndex());
 
     auto inventory = m_player->inventory();
+    auto selectedItem = itemGrid->selectedItem();
     if (context()->shiftHeld()) {
       if (auto sourceItem = itemGrid->selectedItem()) {
         if (auto activeMerchantPane = m_parent->activeMerchantPane()) {
@@ -60,6 +63,47 @@ InventoryPane::InventoryPane(MainInterface* parent, PlayerPtr player, ContainerI
         }
       }
     } else {
+      auto configuration = Root::singleton().configuration();
+      bool buildFromInventoryEnabled = configuration->get("inventoryBuildFromInventory").optBool().value(true);
+      bool controllerMode = configuration->get("controllerInput").optBool().value(true)
+          && configuration->get("controllerMouseEnabled").optBool().value(true);
+      bool selectedItemBuildable = selectedItem
+          && (as<ObjectItem>(selectedItem) || as<MaterialItem>(selectedItem) || as<LiquidItem>(selectedItem));
+
+      if (buildFromInventoryEnabled && controllerMode && selectedItemBuildable && !inventory->swapSlotItem()) {
+        Maybe<CustomBarIndex> selectedBarIndex;
+        uint8_t customBarSize = inventory->customBarIndexes();
+
+        for (uint8_t i = 0; i < customBarSize; ++i) {
+          if (auto slot = inventory->customBarPrimarySlot((CustomBarIndex)i)) {
+            if (*slot == inventorySlot) {
+              selectedBarIndex = (CustomBarIndex)i;
+              break;
+            }
+          }
+        }
+
+        if (!selectedBarIndex) {
+          for (uint8_t i = 0; i < customBarSize; ++i) {
+            if (!inventory->customBarPrimarySlot((CustomBarIndex)i) && !inventory->customBarSecondarySlot((CustomBarIndex)i)) {
+              selectedBarIndex = (CustomBarIndex)i;
+              break;
+            }
+          }
+        }
+
+        if (!selectedBarIndex && inventory->selectedActionBarLocation().is<CustomBarIndex>())
+          selectedBarIndex = inventory->selectedActionBarLocation().get<CustomBarIndex>();
+
+        if (!selectedBarIndex)
+          selectedBarIndex = (CustomBarIndex)0;
+
+        inventory->setCustomBarPrimarySlot(*selectedBarIndex, inventorySlot);
+        inventory->selectActionBarLocation(SelectedActionBarLocation(*selectedBarIndex));
+        dismiss();
+        return;
+      }
+
       inventory->shiftSwap(inventorySlot);
     }
   };

@@ -1,4 +1,5 @@
 {
+  "controllerBuildPanePath" : "/interface/optionsmenu/controllerbuildmenu.config",
   "paneLayout" : {
     "panefeature" : {
       "anchor" : "center"
@@ -13,37 +14,44 @@
       "type" : "button",
       "position" : [30, 185],
       "caption" : "Settings",
-      "base" : "/interface/optionsmenu/duocontrolsbutton.png",
-      "hover" : "/interface/optionsmenu/duocontrolsbuttonhover.png"
+      "base" : "/interface/optionsmenu/controlsbutton.png",
+      "hover" : "/interface/optionsmenu/controlsbuttonhover.png"
     },
     "showVoicePlayers" : {
       "type" : "button",
       "disabled" : true,
       "position" : [133, 185],
       "caption" : "^#a0a000,font=iosevka-semiboldoblique;TODO^#aa7;:^reset; Players",
-      "base" : "/interface/optionsmenu/duocontrolsbutton.png",
-      "hover" : "/interface/optionsmenu/duocontrolsbuttonhover.png"
+      "base" : "/interface/optionsmenu/controlsbutton.png",
+      "hover" : "/interface/optionsmenu/controlsbuttonhover.png"
     },
     "showKeybindings" : {
       "type" : "button",
       "position" : [153, 95],
       "caption" : "Game Binds",
-      "base" : "/interface/optionsmenu/tricontrolsbutton.png",
-      "hover" : "/interface/optionsmenu/tricontrolsbuttonhover.png"
+      "base" : "/interface/optionsmenu/controlsbutton.png",
+      "hover" : "/interface/optionsmenu/controlsbuttonhover.png"
     },
     "showModBindings" : {
       "type" : "button",
       "position" : [87, 95],
       "caption" : "Mod Binds",
-      "base" : "/interface/optionsmenu/tricontrolsbutton.png",
-      "hover" : "/interface/optionsmenu/tricontrolsbuttonhover.png"
+      "base" : "/interface/optionsmenu/controlsbutton.png",
+      "hover" : "/interface/optionsmenu/controlsbuttonhover.png"
     },
     "showGraphics" : {
       "type" : "button",
       "position" : [21, 95],
       "caption" : "Graphics",
-      "base" : "/interface/optionsmenu/tricontrolsbutton.png",
-      "hover" : "/interface/optionsmenu/tricontrolsbuttonhover.png"
+      "base" : "/interface/optionsmenu/controlsbutton.png",
+      "hover" : "/interface/optionsmenu/controlsbuttonhover.png"
+    },
+    "showControllerBuild" : {
+      "type" : "button",
+      "position" : [21, 79],
+      "caption" : "Controller",
+      "base" : "/interface/optionsmenu/controlsbutton.png",
+      "hover" : "/interface/optionsmenu/controlsbuttonhover.png"
     },
 
     "volumeLabel" : { "position" : [119, 173] },
