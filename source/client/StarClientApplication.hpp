@@ -166,7 +166,9 @@ private:
   Vec2F m_controllerRightStick;
   Vec2F m_controllerRightStickRaw;
   Vec2F m_controllerLockedAimDirection;
+  float m_controllerLockedAimDistance = 0.0f;
   bool m_controllerLockedAimDirectionValid = false;
+  Maybe<Vec2F> m_controllerMoveOnlyLockedCursorWorld;
   bool m_hotbarWheelActive = false;
   Maybe<SelectedActionBarLocation> m_hotbarWheelSelection;
   bool m_panelWheelActive = false;
