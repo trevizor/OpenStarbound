@@ -1081,6 +1081,11 @@ void ClientApplication::updateControllerMouse(float dt) {
         return;
       }
 
+      float aimRange = 5.0f;
+      if (forcedAimOnly)
+        aimRange = 20.0f;
+      else if (lockAimDirection)
+        aimRange = m_controllerLockedAimDistance;
       Vec2F castStart = playerPosition + stickDirection * 0.5f;
       Vec2F projectedCursorWorld = playerPosition + stickDirection * 12.0f;
 
