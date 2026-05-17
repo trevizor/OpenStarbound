@@ -1085,19 +1085,23 @@ void ClientApplication::updateControllerMouse(float dt) {
 
       float aimRange = 5.0f;
       if (forcedAimOnly)
-        aimRange = 20.0f;
+        aimRange = 15.0f;
       else if (lockAimDirection)
         aimRange = m_controllerLockedAimDistance;
       Vec2F castStart = playerPosition + stickDirection * 0.5f;
-      Vec2F projectedCursorWorld = playerPosition + stickDirection * 12.0f;
+      Vec2F projectedCursorWorld = playerPosition + stickDirection * aimRange;
 
-      if (auto collision = m_universeClient->worldClient()->lineCollision(Line2F(castStart, projectedCursorWorld))) {
-        auto geometry = m_universeClient->worldClient()->geometry();
-        Vec2F collisionPoint = geometry.nearestTo(castStart, collision->first);
-        Vec2F collisionDelta = geometry.diff(collisionPoint, castStart);
-        float forwardDistance = collisionDelta[0] * stickDirection[0] + collisionDelta[1] * stickDirection[1];
-        if (forwardDistance > 0.0f)
-          projectedCursorWorld = collisionPoint;
+      // Walking and AimOnly should only collide against terrain; MoveOnly keeps no collision adjustment.
+      if (forcedAimOnly || !lockAimDirection) {
+        CollisionSet terrainCollisionSet{CollisionKind::Block, CollisionKind::Slippery};
+        if (auto collision = worldClient->lineTileCollisionPoint(castStart, projectedCursorWorld, terrainCollisionSet)) {
+          auto geometry = worldClient->geometry();
+          Vec2F collisionPoint = geometry.nearestTo(castStart, collision->first);
+          Vec2F collisionDelta = geometry.diff(collisionPoint, castStart);
+          float forwardDistance = collisionDelta[0] * stickDirection[0] + collisionDelta[1] * stickDirection[1];
+          if (forwardDistance > 0.0f)
+            projectedCursorWorld = collisionPoint;
+        }
       }
 
       Vec2F screenCursor = m_worldPainter->camera().worldToScreen(projectedCursorWorld);
