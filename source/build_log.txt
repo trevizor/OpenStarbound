@@ -1,0 +1,1036 @@
+﻿[1/3] Incremental build (windows-release-VS2022)...
+Change Dir: 'C:/projetos/OpenStarbound/build/windows-release'
+
+Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" ALL_BUILD.vcxproj /p:Configuration=Release /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+Vers├úo do MSBuild 17.14.10+8b8e13593 para .NET Framework
+Compila├º├úo de 17/05/2026 17:58:12 iniciada.
+
+Projeto "C:\projetos\OpenStarbound\build\windows-release\ALL_BUILD.vcxproj" no n├│ 1 (destinos padr├úo).
+O projeto "C:\projetos\OpenStarbound\build\windows-release\ALL_BUILD.vcxproj" (1) est├í compilando "C:\projetos\OpenStarbound\build\windows-release\ZERO_CHECK.vcxproj" (2) no n├│ 1 (destinos padr├úo).
+PrepareForBuild:
+  A sa├¡da estruturada est├í habilitada. A formata├º├úo do diagn├│stico do compilador refletir├í a hierarquia de erros. Consulte https://aka.ms/cpp/structured-output para obter mais detalhes.
+InitializeBuildStatus:
+  Criando "x64\Release\ZERO_CHECK\ZERO_CHECK.tlog\unsuccessfulbuild" porque "AlwaysCreate" foi especificado.
+  Tocando "x64\Release\ZERO_CHECK\ZERO_CHECK.tlog\unsuccessfulbuild".
+CustomBuild:
+  Todas as sa├¡das est├úo atualizadas.
+FinalizeBuildStatus:
+  Excluindo o arquivo "x64\Release\ZERO_CHECK\ZERO_CHECK.tlog\unsuccessfulbuild".
+  Tocando "x64\Release\ZERO_CHECK\ZERO_CHECK.tlog\ZERO_CHECK.lastbuildstate".
+Projeto de compila├º├úo pronto "C:\projetos\OpenStarbound\build\windows-release\ZERO_CHECK.vcxproj" (destinos padr├úo).
+O projeto "C:\projetos\OpenStarbound\build\windows-release\ALL_BUILD.vcxproj" (1) est├í compilando "C:\projetos\OpenStarbound\build\windows-release\application\star_application.vcxproj" (3) no n├│ 1 (destinos padr├úo).
+O projeto "C:\projetos\OpenStarbound\build\windows-release\application\star_application.vcxproj" (3) est├í compilando "C:\projetos\OpenStarbound\build\windows-release\core\star_core.vcxproj" (4) no n├│ 1 (destinos padr├úo).
+PrepareForBuild:
+  A sa├¡da estruturada est├í habilitada. A formata├º├úo do diagn├│stico do compilador refletir├í a hierarquia de erros. Consulte https://aka.ms/cpp/structured-output para obter mais detalhes.
+InitializeBuildStatus:
+  Criando "star_core.dir\Release\star_core.tlog\unsuccessfulbuild" porque "AlwaysCreate" foi especificado.
+  Tocando "star_core.dir\Release\star_core.tlog\unsuccessfulbuild".
+CustomBuild:
+  Todas as sa├¡das est├úo atualizadas.
+ClCompile:
+  Todas as sa├¡das est├úo atualizadas.
+  Todas as sa├¡das est├úo atualizadas.
+Lib:
+  Todas as sa├¡das est├úo atualizadas.
+  star_core.vcxproj -> C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\star_core.lib
+FinalizeBuildStatus:
+  Excluindo o arquivo "star_core.dir\Release\star_core.tlog\unsuccessfulbuild".
+  Tocando "star_core.dir\Release\star_core.tlog\star_core.lastbuildstate".
+Projeto de compila├º├úo pronto "C:\projetos\OpenStarbound\build\windows-release\core\star_core.vcxproj" (destinos padr├úo).
+PrepareForBuild:
+  A sa├¡da estruturada est├í habilitada. A formata├º├úo do diagn├│stico do compilador refletir├í a hierarquia de erros. Consulte https://aka.ms/cpp/structured-output para obter mais detalhes.
+InitializeBuildStatus:
+  Criando "star_application.dir\Release\star_application.tlog\unsuccessfulbuild" porque "AlwaysCreate" foi especificado.
+  Tocando "star_application.dir\Release\star_application.tlog\unsuccessfulbuild".
+CustomBuild:
+  Todas as sa├¡das est├úo atualizadas.
+ClCompile:
+  Todas as sa├¡das est├úo atualizadas.
+Lib:
+  Todas as sa├¡das est├úo atualizadas.
+  star_application.vcxproj -> C:\projetos\OpenStarbound\build\windows-release\application\star_application.dir\Release\star_application.lib
+FinalizeBuildStatus:
+  Excluindo o arquivo "star_application.dir\Release\star_application.tlog\unsuccessfulbuild".
+  Tocando "star_application.dir\Release\star_application.tlog\star_application.lastbuildstate".
+Projeto de compila├º├úo pronto "C:\projetos\OpenStarbound\build\windows-release\application\star_application.vcxproj" (destinos padr├úo).
+O projeto "C:\projetos\OpenStarbound\build\windows-release\ALL_BUILD.vcxproj" (1) est├í compilando "C:\projetos\OpenStarbound\build\windows-release\base\star_base.vcxproj" (5) no n├│ 1 (destinos padr├úo).
+PrepareForBuild:
+  A sa├¡da estruturada est├í habilitada. A formata├º├úo do diagn├│stico do compilador refletir├í a hierarquia de erros. Consulte https://aka.ms/cpp/structured-output para obter mais detalhes.
+InitializeBuildStatus:
+  Criando "star_base.dir\Release\star_base.tlog\unsuccessfulbuild" porque "AlwaysCreate" foi especificado.
+  Tocando "star_base.dir\Release\star_base.tlog\unsuccessfulbuild".
+CustomBuild:
+  Todas as sa├¡das est├úo atualizadas.
+ClCompile:
+  Todas as sa├¡das est├úo atualizadas.
+Lib:
+  Todas as sa├¡das est├úo atualizadas.
+  star_base.vcxproj -> C:\projetos\OpenStarbound\build\windows-release\base\star_base.dir\Release\star_base.lib
+FinalizeBuildStatus:
+  Excluindo o arquivo "star_base.dir\Release\star_base.tlog\unsuccessfulbuild".
+  Tocando "star_base.dir\Release\star_base.tlog\star_base.lastbuildstate".
+Projeto de compila├º├úo pronto "C:\projetos\OpenStarbound\build\windows-release\base\star_base.vcxproj" (destinos padr├úo).
+O projeto "C:\projetos\OpenStarbound\build\windows-release\ALL_BUILD.vcxproj" (1) est├í compilando "C:\projetos\OpenStarbound\build\windows-release\extern\star_extern.vcxproj" (6) no n├│ 1 (destinos padr├úo).
+PrepareForBuild:
+  A sa├¡da estruturada est├í habilitada. A formata├º├úo do diagn├│stico do compilador refletir├í a hierarquia de erros. Consulte https://aka.ms/cpp/structured-output para obter mais detalhes.
+InitializeBuildStatus:
+  Criando "star_extern.dir\Release\star_extern.tlog\unsuccessfulbuild" porque "AlwaysCreate" foi especificado.
+  Tocando "star_extern.dir\Release\star_extern.tlog\unsuccessfulbuild".
+CustomBuild:
+  Todas as sa├¡das est├úo atualizadas.
+ClCompile:
+  Todas as sa├¡das est├úo atualizadas.
+  Todas as sa├¡das est├úo atualizadas.
+Lib:
+  Todas as sa├¡das est├úo atualizadas.
+  star_extern.vcxproj -> C:\projetos\OpenStarbound\build\windows-release\extern\star_extern.dir\Release\star_extern.lib
+FinalizeBuildStatus:
+  Excluindo o arquivo "star_extern.dir\Release\star_extern.tlog\unsuccessfulbuild".
+  Tocando "star_extern.dir\Release\star_extern.tlog\star_extern.lastbuildstate".
+Projeto de compila├º├úo pronto "C:\projetos\OpenStarbound\build\windows-release\extern\star_extern.vcxproj" (destinos padr├úo).
+O projeto "C:\projetos\OpenStarbound\build\windows-release\ALL_BUILD.vcxproj" (1) est├í compilando "C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.vcxproj" (7) no n├│ 1 (destinos padr├úo).
+PrepareForBuild:
+  A sa├¡da estruturada est├í habilitada. A formata├º├úo do diagn├│stico do compilador refletir├í a hierarquia de erros. Consulte https://aka.ms/cpp/structured-output para obter mais detalhes.
+InitializeBuildStatus:
+  Criando "star_frontend.dir\Release\star_frontend.tlog\unsuccessfulbuild" porque "AlwaysCreate" foi especificado.
+  Tocando "star_frontend.dir\Release\star_frontend.tlog\unsuccessfulbuild".
+CustomBuild:
+  Todas as sa├¡das est├úo atualizadas.
+ClCompile:
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\bin\HostX64\x64\CL.exe /c /IC:\projetos\OpenStarbound\source\extern /IC:\projetos\OpenStarbound\source\core /IC:\projetos\OpenStarbound\source\core\scripting /IC:\projetos\OpenStarbound\source\base /IC:\projetos\OpenStarbound\source\base\scripting /IC:\projetos\OpenStarbound\source\game /IC:\projetos\OpenStarbound\source\game\interfaces /IC:\projetos\OpenStarbound\source\game\items /IC:\projetos\OpenStarbound\source\game\objects /IC:\projetos\OpenStarbound\source\game\scripting /IC:\projetos\OpenStarbound\source\game\terrain /IC:\projetos\OpenStarbound\source\platform /IC:\projetos\OpenStarbound\source\application /IC:\projetos\OpenStarbound\source\rendering /IC:\projetos\OpenStarbound\source\windowing /IC:\projetos\OpenStarbound\source\frontend /nologo /W1 /WX- /diagnostics:column /MP /Ox /D _UNICODE /D UNICODE /D WIN32 /D _WINDOWS /D NDEBUG /D STAR_LITTLE_ENDIAN /D STAR_ARCHITECTURE_X86_64 /D STAR_SYSTEM_WINDOWS /D STAR_SYSTEM_FAMILY_WINDOWS /D STAR_COMPILER_MSVC /D STAR_ENABLE_STEAM_INTEGRATION /D STAR_ENABLE_DISCORD_INTEGRATION /D STAR_USE_RPMALLOC /D ENABLE_PRELOAD /D UNICODE /D _UNICODE /D NOMINMAX /D "CMAKE_INTDIR=\"Release\"" /EHsc /MD /GS- /Gy /fp:fast /Zc:wchar_t /Zc:forScope /Zc:inline /std:c++17 /Yu"C:/projetos/OpenStarbound/build/windows-release/core/CMakeFiles/star_core.dir/Release/cmake_pch.hxx" /Fp"C:/projetos/OpenStarbound/build/windows-release/core/star_core.dir/Release/cmake_pch.pch" /Fo"star_frontend.dir\Release\\" /Fd"C:\projetos\OpenStarbound\build\windows-release\frontend\Release\star_core.pdb" /external:W0 /Gd /TP /wd4996 /wd4351 /wd4800 /wd4244 /wd4305 /wd4267 /wd4456 /wd4503 /wd4250 /wd4624 /FI"C:/projetos/OpenStarbound/build/windows-release/core/CMakeFiles/star_core.dir/Release/cmake_pch.hxx" /errorReport:queue  /external:I "C:/projetos/OpenStarbound/build/windows-release/vcpkg_installed/x64-windows-mixed-md/include" /external:I "C:/projetos/OpenStarbound/lib/windows/include" /bigobj /GA C:\projetos\OpenStarbound\source\frontend\StarKeybindingsMenu.cpp
+  StarKeybindingsMenu.cpp
+Lib:
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\bin\HostX64\x64\Lib.exe /OUT:"star_frontend.dir\Release\star_frontend.lib" /NOLOGO /MACHINE:X64  /machine:x64 star_frontend.dir\Release\StarActionBar.obj
+  star_frontend.dir\Release\StarAiInterface.obj
+  star_frontend.dir\Release\StarBaseScriptPane.obj
+  star_frontend.dir\Release\StarBindingsMenu.obj
+  star_frontend.dir\Release\StarBookmarkInterface.obj
+  star_frontend.dir\Release\StarChat.obj
+  star_frontend.dir\Release\StarCharCreation.obj
+  star_frontend.dir\Release\StarCharSelection.obj
+  star_frontend.dir\Release\StarChatBubbleSeparation.obj
+  star_frontend.dir\Release\StarChatBubbleManager.obj
+  star_frontend.dir\Release\StarCinematic.obj
+  star_frontend.dir\Release\StarClientCommandProcessor.obj
+  star_frontend.dir\Release\StarClipboardLuaBindings.obj
+  star_frontend.dir\Release\StarCodexInterface.obj
+  star_frontend.dir\Release\StarConfirmationDialog.obj
+  star_frontend.dir\Release\StarHttpTrustDialog.obj
+  star_frontend.dir\Release\StarContainerInterface.obj
+  star_frontend.dir\Release\StarContainerInteractor.obj
+  star_frontend.dir\Release\StarControllerBuildMenu.obj
+  star_frontend.dir\Release\StarCraftingInterface.obj
+  star_frontend.dir\Release\StarErrorScreen.obj
+  star_frontend.dir\Release\StarGraphicsMenu.obj
+  star_frontend.dir\Release\StarInventory.obj
+  star_frontend.dir\Release\StarInterfaceCursor.obj
+  star_frontend.dir\Release\StarInterfaceLuaBindings.obj
+  star_frontend.dir\Release\StarItemTooltip.obj
+  star_frontend.dir\Release\StarJoinRequestDialog.obj
+  star_frontend.dir\Release\StarKeybindingsMenu.obj
+  star_frontend.dir\Release\StarMainInterface.obj
+  star_frontend.dir\Release\StarMainInterfaceTypes.obj
+  star_frontend.dir\Release\StarMainMixer.obj
+  star_frontend.dir\Release\StarMerchantInterface.obj
+  star_frontend.dir\Release\StarModsMenu.obj
+  star_frontend.dir\Release\StarNameplatePainter.obj
+  star_frontend.dir\Release\StarOptionsMenu.obj
+  star_frontend.dir\Release\StarPopupInterface.obj
+  star_frontend.dir\Release\StarQuestIndicatorPainter.obj
+  star_frontend.dir\Release\StarQuestInterface.obj
+  star_frontend.dir\Release\StarQuestTracker.obj
+  star_frontend.dir\Release\StarRadioMessagePopup.obj
+  star_frontend.dir\Release\StarTeamBar.obj
+  star_frontend.dir\Release\StarTitleScreen.obj
+  star_frontend.dir\Release\StarScriptPane.obj
+  star_frontend.dir\Release\StarSimpleTooltip.obj
+  star_frontend.dir\Release\StarSongbookInterface.obj
+  star_frontend.dir\Release\StarStatusPane.obj
+  star_frontend.dir\Release\StarShadersMenu.obj
+  star_frontend.dir\Release\StarTeleportDialog.obj
+  star_frontend.dir\Release\StarVoice.obj
+  star_frontend.dir\Release\StarVoiceLuaBindings.obj
+  star_frontend.dir\Release\StarVoiceSettingsMenu.obj
+  star_frontend.dir\Release\StarWireInterface.obj
+  star_frontend.vcxproj -> C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.dir\Release\star_frontend.lib
+FinalizeBuildStatus:
+  Excluindo o arquivo "star_frontend.dir\Release\star_frontend.tlog\unsuccessfulbuild".
+  Tocando "star_frontend.dir\Release\star_frontend.tlog\star_frontend.lastbuildstate".
+Projeto de compila├º├úo pronto "C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.vcxproj" (destinos padr├úo).
+O projeto "C:\projetos\OpenStarbound\build\windows-release\ALL_BUILD.vcxproj" (1) est├í compilando "C:\projetos\OpenStarbound\build\windows-release\game\star_game.vcxproj" (8) no n├│ 1 (destinos padr├úo).
+PrepareForBuild:
+  A sa├¡da estruturada est├í habilitada. A formata├º├úo do diagn├│stico do compilador refletir├í a hierarquia de erros. Consulte https://aka.ms/cpp/structured-output para obter mais detalhes.
+InitializeBuildStatus:
+  Criando "star_game.dir\Release\star_game.tlog\unsuccessfulbuild" porque "AlwaysCreate" foi especificado.
+  Tocando "star_game.dir\Release\star_game.tlog\unsuccessfulbuild".
+CustomBuild:
+  Todas as sa├¡das est├úo atualizadas.
+ClCompile:
+  Todas as sa├¡das est├úo atualizadas.
+Lib:
+  Todas as sa├¡das est├úo atualizadas.
+  star_game.vcxproj -> C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\star_game.lib
+FinalizeBuildStatus:
+  Excluindo o arquivo "star_game.dir\Release\star_game.tlog\unsuccessfulbuild".
+  Tocando "star_game.dir\Release\star_game.tlog\star_game.lastbuildstate".
+Projeto de compila├º├úo pronto "C:\projetos\OpenStarbound\build\windows-release\game\star_game.vcxproj" (destinos padr├úo).
+O projeto "C:\projetos\OpenStarbound\build\windows-release\ALL_BUILD.vcxproj" (1) est├í compilando "C:\projetos\OpenStarbound\build\windows-release\rendering\star_rendering.vcxproj" (9) no n├│ 1 (destinos padr├úo).
+PrepareForBuild:
+  A sa├¡da estruturada est├í habilitada. A formata├º├úo do diagn├│stico do compilador refletir├í a hierarquia de erros. Consulte https://aka.ms/cpp/structured-output para obter mais detalhes.
+InitializeBuildStatus:
+  Criando "star_rendering.dir\Release\star_rendering.tlog\unsuccessfulbuild" porque "AlwaysCreate" foi especificado.
+  Tocando "star_rendering.dir\Release\star_rendering.tlog\unsuccessfulbuild".
+CustomBuild:
+  Todas as sa├¡das est├úo atualizadas.
+ClCompile:
+  Todas as sa├¡das est├úo atualizadas.
+Lib:
+  Todas as sa├¡das est├úo atualizadas.
+  star_rendering.vcxproj -> C:\projetos\OpenStarbound\build\windows-release\rendering\star_rendering.dir\Release\star_rendering.lib
+FinalizeBuildStatus:
+  Excluindo o arquivo "star_rendering.dir\Release\star_rendering.tlog\unsuccessfulbuild".
+  Tocando "star_rendering.dir\Release\star_rendering.tlog\star_rendering.lastbuildstate".
+Projeto de compila├º├úo pronto "C:\projetos\OpenStarbound\build\windows-release\rendering\star_rendering.vcxproj" (destinos padr├úo).
+O projeto "C:\projetos\OpenStarbound\build\windows-release\ALL_BUILD.vcxproj" (1) est├í compilando "C:\projetos\OpenStarbound\build\windows-release\windowing\star_windowing.vcxproj" (10) no n├│ 1 (destinos padr├úo).
+PrepareForBuild:
+  A sa├¡da estruturada est├í habilitada. A formata├º├úo do diagn├│stico do compilador refletir├í a hierarquia de erros. Consulte https://aka.ms/cpp/structured-output para obter mais detalhes.
+InitializeBuildStatus:
+  Criando "star_windowing.dir\Release\star_windowing.tlog\unsuccessfulbuild" porque "AlwaysCreate" foi especificado.
+  Tocando "star_windowing.dir\Release\star_windowing.tlog\unsuccessfulbuild".
+CustomBuild:
+  Todas as sa├¡das est├úo atualizadas.
+ClCompile:
+  Todas as sa├¡das est├úo atualizadas.
+Lib:
+  Todas as sa├¡das est├úo atualizadas.
+  star_windowing.vcxproj -> C:\projetos\OpenStarbound\build\windows-release\windowing\star_windowing.dir\Release\star_windowing.lib
+FinalizeBuildStatus:
+  Excluindo o arquivo "star_windowing.dir\Release\star_windowing.tlog\unsuccessfulbuild".
+  Tocando "star_windowing.dir\Release\star_windowing.tlog\star_windowing.lastbuildstate".
+Projeto de compila├º├úo pronto "C:\projetos\OpenStarbound\build\windows-release\windowing\star_windowing.vcxproj" (destinos padr├úo).
+O projeto "C:\projetos\OpenStarbound\build\windows-release\ALL_BUILD.vcxproj" (1) est├í compilando "C:\projetos\OpenStarbound\build\windows-release\utility\asset_packer.vcxproj" (11) no n├│ 1 (destinos padr├úo).
+PrepareForBuild:
+  A sa├¡da estruturada est├í habilitada. A formata├º├úo do diagn├│stico do compilador refletir├í a hierarquia de erros. Consulte https://aka.ms/cpp/structured-output para obter mais detalhes.
+InitializeBuildStatus:
+  Criando "asset_packer.dir\Release\asset_packer.tlog\unsuccessfulbuild" porque "AlwaysCreate" foi especificado.
+  Tocando "asset_packer.dir\Release\asset_packer.tlog\unsuccessfulbuild".
+CustomBuild:
+  Todas as sa├¡das est├úo atualizadas.
+ClCompile:
+  Todas as sa├¡das est├úo atualizadas.
+Link:
+  Todas as sa├¡das est├úo atualizadas.
+  asset_packer.vcxproj -> C:\projetos\OpenStarbound\dist\asset_packer.exe
+PostBuildEvent:
+  setlocal
+  C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noprofile -executionpolicy Bypass -file C:/vcpkg/scripts/buildsystems/msbuild/applocal.ps1 -targetBinary C:/projetos/OpenStarbound/dist/asset_packer.exe -installedDir C:/projetos/OpenStarbound/build/windows-release/vcpkg_installed/x64-windows-mixed-md/bin -OutVariable out
+  if %errorlevel% neq 0 goto :cmEnd
+  :cmEnd
+  endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+  :cmErrorLevel
+  exit /b %1
+  :cmDone
+  if %errorlevel% neq 0 goto :VCEnd
+  :VCEnd
+FinalizeBuildStatus:
+  Excluindo o arquivo "asset_packer.dir\Release\asset_packer.tlog\unsuccessfulbuild".
+  Tocando "asset_packer.dir\Release\asset_packer.tlog\asset_packer.lastbuildstate".
+Projeto de compila├º├úo pronto "C:\projetos\OpenStarbound\build\windows-release\utility\asset_packer.vcxproj" (destinos padr├úo).
+O projeto "C:\projetos\OpenStarbound\build\windows-release\ALL_BUILD.vcxproj" (1) est├í compilando "C:\projetos\OpenStarbound\build\windows-release\utility\asset_unpacker.vcxproj" (12) no n├│ 1 (destinos padr├úo).
+PrepareForBuild:
+  A sa├¡da estruturada est├í habilitada. A formata├º├úo do diagn├│stico do compilador refletir├í a hierarquia de erros. Consulte https://aka.ms/cpp/structured-output para obter mais detalhes.
+InitializeBuildStatus:
+  Criando "asset_unpacker.dir\Release\asset_unpacker.tlog\unsuccessfulbuild" porque "AlwaysCreate" foi especificado.
+  Tocando "asset_unpacker.dir\Release\asset_unpacker.tlog\unsuccessfulbuild".
+CustomBuild:
+  Todas as sa├¡das est├úo atualizadas.
+ClCompile:
+  Todas as sa├¡das est├úo atualizadas.
+Link:
+  Todas as sa├¡das est├úo atualizadas.
+  asset_unpacker.vcxproj -> C:\projetos\OpenStarbound\dist\asset_unpacker.exe
+PostBuildEvent:
+  setlocal
+  C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noprofile -executionpolicy Bypass -file C:/vcpkg/scripts/buildsystems/msbuild/applocal.ps1 -targetBinary C:/projetos/OpenStarbound/dist/asset_unpacker.exe -installedDir C:/projetos/OpenStarbound/build/windows-release/vcpkg_installed/x64-windows-mixed-md/bin -OutVariable out
+  if %errorlevel% neq 0 goto :cmEnd
+  :cmEnd
+  endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+  :cmErrorLevel
+  exit /b %1
+  :cmDone
+  if %errorlevel% neq 0 goto :VCEnd
+  :VCEnd
+FinalizeBuildStatus:
+  Excluindo o arquivo "asset_unpacker.dir\Release\asset_unpacker.tlog\unsuccessfulbuild".
+  Tocando "asset_unpacker.dir\Release\asset_unpacker.tlog\asset_unpacker.lastbuildstate".
+Projeto de compila├º├úo pronto "C:\projetos\OpenStarbound\build\windows-release\utility\asset_unpacker.vcxproj" (destinos padr├úo).
+O projeto "C:\projetos\OpenStarbound\build\windows-release\ALL_BUILD.vcxproj" (1) est├í compilando "C:\projetos\OpenStarbound\build\windows-release\utility\btree_repacker.vcxproj" (13) no n├│ 1 (destinos padr├úo).
+PrepareForBuild:
+  A sa├¡da estruturada est├í habilitada. A formata├º├úo do diagn├│stico do compilador refletir├í a hierarquia de erros. Consulte https://aka.ms/cpp/structured-output para obter mais detalhes.
+InitializeBuildStatus:
+  Criando "btree_repacker.dir\Release\btree_repacker.tlog\unsuccessfulbuild" porque "AlwaysCreate" foi especificado.
+  Tocando "btree_repacker.dir\Release\btree_repacker.tlog\unsuccessfulbuild".
+CustomBuild:
+  Todas as sa├¡das est├úo atualizadas.
+ClCompile:
+  Todas as sa├¡das est├úo atualizadas.
+Link:
+  Todas as sa├¡das est├úo atualizadas.
+  btree_repacker.vcxproj -> C:\projetos\OpenStarbound\dist\btree_repacker.exe
+PostBuildEvent:
+  setlocal
+  C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noprofile -executionpolicy Bypass -file C:/vcpkg/scripts/buildsystems/msbuild/applocal.ps1 -targetBinary C:/projetos/OpenStarbound/dist/btree_repacker.exe -installedDir C:/projetos/OpenStarbound/build/windows-release/vcpkg_installed/x64-windows-mixed-md/bin -OutVariable out
+  if %errorlevel% neq 0 goto :cmEnd
+  :cmEnd
+  endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+  :cmErrorLevel
+  exit /b %1
+  :cmDone
+  if %errorlevel% neq 0 goto :VCEnd
+  :VCEnd
+FinalizeBuildStatus:
+  Excluindo o arquivo "btree_repacker.dir\Release\btree_repacker.tlog\unsuccessfulbuild".
+  Tocando "btree_repacker.dir\Release\btree_repacker.tlog\btree_repacker.lastbuildstate".
+Projeto de compila├º├úo pronto "C:\projetos\OpenStarbound\build\windows-release\utility\btree_repacker.vcxproj" (destinos padr├úo).
+O projeto "C:\projetos\OpenStarbound\build\windows-release\ALL_BUILD.vcxproj" (1) est├í compilando "C:\projetos\OpenStarbound\build\windows-release\test\core_tests.vcxproj" (14) no n├│ 1 (destinos padr├úo).
+PrepareForBuild:
+  A sa├¡da estruturada est├í habilitada. A formata├º├úo do diagn├│stico do compilador refletir├í a hierarquia de erros. Consulte https://aka.ms/cpp/structured-output para obter mais detalhes.
+InitializeBuildStatus:
+  Criando "core_tests.dir\Release\core_tests.tlog\unsuccessfulbuild" porque "AlwaysCreate" foi especificado.
+  Tocando "core_tests.dir\Release\core_tests.tlog\unsuccessfulbuild".
+CustomBuild:
+  Todas as sa├¡das est├úo atualizadas.
+ClCompile:
+  Todas as sa├¡das est├úo atualizadas.
+Link:
+  Todas as sa├¡das est├úo atualizadas.
+  core_tests.vcxproj -> C:\projetos\OpenStarbound\dist\core_tests.exe
+PostBuildEvent:
+  setlocal
+  C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noprofile -executionpolicy Bypass -file C:/vcpkg/scripts/buildsystems/msbuild/applocal.ps1 -targetBinary C:/projetos/OpenStarbound/dist/core_tests.exe -installedDir C:/projetos/OpenStarbound/build/windows-release/vcpkg_installed/x64-windows-mixed-md/bin -OutVariable out
+  if %errorlevel% neq 0 goto :cmEnd
+  :cmEnd
+  endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+  :cmErrorLevel
+  exit /b %1
+  :cmDone
+  if %errorlevel% neq 0 goto :VCEnd
+  :VCEnd
+FinalizeBuildStatus:
+  Excluindo o arquivo "core_tests.dir\Release\core_tests.tlog\unsuccessfulbuild".
+  Tocando "core_tests.dir\Release\core_tests.tlog\core_tests.lastbuildstate".
+Projeto de compila├º├úo pronto "C:\projetos\OpenStarbound\build\windows-release\test\core_tests.vcxproj" (destinos padr├úo).
+O projeto "C:\projetos\OpenStarbound\build\windows-release\ALL_BUILD.vcxproj" (1) est├í compilando "C:\projetos\OpenStarbound\build\windows-release\utility\dump_versioned_json.vcxproj" (15) no n├│ 1 (destinos padr├úo).
+PrepareForBuild:
+  A sa├¡da estruturada est├í habilitada. A formata├º├úo do diagn├│stico do compilador refletir├í a hierarquia de erros. Consulte https://aka.ms/cpp/structured-output para obter mais detalhes.
+InitializeBuildStatus:
+  Criando "dump_versioned_json.dir\Release\dump_ver.1D52EA04.tlog\unsuccessfulbuild" porque "AlwaysCreate" foi especificado.
+  Tocando "dump_versioned_json.dir\Release\dump_ver.1D52EA04.tlog\unsuccessfulbuild".
+CustomBuild:
+  Todas as sa├¡das est├úo atualizadas.
+ClCompile:
+  Todas as sa├¡das est├úo atualizadas.
+Link:
+  Todas as sa├¡das est├úo atualizadas.
+  dump_versioned_json.vcxproj -> C:\projetos\OpenStarbound\dist\dump_versioned_json.exe
+PostBuildEvent:
+  setlocal
+  C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noprofile -executionpolicy Bypass -file C:/vcpkg/scripts/buildsystems/msbuild/applocal.ps1 -targetBinary C:/projetos/OpenStarbound/dist/dump_versioned_json.exe -installedDir C:/projetos/OpenStarbound/build/windows-release/vcpkg_installed/x64-windows-mixed-md/bin -OutVariable out
+  if %errorlevel% neq 0 goto :cmEnd
+  :cmEnd
+  endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+  :cmErrorLevel
+  exit /b %1
+  :cmDone
+  if %errorlevel% neq 0 goto :VCEnd
+  :VCEnd
+FinalizeBuildStatus:
+  Excluindo o arquivo "dump_versioned_json.dir\Release\dump_ver.1D52EA04.tlog\unsuccessfulbuild".
+  Tocando "dump_versioned_json.dir\Release\dump_ver.1D52EA04.tlog\dump_versioned_json.lastbuildstate".
+Projeto de compila├º├úo pronto "C:\projetos\OpenStarbound\build\windows-release\utility\dump_versioned_json.vcxproj" (destinos padr├úo).
+O projeto "C:\projetos\OpenStarbound\build\windows-release\ALL_BUILD.vcxproj" (1) est├í compilando "C:\projetos\OpenStarbound\build\windows-release\test\game_tests.vcxproj" (16) no n├│ 1 (destinos padr├úo).
+PrepareForBuild:
+  A sa├¡da estruturada est├í habilitada. A formata├º├úo do diagn├│stico do compilador refletir├í a hierarquia de erros. Consulte https://aka.ms/cpp/structured-output para obter mais detalhes.
+InitializeBuildStatus:
+  Criando "game_tests.dir\Release\game_tests.tlog\unsuccessfulbuild" porque "AlwaysCreate" foi especificado.
+  Tocando "game_tests.dir\Release\game_tests.tlog\unsuccessfulbuild".
+CustomBuild:
+  Todas as sa├¡das est├úo atualizadas.
+ClCompile:
+  Todas as sa├¡das est├úo atualizadas.
+Link:
+  Todas as sa├¡das est├úo atualizadas.
+  game_tests.vcxproj -> C:\projetos\OpenStarbound\dist\game_tests.exe
+PostBuildEvent:
+  setlocal
+  C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noprofile -executionpolicy Bypass -file C:/vcpkg/scripts/buildsystems/msbuild/applocal.ps1 -targetBinary C:/projetos/OpenStarbound/dist/game_tests.exe -installedDir C:/projetos/OpenStarbound/build/windows-release/vcpkg_installed/x64-windows-mixed-md/bin -OutVariable out
+  if %errorlevel% neq 0 goto :cmEnd
+  :cmEnd
+  endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+  :cmErrorLevel
+  exit /b %1
+  :cmDone
+  if %errorlevel% neq 0 goto :VCEnd
+  :VCEnd
+FinalizeBuildStatus:
+  Excluindo o arquivo "game_tests.dir\Release\game_tests.tlog\unsuccessfulbuild".
+  Tocando "game_tests.dir\Release\game_tests.tlog\game_tests.lastbuildstate".
+Projeto de compila├º├úo pronto "C:\projetos\OpenStarbound\build\windows-release\test\game_tests.vcxproj" (destinos padr├úo).
+O projeto "C:\projetos\OpenStarbound\build\windows-release\ALL_BUILD.vcxproj" (1) est├í compilando "C:\projetos\OpenStarbound\build\windows-release\utility\make_versioned_json.vcxproj" (17) no n├│ 1 (destinos padr├úo).
+PrepareForBuild:
+  A sa├¡da estruturada est├í habilitada. A formata├º├úo do diagn├│stico do compilador refletir├í a hierarquia de erros. Consulte https://aka.ms/cpp/structured-output para obter mais detalhes.
+InitializeBuildStatus:
+  Criando "make_versioned_json.dir\Release\make_ver.E4AC02A1.tlog\unsuccessfulbuild" porque "AlwaysCreate" foi especificado.
+  Tocando "make_versioned_json.dir\Release\make_ver.E4AC02A1.tlog\unsuccessfulbuild".
+CustomBuild:
+  Todas as sa├¡das est├úo atualizadas.
+ClCompile:
+  Todas as sa├¡das est├úo atualizadas.
+Link:
+  Todas as sa├¡das est├úo atualizadas.
+  make_versioned_json.vcxproj -> C:\projetos\OpenStarbound\dist\make_versioned_json.exe
+PostBuildEvent:
+  setlocal
+  C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noprofile -executionpolicy Bypass -file C:/vcpkg/scripts/buildsystems/msbuild/applocal.ps1 -targetBinary C:/projetos/OpenStarbound/dist/make_versioned_json.exe -installedDir C:/projetos/OpenStarbound/build/windows-release/vcpkg_installed/x64-windows-mixed-md/bin -OutVariable out
+  if %errorlevel% neq 0 goto :cmEnd
+  :cmEnd
+  endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+  :cmErrorLevel
+  exit /b %1
+  :cmDone
+  if %errorlevel% neq 0 goto :VCEnd
+  :VCEnd
+FinalizeBuildStatus:
+  Excluindo o arquivo "make_versioned_json.dir\Release\make_ver.E4AC02A1.tlog\unsuccessfulbuild".
+  Tocando "make_versioned_json.dir\Release\make_ver.E4AC02A1.tlog\make_versioned_json.lastbuildstate".
+Projeto de compila├º├úo pronto "C:\projetos\OpenStarbound\build\windows-release\utility\make_versioned_json.vcxproj" (destinos padr├úo).
+O projeto "C:\projetos\OpenStarbound\build\windows-release\ALL_BUILD.vcxproj" (1) est├í compilando "C:\projetos\OpenStarbound\build\windows-release\client\starbound.vcxproj" (18) no n├│ 1 (destinos padr├úo).
+PrepareForBuild:
+  A sa├¡da estruturada est├í habilitada. A formata├º├úo do diagn├│stico do compilador refletir├í a hierarquia de erros. Consulte https://aka.ms/cpp/structured-output para obter mais detalhes.
+InitializeBuildStatus:
+  Criando "starbound.dir\Release\starbound.tlog\unsuccessfulbuild" porque "AlwaysCreate" foi especificado.
+  Tocando "starbound.dir\Release\starbound.tlog\unsuccessfulbuild".
+CustomBuild:
+  Todas as sa├¡das est├úo atualizadas.
+ClCompile:
+  Todas as sa├¡das est├úo atualizadas.
+ResourceCompile:
+  Todas as sa├¡das est├úo atualizadas.
+Link:
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\bin\HostX64\x64\link.exe /ERRORREPORT:QUEUE /OUT:"C:\projetos\OpenStarbound\dist\starbound.exe" /INCREMENTAL:NO /NOLOGO "..\vcpkg_installed\x64-windows-mixed-md\lib\zlib.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\libpng16.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\cpr.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\zstd.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\opus.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\re2.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\imgui.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\vorbisfile.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\vorbis.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\ogg.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\SDL3.lib" opengl32.lib glu32.lib "..\vcpkg_installed\x64-windows-mixed-md\lib\libglew32.lib" C:\projetos\OpenStarbound\lib\windows\steam_api64.lib C:\projetos\OpenStarbound\lib\windows\discord_game_sdk.lib "..\vcpkg_installed\x64-windows-mixed-md\lib\libcurl.lib" bcrypt.lib advapi32.lib crypt32.lib secur32.lib ws2_32.lib iphlpapi.lib "..\vcpkg_installed\x64-windows-mixed-md\lib\libpng16.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\bz2.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_log_internal_check_op.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_leak_check.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_log_internal_conditions.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_log_internal_message.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_log_internal_nullguard.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_examine_stack.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_log_internal_format.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_log_internal_structured_proto.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_log_internal_log_sink_set.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_log_internal_globals.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_log_globals.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_log_sink.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_log_entry.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_log_internal_proto.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_strerror.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_vlog_config_internal.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_log_internal_fnmatch.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_flags_internal.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_flags_marshalling.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_flags_reflection.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_flags_config.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_flags_program_name.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_flags_private_handle_accessor.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_flags_commandlineflag.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_flags_commandlineflag_internal.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_raw_hash_set.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_cord.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_cordz_info.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_cord_internal.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_cordz_functions.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_cordz_handle.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_crc_cord_state.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_crc32c.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_crc_internal.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_crc_cpu_detect.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_hashtablez_sampler.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_exponential_biased.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_hash.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_city.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_str_format_internal.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_synchronization.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_graphcycles_internal.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_kernel_timeout_internal.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_stacktrace.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_symbolize.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_malloc_internal.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_debugging_internal.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_demangle_internal.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_demangle_rust.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_decode_rust_punycode.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_utf8_for_code_point.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_time.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_strings.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_strings_internal.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_string_view.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_throw_delegate.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_int128.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_civil_time.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_time_zone.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_tracing_internal.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_base.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_raw_logging_internal.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_log_severity.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\absl_spinlock_wait.lib" "-ignore:4221" "..\vcpkg_installed\x64-windows-mixed-md\lib\freetype.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\zlib.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\bz2.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\libpng16.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\zlib.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\brotlidec.lib" "..\vcpkg_installed\x64-windows-mixed-md\lib\brotlicommon.lib" opengl32.lib kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib ws2_32.lib iphlpapi.lib shlwapi.lib dbghelp.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /PDB:"C:/projetos/OpenStarbound/dist/starbound.pdb" /SUBSYSTEM:WINDOWS /OPT:REF /OPT:ICF /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:/projetos/OpenStarbound/build/windows-release/client/Release/starbound.lib" /MACHINE:X64  /machine:x64 /largeaddressaware /PDBCompress C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\cmake_pch.obj starbound.dir\Release\starbound.res
+  starbound.dir\Release\StarClientApplication.obj
+  starbound.dir\Release\StarRenderingLuaBindings.obj
+  "C:\projetos\OpenStarbound\build\windows-release\extern\star_extern.dir\Release\sha512.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\extern\star_extern.dir\Release\curve25519_dh.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\extern\star_extern.dir\Release\curve25519_mehdi.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\extern\star_extern.dir\Release\curve25519_order.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\extern\star_extern.dir\Release\curve25519_utils.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\extern\star_extern.dir\Release\custom_blind.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\extern\star_extern.dir\Release\ed25519_sign.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\extern\star_extern.dir\Release\ed25519_verify.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\extern\star_extern.dir\Release\xxhash.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\extern\star_extern.dir\Release\format.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\extern\star_extern.dir\Release\imgui_lua_bindings.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\extern\star_extern.dir\Release\lapi.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\extern\star_extern.dir\Release\lauxlib.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\extern\star_extern.dir\Release\lbaselib.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\extern\star_extern.dir\Release\lbitlib.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\extern\star_extern.dir\Release\lcode.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\extern\star_extern.dir\Release\lcorolib.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\extern\star_extern.dir\Release\lctype.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\extern\star_extern.dir\Release\ldblib.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\extern\star_extern.dir\Release\ldebug.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\extern\star_extern.dir\Release\ldo.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\extern\star_extern.dir\Release\ldump.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\extern\star_extern.dir\Release\lfunc.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\extern\star_extern.dir\Release\lgc.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\extern\star_extern.dir\Release\linit.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\extern\star_extern.dir\Release\liolib.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\extern\star_extern.dir\Release\llex.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\extern\star_extern.dir\Release\lmathlib.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\extern\star_extern.dir\Release\lmem.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\extern\star_extern.dir\Release\loadlib.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\extern\star_extern.dir\Release\lobject.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\extern\star_extern.dir\Release\lopcodes.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\extern\star_extern.dir\Release\loslib.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\extern\star_extern.dir\Release\lparser.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\extern\star_extern.dir\Release\lstate.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\extern\star_extern.dir\Release\lstring.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\extern\star_extern.dir\Release\lstrlib.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\extern\star_extern.dir\Release\ltable.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\extern\star_extern.dir\Release\ltablib.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\extern\star_extern.dir\Release\ltm.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\extern\star_extern.dir\Release\lundump.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\extern\star_extern.dir\Release\lutf8lib.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\extern\star_extern.dir\Release\lvm.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\extern\star_extern.dir\Release\lzio.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\extern\star_extern.dir\Release\rpmalloc.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\cmake_pch.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarAudio.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarAssetPath.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarBTreeDatabase.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarBuffer.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarByteArray.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarColor.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarIODeviceCallbacks.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarCompression.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarCurve25519.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarDataStream.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarDataStreamDevices.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarDirectives.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarEncode.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarFile.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarFont.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarHostAddress.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarHttpClient.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarIODevice.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarImage.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarImageProcessing.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarImageScaling.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarInputEvent.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarJson.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarJsonBuilder.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarJsonExtra.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarJsonPath.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarJsonPatch.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarJsonRpc.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarFormattedJson.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarLexicalCast.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarListener.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarLogging.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarLua.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarLuaConverters.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarMemory.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarNetCompatibility.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarNetElement.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarNetElementBasicFields.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarNetElementGroup.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarNetElementSyncGroup.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarOptionParser.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarPerlin.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarRandom.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarSha256.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarShellParser.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarSocket.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarString.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarStringView.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarTcp.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarText.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarThread.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarTime.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarTickRateMonitor.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarUdp.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarUnicode.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarUuid.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarWorkerPool.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarZSTDCompression.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarUtilityLuaBindings.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarDynamicLib_windows.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarFile_windows.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarLockFile_windows.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarMiniDump_windows.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarSignalHandler_windows.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarString_windows.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarThread_windows.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarTime_windows.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarException_windows.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarSecureRandom_windows.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\StarVersion.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\base\star_base.dir\Release\StarAnimatedPartSet.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\base\star_base.dir\Release\StarAssets.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\base\star_base.dir\Release\StarCellularLightArray.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\base\star_base.dir\Release\StarCellularLighting.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\base\star_base.dir\Release\StarConfiguration.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\base\star_base.dir\Release\StarDirectoryAssetSource.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\base\star_base.dir\Release\StarMemoryAssetSource.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\base\star_base.dir\Release\StarMixer.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\base\star_base.dir\Release\StarPackedAssetSource.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\base\star_base.dir\Release\StarRootBase.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\base\star_base.dir\Release\StarVersionOptionParser.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\base\star_base.dir\Release\StarWorldGeometry.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\base\star_base.dir\Release\StarImageLuaBindings.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarActorMovementController.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarAiDatabase.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarAiTypes.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarAmbient.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarAnimation.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarArmorWearer.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarBehaviorDatabase.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarBehaviorState.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarBiome.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarBiomeDatabase.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarBiomePlacement.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarCelestialCoordinate.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarCelestialDatabase.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarCelestialGraphics.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarCelestialParameters.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarCelestialTypes.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarChatAction.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarChatProcessor.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarChatTypes.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarClientContext.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarCodex.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarCodexDatabase.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarCollectionDatabase.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarCollisionBlock.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarCollisionGenerator.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarCommandProcessor.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarDamage.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarDamageDatabase.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarDamageManager.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarDamageTypes.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarDanceDatabase.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarDrawable.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarDungeonGenerator.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarDungeonImagePart.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarDungeonTMXPart.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarEffectEmitter.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarEffectSourceDatabase.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarEmoteProcessor.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarEntityFactory.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarEntityMap.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarEntityRendering.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarEntityRenderingTypes.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarEntitySplash.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarFallingBlocksAgent.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarForceRegions.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarGameTimers.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarGameTypes.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarHumanoid.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarImageMetadataDatabase.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarInput.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarInteractionTypes.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarInterpolationTracker.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarInventoryTypes.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarItem.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarItemBag.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarItemDatabase.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarItemDescriptor.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarItemDrop.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarItemRecipe.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarLightSource.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarLiquidsDatabase.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarLiquidTypes.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarMaterialDatabase.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarMaterialRenderProfile.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarMicroDungeon.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarMonster.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarMonsterDatabase.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarMovementController.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarNameGenerator.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarNetPackets.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarNetPacketSocket.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarNetworkedAnimator.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarNpc.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarNpcDatabase.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarObject.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarObjectDatabase.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarParallax.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarParticle.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarParticleDatabase.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarParticleManager.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarPlant.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarPlantDatabase.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarPlantDrop.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarPlatformerAStar.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarPlatformerAStarTypes.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarPlayer.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarPlayerBlueprints.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarPlayerCodexes.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarPlayerCompanions.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarPlayerDeployment.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarPlayerFactory.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarPlayerInventory.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarPlayerLog.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarPlayerStorage.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarPlayerTech.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarPlayerTypes.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarPlayerUniverseMap.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarProjectile.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarProjectileDatabase.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarQuestDescriptor.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarQuestManager.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarQuests.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarQuestTemplateDatabase.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarRadioMessageDatabase.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarRebuilder.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarRoot.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarRootLoader.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarServerClientContext.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarSky.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarSkyParameters.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarSkyRenderData.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarSkyTypes.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarSongbook.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarSpawner.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarSpawnTypeDatabase.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarSpeciesDatabase.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarStagehand.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarStagehandDatabase.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarStatCollection.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarStatistics.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarStatisticsDatabase.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarStatSet.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarStatusController.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarStatusEffectDatabase.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarStatusTypes.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarStoredFunctions.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarSystemWorld.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarSystemWorldClient.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarSystemWorldServer.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarSystemWorldServerThread.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarTeamClient.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarTeamManager.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarTechController.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarTechDatabase.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarTenantDatabase.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarTerrainDatabase.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarTileDamage.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarTileDrawer.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarTileModification.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarTilesetDatabase.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarToolUser.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarTreasure.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarUniverseClient.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarUniverseConnection.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarUniverseServer.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarUniverseSettings.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarVehicle.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarVehicleDatabase.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarVersioningDatabase.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarWarping.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarWeather.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarWeatherTypes.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarWireProcessor.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarWiring.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarWorldCamera.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarWorldClient.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarWorldClientState.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarWorldGeneration.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarWorldLayout.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarWorldParameters.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarWorldServer.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarWorldServerThread.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarWorldStorage.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarWorldStructure.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarWorldTemplate.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarWorldTiles.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarAnchorableEntity.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarBeamItem.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarContainerEntity.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarDamageBarEntity.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarEntity.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarFireableItem.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarInteractiveEntity.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarLoungingEntities.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarPhysicsEntity.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarPointableItem.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarSwingableItem.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarTileEntity.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarToolUserItem.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarWorld.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarActiveItem.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarArmors.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarAugmentItem.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarBlueprintItem.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarCodexItem.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarCurrency.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarConsumableItem.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarInspectionTool.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarInstrumentItem.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarLiquidItem.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarMaterialItem.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarObjectItem.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarThrownItem.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarTools.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarUnlockItem.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarContainerObject.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarFarmableObject.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarLoungeableObject.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarPhysicsObject.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarTeleporterObject.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarCameraLuaBindings.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarCelestialLuaBindings.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarBehaviorLuaBindings.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarConfigLuaBindings.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarEntityLuaBindings.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarFireableItemLuaBindings.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarInputLuaBindings.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarItemLuaBindings.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarLuaHttpBindings.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarLuaComponents.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarLuaEntityUserdata.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarLuaGameConverters.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarLuaRoot.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarMovementControllerLuaBindings.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarNetworkedAnimatorLuaBindings.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarPlayerLuaBindings.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarRootLuaBindings.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarScriptedAnimatorLuaBindings.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarSongbookLuaBindings.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarStatusControllerLuaBindings.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarTeamClientLuaBindings.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarWorldLuaBindings.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarUniverseServerLuaBindings.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarScriptableThread.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarCacheSelector.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarConstantSelector.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarDisplacementSelector.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarFlatSurfaceSelector.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarIslandSurfaceSelector.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarKarstCave.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarMaxSelector.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarMinMaxSelector.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarMixSelector.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarPerlinSelector.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarRidgeBlocksSelector.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarRotateSelector.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\game\star_game.dir\Release\StarWormCave.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\application\star_application.dir\Release\StarApplication.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\application\star_application.dir\Release\StarRenderer.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\application\star_application.dir\Release\StarMainApplication_sdl.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\application\star_application.dir\Release\StarP2PNetworkingService_pc.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\application\star_application.dir\Release\StarPlatformServices_pc.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\application\star_application.dir\Release\StarRenderer_opengl.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\application\star_application.dir\Release\StarDesktopService_pc_steam.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\application\star_application.dir\Release\StarStatisticsService_pc_steam.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\application\star_application.dir\Release\StarUserGeneratedContentService_pc_steam.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\application\star_application.dir\Release\core.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\application\star_application.dir\Release\image_manager.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\application\star_application.dir\Release\lobby_manager.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\application\star_application.dir\Release\network_manager.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\application\star_application.dir\Release\overlay_manager.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\application\star_application.dir\Release\relationship_manager.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\application\star_application.dir\Release\storage_manager.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\application\star_application.dir\Release\store_manager.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\application\star_application.dir\Release\types.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\application\star_application.dir\Release\user_manager.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\application\star_application.dir\Release\voice_manager.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\application\star_application.dir\Release\achievement_manager.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\application\star_application.dir\Release\activity_manager.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\application\star_application.dir\Release\application_manager.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\rendering\star_rendering.dir\Release\StarAnchorTypes.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\rendering\star_rendering.dir\Release\StarAssetTextureGroup.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\rendering\star_rendering.dir\Release\StarDrawablePainter.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\rendering\star_rendering.dir\Release\StarEnvironmentPainter.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\rendering\star_rendering.dir\Release\StarFontTextureGroup.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\rendering\star_rendering.dir\Release\StarTextPainter.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\rendering\star_rendering.dir\Release\StarTilePainter.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\rendering\star_rendering.dir\Release\StarWorldPainter.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\windowing\star_windowing.dir\Release\StarButtonGroup.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\windowing\star_windowing.dir\Release\StarButtonWidget.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\windowing\star_windowing.dir\Release\StarCanvasWidget.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\windowing\star_windowing.dir\Release\StarFlowLayout.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\windowing\star_windowing.dir\Release\StarFuelWidget.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\windowing\star_windowing.dir\Release\StarGuiContext.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\windowing\star_windowing.dir\Release\StarGuiReader.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\windowing\star_windowing.dir\Release\StarGuiTypes.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\windowing\star_windowing.dir\Release\StarImageWidget.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\windowing\star_windowing.dir\Release\StarImageStretchWidget.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\windowing\star_windowing.dir\Release\StarItemGridWidget.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\windowing\star_windowing.dir\Release\StarItemSlotWidget.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\windowing\star_windowing.dir\Release\StarKeyBindings.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\windowing\star_windowing.dir\Release\StarLayout.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\windowing\star_windowing.dir\Release\StarLabelWidget.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\windowing\star_windowing.dir\Release\StarLargeCharPlateWidget.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\windowing\star_windowing.dir\Release\StarListWidget.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\windowing\star_windowing.dir\Release\StarPane.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\windowing\star_windowing.dir\Release\StarPaneManager.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\windowing\star_windowing.dir\Release\StarPortraitWidget.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\windowing\star_windowing.dir\Release\StarProgressWidget.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\windowing\star_windowing.dir\Release\StarScrollArea.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\windowing\star_windowing.dir\Release\StarSliderBar.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\windowing\star_windowing.dir\Release\StarStackWidget.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\windowing\star_windowing.dir\Release\StarTabSet.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\windowing\star_windowing.dir\Release\StarTextBoxWidget.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\windowing\star_windowing.dir\Release\StarVerticalLayout.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\windowing\star_windowing.dir\Release\StarWidget.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\windowing\star_windowing.dir\Release\StarWidgetLuaBindings.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\windowing\star_windowing.dir\Release\StarWidgetParsing.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.dir\Release\StarActionBar.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.dir\Release\StarAiInterface.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.dir\Release\StarBaseScriptPane.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.dir\Release\StarBindingsMenu.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.dir\Release\StarBookmarkInterface.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.dir\Release\StarChat.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.dir\Release\StarCharCreation.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.dir\Release\StarCharSelection.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.dir\Release\StarChatBubbleSeparation.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.dir\Release\StarChatBubbleManager.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.dir\Release\StarCinematic.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.dir\Release\StarClientCommandProcessor.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.dir\Release\StarClipboardLuaBindings.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.dir\Release\StarCodexInterface.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.dir\Release\StarConfirmationDialog.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.dir\Release\StarHttpTrustDialog.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.dir\Release\StarContainerInterface.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.dir\Release\StarContainerInteractor.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.dir\Release\StarControllerBuildMenu.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.dir\Release\StarCraftingInterface.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.dir\Release\StarErrorScreen.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.dir\Release\StarGraphicsMenu.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.dir\Release\StarInventory.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.dir\Release\StarInterfaceCursor.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.dir\Release\StarInterfaceLuaBindings.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.dir\Release\StarItemTooltip.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.dir\Release\StarJoinRequestDialog.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.dir\Release\StarKeybindingsMenu.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.dir\Release\StarMainInterface.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.dir\Release\StarMainInterfaceTypes.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.dir\Release\StarMainMixer.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.dir\Release\StarMerchantInterface.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.dir\Release\StarModsMenu.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.dir\Release\StarNameplatePainter.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.dir\Release\StarOptionsMenu.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.dir\Release\StarPopupInterface.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.dir\Release\StarQuestIndicatorPainter.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.dir\Release\StarQuestInterface.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.dir\Release\StarQuestTracker.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.dir\Release\StarRadioMessagePopup.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.dir\Release\StarTeamBar.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.dir\Release\StarTitleScreen.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.dir\Release\StarScriptPane.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.dir\Release\StarSimpleTooltip.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.dir\Release\StarSongbookInterface.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.dir\Release\StarStatusPane.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.dir\Release\StarShadersMenu.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.dir\Release\StarTeleportDialog.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.dir\Release\StarVoice.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.dir\Release\StarVoiceLuaBindings.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.dir\Release\StarVoiceSettingsMenu.obj"
+  "C:\projetos\OpenStarbound\build\windows-release\frontend\star_frontend.dir\Release\StarWireInterface.obj"
+C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\cmake_pch.obj : warning LNK4042: objeto especificado mais de uma vez; extras ignorados [C:\projetos\OpenStarbound\build\windows-release\client\starbound.vcxproj]
+     Criando biblioteca C:/projetos/OpenStarbound/build/windows-release/client/Release/starbound.lib e objeto C:/projetos/OpenStarbound/build/windows-release/client/Release/starbound.exp
+  starbound.vcxproj -> C:\projetos\OpenStarbound\dist\starbound.exe
+PostBuildEvent:
+  setlocal
+  C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noprofile -executionpolicy Bypass -file C:/vcpkg/scripts/buildsystems/msbuild/applocal.ps1 -targetBinary C:/projetos/OpenStarbound/dist/starbound.exe -installedDir C:/projetos/OpenStarbound/build/windows-release/vcpkg_installed/x64-windows-mixed-md/bin -OutVariable out
+  if %errorlevel% neq 0 goto :cmEnd
+  :cmEnd
+  endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+  :cmErrorLevel
+  exit /b %1
+  :cmDone
+  if %errorlevel% neq 0 goto :VCEnd
+  :VCEnd
+FinalizeBuildStatus:
+  Excluindo o arquivo "starbound.dir\Release\starbound.tlog\unsuccessfulbuild".
+  Tocando "starbound.dir\Release\starbound.tlog\starbound.lastbuildstate".
+Projeto de compila├º├úo pronto "C:\projetos\OpenStarbound\build\windows-release\client\starbound.vcxproj" (destinos padr├úo).
+O projeto "C:\projetos\OpenStarbound\build\windows-release\ALL_BUILD.vcxproj" (1) est├í compilando "C:\projetos\OpenStarbound\build\windows-release\server\starbound_server.vcxproj" (19) no n├│ 1 (destinos padr├úo).
+PrepareForBuild:
+  A sa├¡da estruturada est├í habilitada. A formata├º├úo do diagn├│stico do compilador refletir├í a hierarquia de erros. Consulte https://aka.ms/cpp/structured-output para obter mais detalhes.
+InitializeBuildStatus:
+  Criando "starbound_server.dir\Release\starbound_server.tlog\unsuccessfulbuild" porque "AlwaysCreate" foi especificado.
+  Tocando "starbound_server.dir\Release\starbound_server.tlog\unsuccessfulbuild".
+CustomBuild:
+  Todas as sa├¡das est├úo atualizadas.
+ClCompile:
+  Todas as sa├¡das est├úo atualizadas.
+ResourceCompile:
+  Todas as sa├¡das est├úo atualizadas.
+Link:
+  Todas as sa├¡das est├úo atualizadas.
+  starbound_server.vcxproj -> C:\projetos\OpenStarbound\dist\starbound_server.exe
+PostBuildEvent:
+  setlocal
+  C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noprofile -executionpolicy Bypass -file C:/vcpkg/scripts/buildsystems/msbuild/applocal.ps1 -targetBinary C:/projetos/OpenStarbound/dist/starbound_server.exe -installedDir C:/projetos/OpenStarbound/build/windows-release/vcpkg_installed/x64-windows-mixed-md/bin -OutVariable out
+  if %errorlevel% neq 0 goto :cmEnd
+  :cmEnd
+  endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+  :cmErrorLevel
+  exit /b %1
+  :cmDone
+  if %errorlevel% neq 0 goto :VCEnd
+  :VCEnd
+FinalizeBuildStatus:
+  Excluindo o arquivo "starbound_server.dir\Release\starbound_server.tlog\unsuccessfulbuild".
+  Tocando "starbound_server.dir\Release\starbound_server.tlog\starbound_server.lastbuildstate".
+Projeto de compila├º├úo pronto "C:\projetos\OpenStarbound\build\windows-release\server\starbound_server.vcxproj" (destinos padr├úo).
+PrepareForBuild:
+  A sa├¡da estruturada est├í habilitada. A formata├º├úo do diagn├│stico do compilador refletir├í a hierarquia de erros. Consulte https://aka.ms/cpp/structured-output para obter mais detalhes.
+InitializeBuildStatus:
+  Criando "x64\Release\ALL_BUILD\ALL_BUILD.tlog\unsuccessfulbuild" porque "AlwaysCreate" foi especificado.
+  Tocando "x64\Release\ALL_BUILD\ALL_BUILD.tlog\unsuccessfulbuild".
+CustomBuild:
+  Todas as sa├¡das est├úo atualizadas.
+FinalizeBuildStatus:
+  Excluindo o arquivo "x64\Release\ALL_BUILD\ALL_BUILD.tlog\unsuccessfulbuild".
+  Tocando "x64\Release\ALL_BUILD\ALL_BUILD.tlog\ALL_BUILD.lastbuildstate".
+Projeto de compila├º├úo pronto "C:\projetos\OpenStarbound\build\windows-release\ALL_BUILD.vcxproj" (destinos padr├úo).
+
+Compila├º├úo com ├¬xito.
+
+"C:\projetos\OpenStarbound\build\windows-release\ALL_BUILD.vcxproj" (destino padr├úo) (1) ->
+"C:\projetos\OpenStarbound\build\windows-release\client\starbound.vcxproj" (destino padr├úo) (18) ->
+(Link destino) -> 
+  C:\projetos\OpenStarbound\build\windows-release\core\star_core.dir\Release\cmake_pch.obj : warning LNK4042: objeto especificado mais de uma vez; extras ignorados [C:\projetos\OpenStarbound\build\windows-release\client\starbound.vcxproj]
+
+    1 Aviso(s)
+    0 Erro(s)
+
+Tempo Decorrido 00:00:11.59
+
+[2/3] Running post_build.bat...
+lib\windows\discord_game_sdk.dll
+1 arquivo(s) copiado(s)
+lib\windows\steam_api64.dll
+1 arquivo(s) copiado(s)
+[3/3] Running assemble.bat...
+client_distribution\win\steam_appid.txt
+1 arquivo(s) copiado(s)
+Output packed assets to C:\projetos\OpenStarbound\client_distribution\assets\opensb.pak in 0.06532520000473596s
+dist\btree_repacker.exe
+1 arquivo(s) copiado(s)
+dist\dump_versioned_json.exe
+1 arquivo(s) copiado(s)
+dist\make_versioned_json.exe
+1 arquivo(s) copiado(s)
+dist\asset_unpacker.exe
+1 arquivo(s) copiado(s)
+dist\asset_packer.exe
+1 arquivo(s) copiado(s)
+dist\starbound.exe
+1 arquivo(s) copiado(s)
+0 arquivo(s) copiado(s)
+dist\discord_game_sdk.dll
+dist\SDL3.dll
+dist\steam_api64.dll
+3 arquivo(s) copiado(s)
+lib\windows\discord_game_sdk.dll
+1 arquivo(s) copiado(s)
+lib\windows\steam_api64.dll
+1 arquivo(s) copiado(s)
+scripts\ci\windows\sbinit.config
+1 arquivo(s) copiado(s)
+build\windows-release\vcpkg_installed\x64-windows-mixed-md\bin\SDL3.pdb
+1 arquivo(s) copiado(s)
+Output packed assets to C:\projetos\OpenStarbound\server_distribution\assets\opensb.pak in 0.04899120001937263s
+dist\btree_repacker.exe
+1 arquivo(s) copiado(s)
+dist\starbound_server.exe
+1 arquivo(s) copiado(s)
+0 arquivo(s) copiado(s)
+scripts\ci\windows\sbinit.config
+1 arquivo(s) copiado(s)
+client_distribution\assets\opensb.pak
+client_distribution\win\asset_packer.exe
+client_distribution\win\asset_unpacker.exe
+client_distribution\win\btree_repacker.exe
+client_distribution\win\discord_game_sdk.dll
+client_distribution\win\dump_versioned_json.exe
+client_distribution\win\make_versioned_json.exe
+client_distribution\win\sbinit.config
+client_distribution\win\SDL3.dll
+client_distribution\win\SDL3.pdb
+client_distribution\win\starbound.exe
+client_distribution\win\steam_api64.dll
+client_distribution\win\steam_appid.txt
+13 arquivo(s) copiado(s)
+server_distribution\assets\opensb.pak
+server_distribution\win\btree_repacker.exe
+server_distribution\win\sbinit.config
+server_distribution\win\starbound_server.exe
+server_distribution\win\steam_appid.txt
+5 arquivo(s) copiado(s)
+Done: incremental build and release scripts completed.

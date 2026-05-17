@@ -1,5 +1,4 @@
 {
-	"panelWidthDelta": 280,
 	"paneLayout": {
 		"panefeature": {
 			"positionLocked": false
@@ -43,10 +42,10 @@
 			{ "action": "InterfaceBarNext", "label": "Action Bar Next" },
 			{ "action": "InterfaceChangeBarGroup", "label": "Change Bar Group" },
 			{ "action": "InterfaceDeselectHands", "label": "Deselect Hands" },
+            { "action": "InterfaceHotbarStripHold", "label": "Hotbar Select" },
 			{ "action": "InterfaceHotbarWheelHold", "label": "Hotbar Wheel" },
-			{ "action": "InterfaceHotbarStripHold", "label": "Hotbar Strip Hold" },
 			{ "action": "InterfacePanelWheelHold", "label": "Panel Wheel" },
-			{ "action": "InterfaceTakeAllItems", "label": "Take All (Container)" },
+			{ "action": "InterfaceTakeAllItems", "label": "Take All" },
 			{ "action": "InterfacePanelSelect", "label": "Panel Select" },
 			{ "action": "InterfacePanelBack", "label": "Panel Back" },
 			{ "action": "InterfacePanelCursorCenter", "label": "Panel Cursor Center" },
@@ -57,7 +56,11 @@
 			{ "action": "InterfacePanelScrollUp", "label": "Panel Scroll Up" },
 			{ "action": "InterfacePanelScrollDown", "label": "Panel Scroll Down" },
 			{ "action": "InterfacePanelDragHold", "label": "Panel Drag Hold" },
-            { "action": "InterfaceBar1", "label": "Action Bar 1" },
+            { "action": "EssentialBar1", "label": "Essential Slot 1" },
+			{ "action": "EssentialBar2", "label": "Essential Slot 2" },
+			{ "action": "EssentialBar3", "label": "Essential Slot 3" },
+			{ "action": "EssentialBar4", "label": "Essential Slot 4" },
+			{ "action": "InterfaceBar1", "label": "Action Bar 1" },
 			{ "action": "InterfaceBar2", "label": "Action Bar 2" },
 			{ "action": "InterfaceBar3", "label": "Action Bar 3" },
 			{ "action": "InterfaceBar4", "label": "Action Bar 4" },
@@ -67,16 +70,6 @@
 			{ "action": "InterfaceBar8", "label": "Action Bar 8" },
 			{ "action": "InterfaceBar9", "label": "Action Bar 9" },
 			{ "action": "InterfaceBar10", "label": "Action Bar 10" },
-			{ "action": "EssentialBar1", "label": "Essential Slot 1" },
-			{ "action": "EssentialBar2", "label": "Essential Slot 2" },
-			{ "action": "EssentialBar3", "label": "Essential Slot 3" },
-			{ "action": "EssentialBar4", "label": "Essential Slot 4" },
-			{ "action": "InterfaceBarPrevious", "label": "Action Bar Previous" },
-			{ "action": "InterfaceBarNext", "label": "Action Bar Next" },
-			{ "action": "InterfaceChangeBarGroup", "label": "Change Bar Group" },
-			{ "action": "InterfaceDeselectHands", "label": "Deselect Hands" },
-			{ "action": "InterfaceHotbarWheelHold", "label": "Hotbar Wheel" },
-			{ "action": "InterfacePanelWheelHold", "label": "Panel Wheel" }
 			{ "action": "InterfaceControllerMouseLeft", "label": "Controller Mouse Left" },
 			{ "action": "InterfaceControllerMouseRight", "label": "Controller Mouse Right" }
 		],

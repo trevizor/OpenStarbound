@@ -36,34 +36,7 @@ KeybindingsMenu::KeybindingsMenu() : m_activeKeybinding(nullptr), m_clearHoldFro
 
   m_tabSet = fetchChild<TabSetWidget>("categories");
 
-  int panelWidthDelta = assets->json("/interface/windowconfig/keybindingsmenu.config:panelWidthDelta").optInt().value(0);
-  if (panelWidthDelta > 0) {
-    Vec2I paneSize = size();
-    paneSize[0] += panelWidthDelta;
-    setSize(paneSize);
-
-    if (m_tabSet) {
-      Vec2I tabSize = m_tabSet->size();
-      tabSize[0] += panelWidthDelta;
-      m_tabSet->setSize(tabSize);
-    }
-  }
-
   buildListsFromConfig();
-
-  if (panelWidthDelta > 0) {
-    auto widenList = [&](ListWidgetPtr const& list) {
-      if (!list)
-        return;
-      Vec2I listSize = list->size();
-      listSize[0] += panelWidthDelta;
-      list->setSize(listSize);
-    };
-
-    widenList(m_playerList);
-    widenList(m_toolBarList);
-    widenList(m_gameList);
-  }
 
   m_currentMods = KeyMod::NoMod;
 }
