@@ -23,6 +23,7 @@ enc_temp_folder/
 /temp_assets/
 /assets/user/
 /assets/devel/
+/assets/unpacked/
 /assets/packed.pak
 /mods/*.pak
 /mods/*
