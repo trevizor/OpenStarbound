@@ -1,26 +1,21 @@
 {
-	"paneLayout": {
-		"panefeature": {
-			"positionLocked": false
-		}
-	},
 	"keyActions": {
 		"player": [
-			{ "action": "PlayerUp", "label": "Move Up" },
-			{ "action": "PlayerDown", "label": "Move Down" },
-			{ "action": "PlayerLeft", "label": "Move Left" },
-			{ "action": "PlayerRight", "label": "Move Right" },
+			{ "action": "PlayerUp", "label": "Up" },
+			{ "action": "PlayerDown", "label": "Down" },
+			{ "action": "PlayerLeft", "label": "Left" },
+			{ "action": "PlayerRight", "label": "Right" },
 			{ "action": "PlayerJump", "label": "Jump" },
 			{ "action": "PlayerInteract", "label": "Interact" },
-			{ "action": "PlayerDropItem", "label": "Drop Item" },
-			{ "action": "InterfacePlaceTorchAtCursor", "label": "Place Torch At Cursor" },
-			{ "action": "InterfaceUseFirstHealingItem", "label": "Use First Healing Item" },
+			{ "action": "PlayerDropItem", "label": "Drop" },
+			{ "action": "InterfacePlaceTorchAtCursor", "label": "Place Torch" },
+			{ "action": "InterfaceUseFirstHealingItem", "label": "Use Healing" },
 			{ "action": "PlayerShifting", "label": "Walk / Shift" },
 			{ "action": "PlayerTechAction1", "label": "Tech 1" },
 			{ "action": "PlayerTechAction2", "label": "Tech 2" },
 			{ "action": "PlayerTechAction3", "label": "Tech 3" },
-			{ "action": "PlayerControllerAimOnly", "label": "Controller Aim Only" },
-			{ "action": "PlayerControllerMoveOnly", "label": "Controller Move Only" },
+			{ "action": "PlayerControllerAimOnly", "label": "Aim Only" },
+			{ "action": "PlayerControllerMoveOnly", "label": "Move Only" },
 			{ "action": "ShowLabels", "label": "Show Labels" },
 			{ "action": "CameraShift", "label": "Camera Shift" },
 			{ "action": "EmoteHappy", "label": "Emote Happy" },
@@ -38,8 +33,8 @@
 			{ "action": "EmoteShouting", "label": "Emote Shouting" }
 		],
 		"toolbar": [
-			{ "action": "InterfaceBarPrevious", "label": "Action Bar Previous" },
-			{ "action": "InterfaceBarNext", "label": "Action Bar Next" },
+			{ "action": "InterfaceBarPrevious", "label": "Hotbar Previous" },
+			{ "action": "InterfaceBarNext", "label": "Hotbar Next" },
 			{ "action": "InterfaceChangeBarGroup", "label": "Change Bar Group" },
 			{ "action": "InterfaceDeselectHands", "label": "Deselect Hands" },
             { "action": "InterfaceHotbarStripHold", "label": "Hotbar Select" },
@@ -48,28 +43,28 @@
 			{ "action": "InterfaceTakeAllItems", "label": "Take All" },
 			{ "action": "InterfacePanelSelect", "label": "Panel Select" },
 			{ "action": "InterfacePanelBack", "label": "Panel Back" },
-			{ "action": "InterfacePanelCursorCenter", "label": "Panel Cursor Center" },
-			{ "action": "InterfacePanelCursorLeft", "label": "Panel Cursor Left" },
-			{ "action": "InterfacePanelCursorRight", "label": "Panel Cursor Right" },
-			{ "action": "InterfacePanelCursorUp", "label": "Panel Cursor Up" },
-			{ "action": "InterfacePanelCursorDown", "label": "Panel Cursor Down" },
-			{ "action": "InterfacePanelScrollUp", "label": "Panel Scroll Up" },
-			{ "action": "InterfacePanelScrollDown", "label": "Panel Scroll Down" },
-			{ "action": "InterfacePanelDragHold", "label": "Panel Drag Hold" },
+			{ "action": "InterfacePanelCursorCenter", "label": "Cursor Center" },
+			{ "action": "InterfacePanelCursorLeft", "label": "Cursor Left" },
+			{ "action": "InterfacePanelCursorRight", "label": "Cursor Right" },
+			{ "action": "InterfacePanelCursorUp", "label": "Cursor Up" },
+			{ "action": "InterfacePanelCursorDown", "label": "Cursor Down" },
+			{ "action": "InterfacePanelScrollUp", "label": "Scroll Up" },
+			{ "action": "InterfacePanelScrollDown", "label": "Scroll Down" },
+			{ "action": "InterfacePanelDragHold", "label": "Drag Hold" },
             { "action": "EssentialBar1", "label": "Essential Slot 1" },
 			{ "action": "EssentialBar2", "label": "Essential Slot 2" },
 			{ "action": "EssentialBar3", "label": "Essential Slot 3" },
 			{ "action": "EssentialBar4", "label": "Essential Slot 4" },
-			{ "action": "InterfaceBar1", "label": "Action Bar 1" },
-			{ "action": "InterfaceBar2", "label": "Action Bar 2" },
-			{ "action": "InterfaceBar3", "label": "Action Bar 3" },
-			{ "action": "InterfaceBar4", "label": "Action Bar 4" },
-			{ "action": "InterfaceBar5", "label": "Action Bar 5" },
-			{ "action": "InterfaceBar6", "label": "Action Bar 6" },
-			{ "action": "InterfaceBar7", "label": "Action Bar 7" },
-			{ "action": "InterfaceBar8", "label": "Action Bar 8" },
-			{ "action": "InterfaceBar9", "label": "Action Bar 9" },
-			{ "action": "InterfaceBar10", "label": "Action Bar 10" },
+			{ "action": "InterfaceBar1", "label": "Hotbar 1" },
+			{ "action": "InterfaceBar2", "label": "Hotbar 2" },
+			{ "action": "InterfaceBar3", "label": "Hotbar 3" },
+			{ "action": "InterfaceBar4", "label": "Hotbar 4" },
+			{ "action": "InterfaceBar5", "label": "Hotbar 5" },
+			{ "action": "InterfaceBar6", "label": "Hotbar 6" },
+			{ "action": "InterfaceBar7", "label": "Hotbar 7" },
+			{ "action": "InterfaceBar8", "label": "Hotbar 8" },
+			{ "action": "InterfaceBar9", "label": "Hotbar 9" },
+			{ "action": "InterfaceBar10", "label": "Hotbar 10" },
 			{ "action": "InterfaceControllerMouseLeft", "label": "Controller Mouse Left" },
 			{ "action": "InterfaceControllerMouseRight", "label": "Controller Mouse Right" }
 		],
@@ -103,5 +98,177 @@
 			{ "action": "InterfaceKeybindingsTabPrevious", "label": "Keybindings Tab Previous" },
 			{ "action": "InterfaceKeybindingsTabNext", "label": "Keybindings Tab Next" }
 		]
-	}
+	},
+
+  "paneLayout" : {
+    "panefeature" : {
+		"type" : "panefeature",
+		"positionLocked" : false,
+		"rect" : [13, 29, 363, 205]
+    },
+    "categories" : {
+      "type" : "tabSet",
+      "tabButtonBaseImage" : "/interface/tabs/tabbase.png",
+      "tabButtonHoverImage" : "/interface/tabs/tabover.png",
+      "tabButtonBaseImageSelected" : "/interface/tabs/tabselected.png",
+      "tabButtonHoverImageSelected" : "/interface/tabs/tabselectedover.png",
+      "tabButtonPressedOffset" : [0, 0],
+      "tabButtonTextOffset" : [0, -1],
+      "tabButtonSpacing" : [-1, 0],
+      "rect" : [13, 29, 353, 205],
+      "zlevel" : 9,
+      "tabs" : [
+        {
+          "tabName" : "player",
+          "tabTitle" : "PLAYER",
+          "children" : {
+            "scrollArea" : {
+              "type" : "scrollArea",
+              "rect" : [2, 26, 339, 156],
+              "children" : {
+                "keyList" : {
+                  "type" : "list",
+                  "schema" : {
+                    "selectedBG" : "/interface/keybindings/listbg.png",
+                    "unselectedBG" : "/interface/keybindings/listbg.png",
+                    "spacing" : [0, 3],
+                    "memberSize" : [285, 13],
+                    "listTemplate" : {
+                      "background" : {
+                        "type" : "image",
+                        "file" : "/interface/keybindings/listbg.png",
+                        "position" : [2, 1],
+                        "zlevel" : -1
+                      },
+                      "actionName" : {
+                        "type" : "label",
+                        "value" : "replace me",
+                        "position" : [5, 2],
+                        "hAnchor" : "left"
+                      },
+                      "boundKeys" : {
+                        "type" : "button",
+                        "textAlign" : "left",
+                        "callback" : "activateBinding",
+                        "base" : "/interface/keybindings/option.png",
+                        "hover" : "/interface/keybindings/optionOver.png",
+                        "press" : "/interface/keybindings/optionActive.png",
+                        "position" : [105, 2.5]
+                      },
+                      "deleteBinding" : {
+                        "type" : "button",
+                        "base" : "/interface/keybindings/garbage.png",
+                        "press" : "/interface/keybindings/garbageDown.png",
+                        "position" : [165, 1]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "tabName" : "toolbar",
+          "tabTitle" : "TOOL BAR",
+          "children" : {
+            "scrollArea" : {
+              "type" : "scrollArea",
+              "rect" : [2, 26, 339, 156],
+              "children" : {
+                "keyList" : {
+                  "type" : "list",
+                  "schema" : {
+                    "selectedBG" : "/interface/keybindings/listbg.png",
+                    "unselectedBG" : "/interface/keybindings/listbg.png",
+                    "spacing" : [0, 3],
+                    "memberSize" : [285, 13],
+                    "listTemplate" : {
+                      "background" : {
+                        "type" : "image",
+                        "file" : "/interface/keybindings/listbg.png",
+                        "position" : [2, 1],
+                        "zlevel" : -1
+                      },
+                      "actionName" : {
+                        "type" : "label",
+                        "value" : "replace me",
+                        "position" : [5, 2],
+                        "hAnchor" : "left"
+                      },
+                      "boundKeys" : {
+                        "type" : "button",
+                        "textAlign" : "left",
+                        "callback" : "activateBinding",
+                        "base" : "/interface/keybindings/option.png",
+                        "hover" : "/interface/keybindings/optionOver.png",
+                        "press" : "/interface/keybindings/optionActive.png",
+                        "position" : [105, 2.5]
+                      },
+                      "deleteBinding" : {
+                        "type" : "button",
+                        "base" : "/interface/keybindings/garbage.png",
+                        "press" : "/interface/keybindings/garbageDown.png",
+                        "position" : [165, 1]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "tabName" : "game",
+          "tabTitle" : "GAME",
+          "children" : {
+            "scrollArea" : {
+              "type" : "scrollArea",
+              "rect" : [2, 26, 339, 156],
+              "children" : {
+                "keyList" : {
+                  "type" : "list",
+                  "schema" : {
+                    "selectedBG" : "/interface/keybindings/listbg.png",
+                    "unselectedBG" : "/interface/keybindings/listbg.png",
+                    "spacing" : [0, 3],
+                    "memberSize" : [285, 13],
+                    "listTemplate" : {
+                      "background" : {
+                        "type" : "image",
+                        "file" : "/interface/keybindings/listbg.png",
+                        "position" : [2, 1],
+                        "zlevel" : -1
+                      },
+                      "actionName" : {
+                        "type" : "label",
+                        "value" : "replace me",
+                        "position" : [5, 2],
+                        "hAnchor" : "left"
+                      },
+                      "boundKeys" : {
+                        "type" : "button",
+                        "textAlign" : "left",
+                        "callback" : "activateBinding",
+                        "base" : "/interface/keybindings/option.png",
+                        "hover" : "/interface/keybindings/optionOver.png",
+                        "press" : "/interface/keybindings/optionActive.png",
+                        "position" : [105, 2.5]
+                      },
+                      "deleteBinding" : {
+                        "type" : "button",
+                        "base" : "/interface/keybindings/garbage.png",
+                        "press" : "/interface/keybindings/garbageDown.png",
+                        "position" : [165, 1]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
 }
