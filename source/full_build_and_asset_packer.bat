@@ -69,6 +69,10 @@ if errorlevel 1 (
   exit /b 1
 )
 
+echo Copying win files to Steam Starbound win64 directory...
+xcopy /E /Y /I "..\client_distribution\assets\*" "H:\SteamLibrary\steamapps\common\Starbound\assets\"
+xcopy /E /Y /I "..\client_distribution\win\*" "H:\SteamLibrary\steamapps\common\Starbound\win64\"
+
 popd
 echo Done: full build and asset packing completed.
 popd

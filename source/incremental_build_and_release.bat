@@ -35,6 +35,11 @@ if errorlevel 1 (
 
 popd
 
-echo Done: incremental build and release scripts completed.
+echo [4/4] Copying assets to Steam Starbound directory...
+xcopy /E /Y /I "..\client_distribution\assets\*" "H:\SteamLibrary\steamapps\common\Starbound\assets\"
+echo [5/5] Copying win files to Steam Starbound win64 directory...
+xcopy /E /Y /I "..\client_distribution\win\*" "H:\SteamLibrary\steamapps\common\Starbound\win64\"
+
+echo Done: incremental build, release, and deploy scripts completed.
 popd
 exit /b 0
