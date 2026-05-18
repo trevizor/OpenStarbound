@@ -1266,7 +1266,7 @@ void ClientApplication::updateControllerMouse(float dt) {
       }
 
       Vec2F projectedCursorWorld;
-
+      bool cursorHasCollidedWithTerrain = false;
       // In AimOnly, if the stick is neutral, keep the cursor anchored in world space.
       if (forcedAimOnly && !liveStickDirection) {
         if (!m_controllerAimOnlyLockedWorld || m_controllerAimOnlyHadInput)
@@ -1276,20 +1276,21 @@ void ClientApplication::updateControllerMouse(float dt) {
       } else {
         float aimRange = 5.0f;
         if (forcedAimOnly)
-          aimRange = 15.0f;
+          aimRange = 25.0f;
         else if (lockAimDirection)
           aimRange = m_controllerLockedAimDistance;
 
         Vec2F castStart = playerPosition + stickDirection * 0.5f;
         projectedCursorWorld = playerPosition + stickDirection * aimRange;
-
+        
         // Walking and AimOnly should only collide against terrain; MoveOnly keeps no collision adjustment.
         if (forcedAimOnly || !lockAimDirection) {
-          CollisionSet terrainCollisionSet{CollisionKind::Block, CollisionKind::Slippery};
+          CollisionSet terrainCollisionSet{CollisionKind::Block};
           float tempAimRange = min(aimRange, worldClient->geometry().diff(m_mainInterface->cursorWorldPosition(), playerPosition).magnitude());
           Vec2F tempProjectedCursorWorld = playerPosition + stickDirection * tempAimRange;
           if (auto collision = worldClient->lineTileCollisionPoint(castStart, tempProjectedCursorWorld, terrainCollisionSet)) {
             auto geometry = worldClient->geometry();
+            cursorHasCollidedWithTerrain = true;
             Vec2F collisionPoint = geometry.nearestTo(castStart, collision->first);
             Vec2F collisionDelta = geometry.diff(collisionPoint, castStart);
             float forwardDistance = collisionDelta[0] * stickDirection[0] + collisionDelta[1] * stickDirection[1];
@@ -1316,7 +1317,8 @@ void ClientApplication::updateControllerMouse(float dt) {
 
         Vec2F desiredVelocity;
         if (distance > 0.0f) {
-          float maxSpeed = mouseSpeed * 0.5f;
+          float maxSpeed = mouseSpeed;
+          if(!cursorHasCollidedWithTerrain) maxSpeed *= 0.5f;
           float frameLimitedSpeed = distance / max(dt, 0.0001f);
           float desiredSpeed = min(maxSpeed, frameLimitedSpeed);
           desiredVelocity = toTarget / distance * desiredSpeed;
