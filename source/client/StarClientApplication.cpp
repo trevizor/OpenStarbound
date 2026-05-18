@@ -1465,17 +1465,34 @@ void ClientApplication::renderHotbarWheelOverlay() {
   if (slotCount <= 0)
     return;
 
+  // Build filtered list of non-empty slots
+  struct SlotInfo {
+    SelectedActionBarLocation selection;
+    ItemPtr item;
+  };
+  List<SlotInfo> nonEmptySlots;
+  for (int index = 0; index < slotCount; ++index) {
+    auto slotSelection = hotbarWheelSelectionFromIndex(inventory, index);
+    if (auto item = hotbarWheelItemForSelection(inventory, slotSelection)) {
+      if (!item->empty())
+        nonEmptySlots.append({slotSelection, item});
+    }
+  }
+  int filteredCount = nonEmptySlots.size();
+  if (filteredCount == 0)
+    return;
+
   Vec2F center = Vec2F(m_guiContext->windowInterfaceSize()) / 2.0f;
   float radius = 56.0f;
   float slotSize = 20.0f;
   float fullCircle = 6.28318530718f;
 
-  for (int index = 0; index < slotCount; ++index) {
-    float angle = ((index + 0.5f) / slotCount) * fullCircle;
+  for (int i = 0; i < filteredCount; ++i) {
+    float angle = ((i + 0.5f) / filteredCount) * fullCircle;
     Vec2F slotCenter = center + Vec2F(cos(angle), -sin(angle)) * radius;
 
-    auto slotSelection = hotbarWheelSelectionFromIndex(inventory, index);
-    bool selected = m_hotbarWheelSelection && *m_hotbarWheelSelection == slotSelection;
+    auto& slotInfo = nonEmptySlots[i];
+    bool selected = m_hotbarWheelSelection && *m_hotbarWheelSelection == slotInfo.selection;
 
     Vec4B bgColor = selected ? Vec4B(15, 15, 15, 220) : Vec4B(5, 5, 5, 170);
     m_guiContext->drawInterfaceQuad(RectF::withCenter(slotCenter, Vec2F::filled(slotSize)), bgColor);
@@ -1483,11 +1500,9 @@ void ClientApplication::renderHotbarWheelOverlay() {
     if (selected)
       m_guiContext->drawInterfacePolyLines(PolyF(RectF::withCenter(slotCenter, Vec2F::filled(slotSize + 6.0f))), Vec4B(255, 236, 170, 255), 1.5f);
 
-    if (auto item = hotbarWheelItemForSelection(inventory, slotSelection)) {
-      Vec4B iconColor = selected ? Vec4B::filled(255) : Vec4B(220, 220, 220, 255);
-      for (auto const& drawable : item->iconDrawables())
-        m_guiContext->drawInterfaceDrawable(drawable, slotCenter, iconColor);
-    }
+    Vec4B iconColor = selected ? Vec4B::filled(255) : Vec4B(220, 220, 220, 255);
+    for (auto const& drawable : slotInfo.item->iconDrawables())
+      m_guiContext->drawInterfaceDrawable(drawable, slotCenter, iconColor);
   }
 }
 
@@ -1500,14 +1515,33 @@ void ClientApplication::renderHotbarStripOverlay() {
   if (slotCount <= 0)
     return;
 
+  // Build filtered list of non-empty slots
+  struct SlotInfo {
+    SelectedActionBarLocation selection;
+    ItemPtr item;
+  };
+  List<SlotInfo> nonEmptySlots;
+  for (int index = 0; index < slotCount; ++index) {
+    auto slotSelection = hotbarWheelSelectionFromIndex(inventory, index);
+    if (auto item = hotbarWheelItemForSelection(inventory, slotSelection)) {
+      if (!item->empty())
+        nonEmptySlots.append({slotSelection, item});
+    }
+  }
+  int filteredCount = nonEmptySlots.size();
+  if (filteredCount == 0)
+    return;
+
   Vec2F center = Vec2F(m_guiContext->windowInterfaceSize()) / 2.0f;
   float spacing = 38.0f;
   float slotSize = 26.0f;
   int visibleRange = 4;
 
-  for (int offset = -visibleRange; offset <= visibleRange; ++offset) {
-    int index = pmod(m_hotbarStripIndex + offset, slotCount);
-    auto selection = hotbarWheelSelectionFromIndex(inventory, index);
+  // Clamp visibleRange if there are fewer slots
+  int maxVisible = std::min(visibleRange, (filteredCount - 1) / 2);
+  for (int offset = -maxVisible; offset <= maxVisible; ++offset) {
+    int index = pmod(m_hotbarStripIndex + offset, filteredCount);
+    auto& slotInfo = nonEmptySlots[index];
     bool selected = offset == 0;
 
     float xOffset = offset * spacing;
@@ -1522,12 +1556,10 @@ void ClientApplication::renderHotbarStripOverlay() {
     if (selected)
       m_guiContext->drawInterfacePolyLines(PolyF(RectF::withCenter(slotCenter, Vec2F::filled(finalSize + 6.0f))), Vec4B(255, 236, 170, 255), 1.5f);
 
-    if (auto item = hotbarWheelItemForSelection(inventory, selection)) {
-      uint8_t alpha = (uint8_t)clamp(255.0f - std::abs((float)offset) * 28.0f, 120.0f, 255.0f);
-      Vec4B iconColor = selected ? Vec4B::filled(255) : Vec4B(230, 230, 230, alpha);
-      for (auto const& drawable : item->iconDrawables())
-        m_guiContext->drawInterfaceDrawable(drawable, slotCenter, iconColor);
-    }
+    uint8_t alpha = (uint8_t)clamp(255.0f - std::abs((float)offset) * 28.0f, 120.0f, 255.0f);
+    Vec4B iconColor = selected ? Vec4B::filled(255) : Vec4B(230, 230, 230, alpha);
+    for (auto const& drawable : slotInfo.item->iconDrawables())
+      m_guiContext->drawInterfaceDrawable(drawable, slotCenter, iconColor);
   }
 }
 
@@ -2168,10 +2200,24 @@ void ClientApplication::updateRunning(float dt) {
 
     if (m_hotbarStripActive && !hotbarStripHeld) {
       if (auto inventory = m_player->inventory()) {
+        // Build filtered list for confirmation
         int slotCount = hotbarWheelSlotCount(inventory);
-        if (slotCount > 0) {
-          int index = pmod(m_hotbarStripIndex, slotCount);
-          inventory->selectActionBarLocation(hotbarWheelSelectionFromIndex(inventory, index));
+        struct SlotInfo {
+          SelectedActionBarLocation selection;
+          ItemPtr item;
+        };
+        List<SlotInfo> nonEmptySlots;
+        for (int index = 0; index < slotCount; ++index) {
+          auto slotSelection = hotbarWheelSelectionFromIndex(inventory, index);
+          if (auto item = hotbarWheelItemForSelection(inventory, slotSelection)) {
+            if (!item->empty())
+              nonEmptySlots.append({slotSelection, item});
+          }
+        }
+        int filteredCount = nonEmptySlots.size();
+        if (filteredCount > 0) {
+          int index = pmod(m_hotbarStripIndex, filteredCount);
+          inventory->selectActionBarLocation(nonEmptySlots[index].selection);
         }
       }
 
@@ -2181,11 +2227,32 @@ void ClientApplication::updateRunning(float dt) {
     } else if (!m_hotbarStripActive && hotbarStripHeld && m_state > MainAppState::Title) {
       auto inventory = m_player->inventory();
       int slotCount = hotbarWheelSlotCount(inventory);
-      if (slotCount > 0) {
+      struct SlotInfo {
+        SelectedActionBarLocation selection;
+        ItemPtr item;
+      };
+      List<SlotInfo> nonEmptySlots;
+      for (int index = 0; index < slotCount; ++index) {
+        auto slotSelection = hotbarWheelSelectionFromIndex(inventory, index);
+        if (auto item = hotbarWheelItemForSelection(inventory, slotSelection)) {
+          if (!item->empty())
+            nonEmptySlots.append({slotSelection, item});
+        }
+      }
+      int filteredCount = nonEmptySlots.size();
+      if (filteredCount > 0) {
         m_hotbarStripActive = true;
         m_hotbarStripScrollAccumulator = 0.0f;
         m_hotbarStripEdgeLatchDirection = 0;
-        m_hotbarStripIndex = clamp(hotbarWheelIndexFromSelection(inventory, inventory->selectedActionBarLocation()), 0, slotCount - 1);
+        // Find the filtered index for the currently selected slot
+        int foundIndex = 0;
+        for (int i = 0; i < filteredCount; ++i) {
+          if (nonEmptySlots[i].selection == inventory->selectedActionBarLocation()) {
+            foundIndex = i;
+            break;
+          }
+        }
+        m_hotbarStripIndex = foundIndex;
         m_hotbarWheelActive = false;
         m_panelWheelActive = false;
       }
