@@ -741,22 +741,14 @@ void ClientApplication::processInput(InputEvent const& event) {
           if (auto paneManager = m_titleScreen->paneManager())
             topPane = paneManager->topPane({PaneLayer::ModalWindow, PaneLayer::Window});
         }
-
         float axisY = m_controllerRightStick[1];
-        if (topPane && panelHasList(topPane) && std::abs(axisY) > 0.35f) {
-          m_panelScrollAccumulator += axisY * 6.0f * GlobalTimestep;
-          while (m_panelScrollAccumulator >= 1.0f) {
-            InputEvent mouseEvent{MouseWheelEvent{MouseWheel::Up, m_input->mousePosition()}};
-            routeInputEvent(mouseEvent);
-            m_panelScrollAccumulator -= 1.0f;
+        if (topPane && std::abs(axisY) > 0.35f) {
+          Maybe<InputEvent> starEvent;
+          if(axisY > 0.0f){
+            starEvent.set(MouseWheelEvent{MouseWheel::Up, m_input->mousePosition()});
+          } else {
+            starEvent.set(MouseWheelEvent{MouseWheel::Down, m_input->mousePosition()});
           }
-          while (m_panelScrollAccumulator <= -1.0f) {
-            InputEvent mouseEvent{MouseWheelEvent{MouseWheel::Down, m_input->mousePosition()}};
-            routeInputEvent(mouseEvent);
-            m_panelScrollAccumulator += 1.0f;
-          }
-        } else {
-          m_panelScrollAccumulator = 0.0f;
         }
       }
 
