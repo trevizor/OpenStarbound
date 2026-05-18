@@ -20,7 +20,7 @@
     "showVoicePlayers" : {
       "type" : "button",
       "position" : [133, 185],
-      "caption" : "Controller",
+      "caption" : "Extra Options",
       "base" : "/interface/optionsmenu/controlsbutton.png",
       "hover" : "/interface/optionsmenu/controlsbuttonhover.png"
     },

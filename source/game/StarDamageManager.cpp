@@ -111,7 +111,15 @@ void DamageManager::update(float dt) {
           else
             eventList.append({causingEntity->entityId(), timeout});
 
-          auto damageRequest = DamageRequest(hitResultPair.second, damageSource.damageType, damageSource.damage,
+          float outgoingMultiplier = 1.0f;
+          // Apply outgoing damage multiplier if causing entity is a Player
+          if (causingEntity->entityType() == EntityType::Player) {
+            auto config = Root::singleton().configuration();
+            outgoingMultiplier = config->get("ongoingDamageMultiplier").optFloat().value(1.0f);
+          }
+
+          float finalDamage = damageSource.damage * outgoingMultiplier;
+          auto damageRequest = DamageRequest(hitResultPair.second, damageSource.damageType, finalDamage,
               damageSource.knockbackMomentum(m_world->geometry(), targetEntity->position()),
               damageSource.sourceEntityId, damageSource.damageSourceKind, damageSource.statusEffects);
           addHitRequest({causingEntity->entityId(), targetEntity->entityId(), damageRequest});

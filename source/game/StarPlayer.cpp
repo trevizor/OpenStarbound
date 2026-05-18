@@ -611,7 +611,16 @@ List<DamageNotification> Player::applyDamage(DamageRequest const& request) {
   if (!inWorld() || isDead() || m_isAdmin)
     return {};
 
-  return m_statusController->applyDamageRequest(request);
+  // Apply incoming damage multiplier after armor
+  auto config = Root::singleton().configuration();
+  float incomingMultiplier = config->get("incomingDamageMultiplier").optFloat().value(1.0f);
+  DamageRequest modRequest = request;
+  // Only scale actual damage, not healing or special types
+  if (modRequest.damageType == DamageType::Damage || modRequest.damageType == DamageType::Knockback) {
+    modRequest.damage *= incomingMultiplier;
+  }
+
+  return m_statusController->applyDamageRequest(modRequest);
 }
 
 List<DamageNotification> Player::selfDamageNotifications() {
@@ -622,7 +631,15 @@ void Player::hitOther(EntityId targetEntityId, DamageRequest const& damageReques
   if (!isMaster())
     return;
 
-  m_statusController->hitOther(targetEntityId, damageRequest);
+  // Apply outgoing (ongoing) damage multiplier after armor
+  auto config = Root::singleton().configuration();
+  float outgoingMultiplier = config->get("ongoingDamageMultiplier").optFloat().value(1.0f);
+  DamageRequest modRequest = damageRequest;
+  if (modRequest.damageType == DamageType::Damage || modRequest.damageType == DamageType::Knockback) {
+    modRequest.damage *= outgoingMultiplier;
+  }
+
+  m_statusController->hitOther(targetEntityId, modRequest);
   if (as<DamageBarEntity>(world()->entity(targetEntityId))) {
     m_lastDamagedOtherTimer = 0;
     m_lastDamagedTarget = targetEntityId;

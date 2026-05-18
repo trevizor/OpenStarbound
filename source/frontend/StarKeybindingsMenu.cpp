@@ -32,6 +32,15 @@ KeybindingsMenu::KeybindingsMenu() : m_activeKeybinding(nullptr), m_clearHoldFro
   m_maxBindings = assets->json("/interface/windowconfig/keybindingsmenu.config:maxBindings").toUInt();
 
   Json paneLayout = assets->json("/interface/windowconfig/keybindingsmenu.config:paneLayout");
+  // Increase pane width by 200% if possible (using correct Star::Json API)
+  if (paneLayout.type() == Json::Type::Object && paneLayout.contains("size")) {
+    Json sizeArr = paneLayout.get("size");
+    if (sizeArr.type() == Json::Type::Array && sizeArr.size() == 2) {
+      JsonArray arr = sizeArr.toArray();
+      arr[0] = Json(arr[0].toInt() * 2);
+      paneLayout.set("size", arr);
+    }
+  }
   reader.construct(paneLayout, this);
 
   m_tabSet = fetchChild<TabSetWidget>("categories");
@@ -200,7 +209,7 @@ void KeybindingsMenu::buildListsFromConfig() {
 
       // Give more room for long controller/axis chord labels in the rebind field.
       Vec2I boundSize = boundKeysButton->size();
-      int widthDelta = 72;
+      int widthDelta = 72 * 2; // 200% wider
       boundSize[0] += widthDelta;
       boundKeysButton->setSize(boundSize);
 

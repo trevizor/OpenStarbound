@@ -271,6 +271,8 @@ Json const AdditionalDefaultConfiguration = Json::parseJson(R"JSON(
       "controllerMouseDeadzone" : 0.20,
       "gameSpeed" : 1.0,
       "inventoryBuildFromInventory" : true,
+      "incomingDamageMultiplier" : 1.0,
+      "ongoingDamageMultiplier" : 1.0,
 
       "title" : {
         "multiPlayerAddress" : "",
