@@ -1732,25 +1732,14 @@ bool Player::useFirstHealingItem() {
   };
 
   bool used = false;
+  // Use the first usable consumable item in the inventory (not just healing)
   m_inventory->forEveryItem([&](InventorySlot const&, ItemPtr& item) {
-      if (used || !item)
-        return;
-
-      if (auto consumable = as<ConsumableItem>(item)) {
-        if (looksLikeHealingConsumable(consumable))
-          used = tryUseConsumable(consumable);
-      }
-    });
-
-  if (!used) {
-    m_inventory->forEveryItem([&](InventorySlot const&, ItemPtr& item) {
-        if (used || !item)
-          return;
-
-        if (auto consumable = as<ConsumableItem>(item))
-          used = tryUseConsumable(consumable);
-      });
-  }
+    if (used || !item)
+      return;
+    if (auto consumable = as<ConsumableItem>(item)) {
+      used = tryUseConsumable(consumable);
+    }
+  });
 
   if (used)
     m_inventory->cleanup();
