@@ -2264,10 +2264,27 @@ void ClientApplication::updateRunning(float dt) {
 
     if (m_hotbarStripActive) {
       auto inventory = m_player->inventory();
+      // Build filtered list of non-empty slots (same as used for selection)
       int slotCount = hotbarWheelSlotCount(inventory);
-      if (slotCount > 0) {
+      struct SlotInfo {
+        SelectedActionBarLocation selection;
+        ItemPtr item;
+      };
+      List<SlotInfo> nonEmptySlots;
+      for (int index = 0; index < slotCount; ++index) {
+        auto slotSelection = hotbarWheelSelectionFromIndex(inventory, index);
+        if (auto item = hotbarWheelItemForSelection(inventory, slotSelection)) {
+          if (!item->empty())
+            nonEmptySlots.append({slotSelection, item});
+        }
+      }
+      int filteredCount = nonEmptySlots.size();
+      if (filteredCount > 0) {
         float wheelDeadzone = m_root->configuration()->get("controllerMouseDeadzone").optFloat().value(0.20f);
         float rightX = applyControllerAxisResponse(m_controllerRightStickRaw[0], wheelDeadzone, 1.0f);
+
+        // Clamp index to filteredCount in case slots were removed
+        m_hotbarStripIndex = pmod(m_hotbarStripIndex, filteredCount);
 
         if (std::abs(rightX) > 0.05f) {
           int edgeDirection = 0;
@@ -2277,7 +2294,7 @@ void ClientApplication::updateRunning(float dt) {
             edgeDirection = -1;
 
           if (edgeDirection != 0 && edgeDirection != m_hotbarStripEdgeLatchDirection) {
-            m_hotbarStripIndex = pmod(m_hotbarStripIndex + edgeDirection, slotCount);
+            m_hotbarStripIndex = pmod(m_hotbarStripIndex + edgeDirection, filteredCount);
             m_hotbarStripScrollAccumulator = 0.0f;
           }
 
@@ -2285,11 +2302,11 @@ void ClientApplication::updateRunning(float dt) {
 
           m_hotbarStripScrollAccumulator += rightX * 9.0f * dt;
           while (m_hotbarStripScrollAccumulator >= 1.0f) {
-            m_hotbarStripIndex = pmod(m_hotbarStripIndex + 1, slotCount);
+            m_hotbarStripIndex = pmod(m_hotbarStripIndex + 1, filteredCount);
             m_hotbarStripScrollAccumulator -= 1.0f;
           }
           while (m_hotbarStripScrollAccumulator <= -1.0f) {
-            m_hotbarStripIndex = pmod(m_hotbarStripIndex - 1, slotCount);
+            m_hotbarStripIndex = pmod(m_hotbarStripIndex - 1, filteredCount);
             m_hotbarStripScrollAccumulator += 1.0f;
           }
         } else {
