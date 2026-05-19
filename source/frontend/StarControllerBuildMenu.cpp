@@ -119,7 +119,7 @@ void ControllerBuildMenu::syncGui() {
   int deadzonePercent = (int)std::round(m_localChanges.get("controllerMouseDeadzone").optFloat().value(0.20f) * 100.0f);
   int gameSpeedPercent = (int)std::round(clamp(m_localChanges.get("gameSpeed").optFloat().value(1.0f), 0.5f, 1.5f) * 100.0f);
   bool buildFromInventory = m_localChanges.get("inventoryBuildFromInventory").optBool().value(true);
-
+  buildFromInventory = false; //removing because is quite broken right now
   float incomingMultiplier = Star::clamp(m_localChanges.get("incomingDamageMultiplier").optFloat().value(1.0f), 0.5f, 2.0f);
   float ongoingMultiplier = Star::clamp(m_localChanges.get("ongoingDamageMultiplier").optFloat().value(1.0f), 0.5f, 2.0f);
   int incomingVal = (int)std::round(incomingMultiplier * 100.0f);
