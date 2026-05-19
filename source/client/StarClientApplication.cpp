@@ -2304,13 +2304,17 @@ void ClientApplication::updateRunning(float dt) {
 
         // Clamp index to filteredCount in case slots were removed
         m_hotbarStripIndex = pmod(m_hotbarStripIndex, filteredCount);
-
-        if (std::abs(rightX) > 0.05f) {
+        bool pressedLeft = isActionTaken(InterfaceAction::PlayerLeft);
+        bool pressedRight = isActionTaken(InterfaceAction::PlayerRight);
+        if (std::abs(rightX) > 0.05f || pressedLeft || pressedRight) {
           int edgeDirection = 0;
           if (rightX >= 0.90f)
             edgeDirection = 1;
           else if (rightX <= -0.90f)
             edgeDirection = -1;
+          
+            if(pressedLeft) edgeDirection = -1;
+            if(pressedRight) edgeDirection = 1;
 
           if (edgeDirection != 0 && edgeDirection != m_hotbarStripEdgeLatchDirection) {
             m_hotbarStripIndex = pmod(m_hotbarStripIndex + edgeDirection, filteredCount);
