@@ -336,6 +336,7 @@ Json const AdditionalDefaultConfiguration = Json::parseJson(R"JSON(
         "InterfaceHotbarStripHold" : [ { "type" : "controller", "value" : "DPadRight" } ],
         "InterfacePanelWheelHold" : [ { "type" : "controller", "value" : "DPadLeft" } ],
         "InterfacePanelSelect" : [ { "type" : "controller", "value" : "A" } ],
+        "InterfacePanelAltSelect" : [ { "type" : "controller", "value" : "Y" } ],
         "InterfacePanelBack" : [ { "type" : "controller", "value" : "B" } ],
         "InterfacePanelCursorCenter" : [ { "type" : "controller", "value" : "LeftStick" } ],
         "InterfacePanelCursorLeft" : [ { "type" : "controller", "value" : "DPadLeft" } ],
@@ -422,6 +423,7 @@ void ClientApplication::applicationInit(ApplicationControllerPtr appController) 
   ensureBindingActionDefault(configuration, InterfaceAction::InterfaceHotbarStripHold);
   ensureBindingActionDefault(configuration, InterfaceAction::InterfacePanelWheelHold);
   ensureBindingActionDefault(configuration, InterfaceAction::InterfacePanelSelect);
+  ensureBindingActionDefault(configuration, InterfaceAction::InterfacePanelAltSelect);
   ensureBindingActionDefault(configuration, InterfaceAction::InterfacePanelBack);
   ensureBindingActionDefault(configuration, InterfaceAction::InterfacePanelCursorCenter);
   ensureBindingActionDefault(configuration, InterfaceAction::InterfacePanelCursorLeft);
@@ -787,6 +789,10 @@ void ClientApplication::processInput(InputEvent const& event) {
         InputEvent mouseEvent{MouseButtonDownEvent{MouseButton::Left, m_input->mousePosition()}};
         routeInputEvent(mouseEvent);
       }
+      if (buttonActions.contains(InterfaceAction::InterfacePanelAltSelect)) {
+        InputEvent mouseEvent{MouseButtonDownEvent{MouseButton::Right, m_input->mousePosition()}};
+        routeInputEvent(mouseEvent);
+      }
 
       if (buttonActions.contains(InterfaceAction::InterfacePanelBack)) {
         if (m_state > MainAppState::Title && m_mainInterface)
@@ -812,6 +818,9 @@ void ClientApplication::processInput(InputEvent const& event) {
     }
 
     if (auto cUp = event.ptr<ControllerButtonUpEvent>()) {
+      if (m_guiContext->actions(cUp->controllerButton).contains(InterfaceAction::InterfacePanelAltSelect))
+        routeInputEvent(InputEvent{MouseButtonUpEvent{MouseButton::Right, m_input->mousePosition()}});
+      return;
       if (m_guiContext->actions(cUp->controllerButton).contains(InterfaceAction::InterfacePanelSelect))
         routeInputEvent(InputEvent{MouseButtonUpEvent{MouseButton::Left, m_input->mousePosition()}});
       return;

@@ -62,6 +62,7 @@ enum class InterfaceAction {
   InterfaceHotbarStripHold,
   InterfacePanelWheelHold,
   InterfacePanelSelect,
+  InterfacePanelAltSelect,
   InterfacePanelBack,
   InterfacePanelCursorCenter,
   InterfacePanelCursorLeft,

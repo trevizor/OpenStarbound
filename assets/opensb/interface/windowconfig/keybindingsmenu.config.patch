@@ -42,6 +42,7 @@
 			{ "action": "InterfacePanelWheelHold", "label": "Panel Wheel" },
 			{ "action": "InterfaceTakeAllItems", "label": "Take All" },
 			{ "action": "InterfacePanelSelect", "label": "Panel Select" },
+			{ "action": "InterfacePanelAltSelect", "label": "Panel Alt Select" },
 			{ "action": "InterfacePanelBack", "label": "Panel Back" },
 			{ "action": "InterfacePanelCursorCenter", "label": "Cursor Center" },
 			{ "action": "InterfacePanelCursorLeft", "label": "Cursor Left" },

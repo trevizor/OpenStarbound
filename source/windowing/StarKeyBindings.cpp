@@ -76,6 +76,7 @@ EnumMap<InterfaceAction> const InterfaceActionNames{
     {InterfaceAction::InterfaceHotbarStripHold, "InterfaceHotbarStripHold"},
     {InterfaceAction::InterfacePanelWheelHold, "InterfacePanelWheelHold"},
     {InterfaceAction::InterfacePanelSelect, "InterfacePanelSelect"},
+    {InterfaceAction::InterfacePanelAltSelect, "InterfacePanelAltSelect"},
     {InterfaceAction::InterfacePanelBack, "InterfacePanelBack"},
     {InterfaceAction::InterfacePanelCursorCenter, "InterfacePanelCursorCenter"},
     {InterfaceAction::InterfacePanelCursorLeft, "InterfacePanelCursorLeft"},
