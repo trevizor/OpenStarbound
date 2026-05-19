@@ -102,9 +102,9 @@
 
   "paneLayout" : {
     "panefeature" : {
-		"type" : "panefeature",
-		"positionLocked" : false,
-		"rect" : [13, 29, 363, 205]
+    "type" : "panefeature",
+    "positionLocked" : false,
+    "rect" : [13, 29, 463, 205]
     },
     "categories" : {
       "type" : "tabSet",
@@ -115,7 +115,7 @@
       "tabButtonPressedOffset" : [0, 0],
       "tabButtonTextOffset" : [0, -1],
       "tabButtonSpacing" : [-1, 0],
-      "rect" : [13, 29, 353, 205],
+      "rect" : [13, 29, 453, 205],
       "zlevel" : 9,
       "tabs" : [
         {
@@ -124,7 +124,7 @@
           "children" : {
             "scrollArea" : {
               "type" : "scrollArea",
-              "rect" : [2, 26, 339, 156],
+              "rect" : [2, 26, 389, 156],
               "children" : {
                 "keyList" : {
                   "type" : "list",
@@ -174,7 +174,7 @@
           "children" : {
             "scrollArea" : {
               "type" : "scrollArea",
-              "rect" : [2, 26, 339, 156],
+              "rect" : [2, 26, 389, 156],
               "children" : {
                 "keyList" : {
                   "type" : "list",
@@ -224,7 +224,7 @@
           "children" : {
             "scrollArea" : {
               "type" : "scrollArea",
-              "rect" : [2, 26, 339, 156],
+              "rect" : [2, 26, 389, 156],
               "children" : {
                 "keyList" : {
                   "type" : "list",
