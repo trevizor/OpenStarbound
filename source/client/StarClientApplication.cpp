@@ -1,3 +1,4 @@
+
 #include "StarClientApplication.hpp"
 #include "SDL3/SDL.h"
 #include "StarConfiguration.hpp"
@@ -1059,7 +1060,7 @@ void ClientApplication::movePanelCursorByStep(Vec2I const& direction) {
 
   m_virtualCursorVelocity = {};
 
-  Vec2F step = panelCursorStepSize();
+  Vec2F step = panelCursorStepSize() * 1.1f;
   Vec2F targetPos = m_input->mousePosition();
   targetPos += Vec2F((float)direction[0] * step[0], (float)-direction[1] * step[1]);
 
@@ -1174,17 +1175,16 @@ void ClientApplication::updateControllerMouse(float dt) {
 
     float panelMouseDeadzone = configuration->get("controllerMouseDeadzone").optFloat().value(0.20f) * 1.5f;
     Vec2F panelStick = m_controllerLeftStick;
-
-    if (std::abs(panelStick[0]) <= panelMouseDeadzone)
-      panelStick[0] = 0.0f;
-    else
-      panelStick[0] = std::copysign(std::abs(panelStick[0]) - panelMouseDeadzone, panelStick[0]);
-
-    if (std::abs(panelStick[1]) <= panelMouseDeadzone)
-      panelStick[1] = 0.0f;
-    else
-      panelStick[1] = std::copysign(std::abs(panelStick[1]) - panelMouseDeadzone, panelStick[1]);
-      
+    for (size_t i = 0; i < 2; i++)
+    {
+      if (std::abs(panelStick[0]) <= panelMouseDeadzone)
+      {
+        panelStick[i] = 0.0f;
+      }
+      else {
+        //panelStick[i] = std::copysign(std::abs(panelStick[i]) - panelMouseDeadzone, panelStick[i]);
+      }
+    }
 
     bool slowOverInteractive = false;
     if (m_mainInterface && m_guiContext) {
@@ -1538,6 +1538,21 @@ void ClientApplication::renderHotbarWheelOverlay() {
   }
 }
 
+// Returns the secondary item for a hotbar selection, if any
+static ItemPtr hotbarWheelSecondaryItemForSelection(PlayerInventoryPtr const& inventory, SelectedActionBarLocation const& selection) {
+  if (!inventory)
+    return {};
+
+  if (selection.is<CustomBarIndex>()) {
+    if (auto slot = inventory->customBarSecondarySlot(selection.get<CustomBarIndex>()))
+      return inventory->itemsAt(*slot);
+    return {};
+  }
+
+  // Essential items do not have a secondary slot
+  return {};
+}
+
 void ClientApplication::renderHotbarStripOverlay() {
   if (!m_hotbarStripActive || !m_player || !m_guiContext)
     return;
@@ -1574,11 +1589,13 @@ void ClientApplication::renderHotbarStripOverlay() {
   for (int offset = -maxVisible; offset <= maxVisible; ++offset) {
     int index = pmod(m_hotbarStripIndex + offset, filteredCount);
     auto& slotInfo = nonEmptySlots[index];
+    auto secondaryItem = hotbarWheelSecondaryItemForSelection(inventory, slotInfo.selection);
     bool selected = offset == 0;
 
     float xOffset = offset * spacing;
     float yOffset = selected ? 0.0f : std::abs((float)offset) * 2.0f;
     Vec2F slotCenter = center + Vec2F(xOffset, yOffset);
+    Vec2F slotSecondaryCenter = slotCenter + Vec2F(10.0f, -5.0f);
 
     float sizeScale = selected ? 1.20f : max(0.72f, 1.0f - std::abs((float)offset) * 0.08f);
     float finalSize = slotSize * sizeScale;
@@ -1590,8 +1607,21 @@ void ClientApplication::renderHotbarStripOverlay() {
 
     uint8_t alpha = (uint8_t)clamp(255.0f - std::abs((float)offset) * 28.0f, 120.0f, 255.0f);
     Vec4B iconColor = selected ? Vec4B::filled(255) : Vec4B(230, 230, 230, alpha);
-    for (auto const& drawable : slotInfo.item->iconDrawables())
+    Vec4B iconSecondaryColor = selected ? Vec4B::filled(255) : Vec4B(230, 230, 230, alpha*0.5f);
+
+    // Draw secondary slot item icon(s) if available
+    if (secondaryItem) {
+      for (auto const& drawable : secondaryItem->iconDrawables()) {
+        m_guiContext->drawInterfaceDrawable(drawable, slotSecondaryCenter, iconSecondaryColor);
+      }
+    }
+    // Draw main slot item icon(s)
+    for (auto const& drawable : slotInfo.item->iconDrawables()) {
       m_guiContext->drawInterfaceDrawable(drawable, slotCenter, iconColor);
+    }
+
+
+      
   }
 }
 
@@ -2322,8 +2352,8 @@ void ClientApplication::updateRunning(float dt) {
           else if (rightX <= -0.90f)
             edgeDirection = -1;
           
-            if(pressedLeft) edgeDirection = -1;
-            if(pressedRight) edgeDirection = 1;
+          if(pressedLeft) edgeDirection = -1;
+          if(pressedRight) edgeDirection = 1;
 
           if (edgeDirection != 0 && edgeDirection != m_hotbarStripEdgeLatchDirection) {
             m_hotbarStripIndex = pmod(m_hotbarStripIndex + edgeDirection, filteredCount);
