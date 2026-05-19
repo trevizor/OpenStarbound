@@ -1,4 +1,5 @@
 #include "StarClientApplication.hpp"
+#include "SDL3/SDL.h"
 #include "StarConfiguration.hpp"
 #include "StarJsonExtra.hpp"
 #include "StarFile.hpp"
@@ -867,68 +868,86 @@ void ClientApplication::processInput(InputEvent const& event) {
 }
 
 void ClientApplication::update() {
+  // --- Fixed timestep simulation with game speed control ---
   auto configuration = m_root->configuration();
   float configuredGameSpeed = clamp(configuration->get("gameSpeed").optFloat().value(1.0f), 0.5f, 1.5f);
   bool sleeping = m_state > MainAppState::Title && playerIsSleeping(m_player, m_universeClient ? m_universeClient->worldClient() : nullptr);
   GlobalTimescale = sleeping ? 2.0f : configuredGameSpeed;
 
-  float dt = GlobalTimestep * GlobalTimescale;
-  auto& app = appController();
-  if (m_state >= MainAppState::Title) {
-    if (auto p2pNetworkingService = app->p2pNetworkingService()) {
-      if (auto join = p2pNetworkingService->pullPendingJoin()) {
-        m_pendingMultiPlayerConnection = PendingMultiPlayerConnection{join.takeValue(), {}, {}, false};
-        changeState(MainAppState::Title);
+  // Get current time in seconds (high-res clock)
+  double now = static_cast<double>(SDL_GetPerformanceCounter()) / SDL_GetPerformanceFrequency();
+  if (m_lastUpdateTime == 0.0)
+    m_lastUpdateTime = now;
+
+  // Calculate real elapsed time, scale by game speed
+  float frameElapsed = static_cast<float>(now - m_lastUpdateTime);
+  m_lastUpdateTime = now;
+  m_accumulator += frameElapsed * GlobalTimescale;
+
+  // Clamp accumulator to avoid spiral of death on long frames
+  const float maxAccumulator = 0.25f;
+  if (m_accumulator > maxAccumulator)
+    m_accumulator = maxAccumulator;
+
+  // Run simulation steps for each fixed dt
+  while (m_accumulator >= GlobalTimestep) {
+    float dt = GlobalTimestep;
+    auto& app = appController();
+    if (m_state >= MainAppState::Title) {
+      if (auto p2pNetworkingService = app->p2pNetworkingService()) {
+        if (auto join = p2pNetworkingService->pullPendingJoin()) {
+          m_pendingMultiPlayerConnection = PendingMultiPlayerConnection{join.takeValue(), {}, {}, false};
+          changeState(MainAppState::Title);
+        }
+        if (auto req = p2pNetworkingService->pullJoinRequest())
+          m_mainInterface->queueJoinRequest(*req);
+        p2pNetworkingService->update();
       }
-      
-      if (auto req = p2pNetworkingService->pullJoinRequest())
-        m_mainInterface->queueJoinRequest(*req);
-
-      p2pNetworkingService->update();
     }
+
+    if (!m_errorScreen->accepted())
+      m_errorScreen->update(dt);
+
+    #ifdef STAR_ENABLE_STEAM_INTEGRATION
+    #ifdef STAR_SYSTEM_LINUX
+    if (m_state == MainAppState::SteamFlatpakWarning)
+      updateSteamFlatpakWarning(dt);
+    else
+    #endif
+    #endif
+
+    if (m_state == MainAppState::Mods)
+      updateMods(dt);
+    else if (m_state == MainAppState::ModsWarning)
+      updateModsWarning(dt);
+
+    if (m_state == MainAppState::Splash)
+      updateSplash(dt);
+    else if (m_state == MainAppState::Error)
+      updateError(dt);
+    else if (m_state == MainAppState::Title)
+      updateTitle(dt);
+    else if (m_state > MainAppState::Title)
+      updateRunning(dt);
+
+    if (m_state >= MainAppState::Title)
+      updateControllerMouse(dt);
+
+    // Swallow leftover encoded voice data if we aren't in-game to allow mic read to continue for settings.
+    if (m_state <= MainAppState::Title) {
+      DataStreamBuffer ext;
+      m_voice->send(ext);
+    }
+
+    m_guiContext->cleanup();
+    m_edgeKeyEvents.clear();
+    m_edgeControllerButtonEvents.clear();
+    m_edgeControllerAxisActions.clear();
+    m_input->update();
+    ++m_framesSkipped;
+
+    m_accumulator -= GlobalTimestep;
   }
-
-  if (!m_errorScreen->accepted())
-    m_errorScreen->update(dt);
-
-  // This warning is only applicable to Linux systems so no need to process it otherwise.
-  #ifdef STAR_ENABLE_STEAM_INTEGRATION
-  #ifdef STAR_SYSTEM_LINUX
-  if (m_state == MainAppState::SteamFlatpakWarning)
-    updateSteamFlatpakWarning(dt);
-  else
-  #endif
-  #endif
-
-  if (m_state == MainAppState::Mods)
-    updateMods(dt);
-  else if (m_state == MainAppState::ModsWarning)
-    updateModsWarning(dt);
-
-  if (m_state == MainAppState::Splash)
-    updateSplash(dt);
-  else if (m_state == MainAppState::Error)
-    updateError(dt);
-  else if (m_state == MainAppState::Title)
-    updateTitle(dt);
-  else if (m_state > MainAppState::Title)
-    updateRunning(dt);
-
-  if (m_state >= MainAppState::Title)
-    updateControllerMouse(dt);
-  
-  // Swallow leftover encoded voice data if we aren't in-game to allow mic read to continue for settings.
-  if (m_state <= MainAppState::Title) {
-    DataStreamBuffer ext;
-    m_voice->send(ext);
-  } // TODO: directly disable encoding at menu so we don't have to do this
-
-  m_guiContext->cleanup();
-  m_edgeKeyEvents.clear();
-  m_edgeControllerButtonEvents.clear();
-  m_edgeControllerAxisActions.clear();
-  m_input->update();
-  ++m_framesSkipped;
 }
 
 bool ClientApplication::panelInteractionModeActive() const {

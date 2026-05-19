@@ -18,6 +18,9 @@ STAR_CLASS(Input);
 STAR_CLASS(Voice);
 
 class ClientApplication : public Application {
+  // Fixed timestep simulation variables
+  double m_lastUpdateTime = 0.0;
+  float m_accumulator = 0.0f;
 public:
   enum class PanelWheelOption {
     Inventory,
