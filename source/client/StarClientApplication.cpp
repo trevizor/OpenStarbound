@@ -319,7 +319,7 @@ Json const AdditionalDefaultConfiguration = Json::parseJson(R"JSON(
         "CinematicNext" :  [ { "type" : "key", "value" : "Right", "mods" : [] }, { "type" : "key", "value" : "Return", "mods" : [] }, { "type" : "controller", "value" : "A" } ],
         "GuiClose" :  [ { "type" : "key", "value" : "Esc", "mods" : [] }, { "type" : "controller", "value" : "Back" } ],
         "InterfaceToggleControllerMouse" :  [],
-        "InterfacePanelClose" :  [ { "type" : "controller", "value" : "B" } ],
+        "InterfacePanelClose" :  [ { "type" : "key", "value" : "Tab", "mods" : [] }, { "type" : "controller", "value" : "B" } ],
         "GuiShifting" :  [ { "type" : "key", "value" : "RShift", "mods" : [] }, { "type" : "key", "value" : "LShift", "mods" : [] } ],
         "KeybindingCancel" :  [ { "type" : "key", "value" : "Esc", "mods" : [] }, { "type" : "controller", "value" : "Start" } ],
         "KeybindingClear" :  [ { "type" : "key", "value" : "Del", "mods" : [] }, { "type" : "key", "value" : "Backspace", "mods" : [] } ],
@@ -334,7 +334,7 @@ Json const AdditionalDefaultConfiguration = Json::parseJson(R"JSON(
         "InterfaceHideHud" :  [ { "type" : "key", "value" : "F1", "mods" : [] } ],
         "InterfaceChangeBarGroup" :  [ { "type" : "key", "value" : "X", "mods" : [] }, { "type" : "controller", "value" : "RightShoulder" } ],
         "InterfaceHotbarWheelHold" : [],
-        "InterfaceHotbarStripHold" : [ { "type" : "controller", "value" : "DPadRight" } ],
+        "InterfaceHotbarStripHold" : [ { "type" : "key", "value" : "Tab", "mods" : [] }, { "type" : "controller", "value" : "DPadRight" } ],
         "InterfacePanelWheelHold" : [ { "type" : "controller", "value" : "DPadLeft" } ],
         "InterfacePanelSelect" : [ { "type" : "controller", "value" : "A" } ],
         "InterfacePanelAltSelect" : [ { "type" : "controller", "value" : "Y" } ],
@@ -351,7 +351,7 @@ Json const AdditionalDefaultConfiguration = Json::parseJson(R"JSON(
         "InterfaceControllerMouseRight" : [ { "type" : "controller", "value" : "Y" } ],
         "InterfaceKeybindingsTabPrevious" : [ { "type" : "controller", "value" : "LeftShoulder" }, { "type" : "controller", "value" : "DPadLeft" } ],
         "InterfaceKeybindingsTabNext" : [ { "type" : "controller", "value" : "RightShoulder" }, { "type" : "controller", "value" : "DPadRight" } ],
-        "InterfaceTakeAllItems" : [ { "type" : "controller", "value" : "X" } ],
+        "InterfaceTakeAllItems" : [ { "type" : "key", "value" : "R", "mods" : [] }, { "type" : "controller", "value" : "X" } ],
         "InterfaceDeselectHands" :  [ { "type" : "key", "value" : "Z", "mods" : [] } ],
         "InterfaceBarPrevious" :  [  ],
         "InterfaceBarNext" :  [  ],
@@ -373,7 +373,7 @@ Json const AdditionalDefaultConfiguration = Json::parseJson(R"JSON(
         "InterfaceToggleFullscreen" :  [ { "type" : "key", "value" : "F11", "mods" : [] } ],
         "InterfaceReload" :  [],
         "InterfaceEscapeMenu" :  [ { "type" : "key", "value" : "Esc", "mods" : [] }, { "type" : "controller", "value" : "Start" } ],
-        "InterfaceInventory" :  [ { "type" : "key", "value" : "I", "mods" : [] }, { "type" : "controller", "value" : "Guide" } ],
+        "InterfaceInventory" :  [ { "type" : "key", "value" : "Capslock", "mods" : [] }, { "type" : "key", "value" : "I", "mods" : [] }, { "type" : "controller", "value" : "Guide" } ],
         "InterfaceCodex" :  [ { "type" : "key", "value" : "L", "mods" : [] } ],
         "InterfaceQuest" :  [ { "type" : "key", "value" : "J", "mods" : [] } ],
         "InterfaceCrafting" :  [ { "type" : "key", "value" : "C", "mods" : [] } ]
@@ -821,7 +821,6 @@ void ClientApplication::processInput(InputEvent const& event) {
     if (auto cUp = event.ptr<ControllerButtonUpEvent>()) {
       if (m_guiContext->actions(cUp->controllerButton).contains(InterfaceAction::InterfacePanelAltSelect))
         routeInputEvent(InputEvent{MouseButtonUpEvent{MouseButton::Right, m_input->mousePosition()}});
-      return;
       if (m_guiContext->actions(cUp->controllerButton).contains(InterfaceAction::InterfacePanelSelect))
         routeInputEvent(InputEvent{MouseButtonUpEvent{MouseButton::Left, m_input->mousePosition()}});
       return;
