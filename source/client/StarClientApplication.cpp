@@ -1176,6 +1176,7 @@ void ClientApplication::updateControllerMouse(float dt) {
     Vec2F panelStick = m_controllerLeftStick;
     for (size_t i = 0; i < 2; i++)
     {
+      if (std::abs(panelStick[i]) <= panelMouseDeadzone)
       if (std::abs(panelStick[0]) <= panelMouseDeadzone)
       {
         panelStick[i] = 0.0f;
