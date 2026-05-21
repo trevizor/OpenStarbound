@@ -1244,8 +1244,8 @@ void ClientApplication::updateControllerMouse(float dt) {
     float movementDeadZone = aimingDeadzone * 2.0f;
     for (size_t i = 0; i < 2; i++)
     {
-      if(leftStick[i] < movementDeadZone) leftStick[i] = 0;
-      if(rightStick[i] < aimingDeadzone) rightStick[i] = 0;
+      if(std::abs(leftStick[i]) < movementDeadZone) leftStick[i] = 0;
+      if(std::abs(rightStick[i]) < aimingDeadzone) rightStick[i] = 0;
     }
 
     if (moveOnlyJustPressed) {
