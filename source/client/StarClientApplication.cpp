@@ -1228,11 +1228,7 @@ void ClientApplication::updateControllerMouse(float dt) {
     rightStickRaw[0] = applyControllerAxisResponse(m_controllerRightStickRaw[0], mouseDeadzone, 1.0f);
     rightStickRaw[1] = applyControllerAxisResponse(m_controllerRightStickRaw[1], mouseDeadzone, 1.0f);
     Vec2F cursorWorld = m_mainInterface->cursorWorldPosition();
-    if (stickAxisActive(rightStickRaw)) {
-      Vec2F desiredVelocity = Vec2F(rightStickRaw[0], -rightStickRaw[1]) * mouseSpeed;
-      applyVirtualCursorVelocity(desiredVelocity, dt);
-      return;
-    }
+    
 
     auto worldClient = m_universeClient->worldClient();
     Vec2F playerPosition = m_player->position();
@@ -1306,6 +1302,12 @@ void ClientApplication::updateControllerMouse(float dt) {
           m_controllerLockedAimDirectionValid = true;
         }
       } else {
+        if (stickAxisActive(rightStickRaw)) {
+          Vec2F desiredVelocity = Vec2F(rightStickRaw[0], -rightStickRaw[1]) * mouseSpeed;
+          // Update the locked cursor direction/position with the desired velocity
+          m_controllerLockedAimDirection += desiredVelocity;
+          m_controllerLockedAimDirectionValid = true;
+        }
         return;
       }
 
@@ -1323,13 +1325,12 @@ void ClientApplication::updateControllerMouse(float dt) {
           aimRange = 25.0f;
         else if (lockAimDirection)
           aimRange = m_controllerLockedAimDistance;
-
-        Vec2F castStart = playerPosition + stickDirection * 0.5f;
         projectedCursorWorld = playerPosition + stickDirection * aimRange;
         
         // Walking and AimOnly should only collide against terrain; MoveOnly keeps no collision adjustment.
         if (forcedAimOnly || !lockAimDirection) {
           CollisionSet terrainCollisionSet{CollisionKind::Block};
+          Vec2F castStart = playerPosition + stickDirection * 0.25f;
           float tempAimRange = min(aimRange, worldClient->geometry().diff(m_mainInterface->cursorWorldPosition(), playerPosition).magnitude());
           Vec2F tempProjectedCursorWorld = playerPosition + stickDirection * tempAimRange;
           if (auto collision = worldClient->lineTileCollisionPoint(castStart, tempProjectedCursorWorld, terrainCollisionSet)) {
@@ -1339,7 +1340,7 @@ void ClientApplication::updateControllerMouse(float dt) {
             Vec2F collisionDelta = geometry.diff(collisionPoint, castStart);
             float forwardDistance = collisionDelta[0] * stickDirection[0] + collisionDelta[1] * stickDirection[1];
             if (forwardDistance > 0.0f){
-              projectedCursorWorld = (collisionPoint*2.0f + cursorWorld)/3.0f;
+              projectedCursorWorld = (collisionPoint*3.0f + cursorWorld)/4.0f;
             }
           }
         }
@@ -1383,7 +1384,11 @@ void ClientApplication::updateControllerMouse(float dt) {
       appController()->setCursorPosition(cursorPosition);
       return;
     }
-
+    if (stickAxisActive(rightStickRaw)) {
+      Vec2F desiredVelocity = Vec2F(rightStickRaw[0], -rightStickRaw[1]) * mouseSpeed;
+      applyVirtualCursorVelocity(desiredVelocity, dt);
+      return;
+    }
     if (!lockAimDirection && !forcedAimOnly)
       m_controllerLockedAimDirectionValid = false;
 
