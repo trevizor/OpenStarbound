@@ -1168,7 +1168,10 @@ void ClientApplication::updateControllerMouse(float dt) {
   if (panelInteractionModeActive()) {
     appController()->setCursorVisible(true);
 
-    float baseSpeed = configuration->get("controllerMouseSpeed").optFloat().value(1400.0f) * 1.25f; //TODO: 1.25 should be a resolution modifier, so higher resolutions get a speed boost
+    // Scale base speed by vertical resolution (1400.0f is for 1080p)
+    auto screenSize = Vec2F(renderer()->screenSize());
+    float resolutionScale = screenSize[1] / 1080.0f;
+    float baseSpeed = configuration->get("controllerMouseSpeed").optFloat().value(1400.0f) * resolutionScale;
     if (baseSpeed <= 0.0f)
       return;
 
