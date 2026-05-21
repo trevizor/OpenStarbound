@@ -1224,12 +1224,12 @@ void ClientApplication::updateControllerMouse(float dt) {
   m_controllerMoveOnlyWasActive = lockAimDirection;
 
   if (m_state > MainAppState::Title && m_player && m_universeClient && m_universeClient->worldClient()) {
-    Vec2F rightStick;
-    rightStick[0] = applyControllerAxisResponse(m_controllerRightStickRaw[0], mouseDeadzone, 1.0f);
-    rightStick[1] = applyControllerAxisResponse(m_controllerRightStickRaw[1], mouseDeadzone, 1.0f);
+    Vec2F rightStickRaw;
+    rightStickRaw[0] = applyControllerAxisResponse(m_controllerRightStickRaw[0], mouseDeadzone, 1.0f);
+    rightStickRaw[1] = applyControllerAxisResponse(m_controllerRightStickRaw[1], mouseDeadzone, 1.0f);
     Vec2F cursorWorld = m_mainInterface->cursorWorldPosition();
-    if (stickAxisActive(rightStick)) {
-      Vec2F desiredVelocity = Vec2F(rightStick[0], -rightStick[1]) * mouseSpeed;
+    if (stickAxisActive(rightStickRaw)) {
+      Vec2F desiredVelocity = Vec2F(rightStickRaw[0], -rightStickRaw[1]) * mouseSpeed;
       applyVirtualCursorVelocity(desiredVelocity, dt);
       return;
     }
@@ -1238,6 +1238,15 @@ void ClientApplication::updateControllerMouse(float dt) {
     Vec2F playerPosition = m_player->position();
     float leftStickMagnitude = m_controllerLeftStick.magnitude();
     bool leftStickActive = stickAxisActive(m_controllerLeftStick, aimingDeadzone);
+    Vec2F leftStick = m_controllerLeftStick;
+    Vec2F rightStick = Vec2F(m_controllerRightStick[0], -m_controllerRightStick[1]);
+
+    float movementDeadZone = aimingDeadzone * 2.0f;
+    for (size_t i = 0; i < 2; i++)
+    {
+      if(leftStick[i] < movementDeadZone) leftStick[i] = 0;
+      if(rightStick[i] < aimingDeadzone) rightStick[i] = 0;
+    }
 
     if (moveOnlyJustPressed) {
       m_controllerLockedAimDirectionValid = false;
