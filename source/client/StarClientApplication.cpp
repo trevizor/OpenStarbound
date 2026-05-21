@@ -1168,11 +1168,11 @@ void ClientApplication::updateControllerMouse(float dt) {
   if (panelInteractionModeActive()) {
     appController()->setCursorVisible(true);
 
-    float baseSpeed = configuration->get("controllerMouseSpeed").optFloat().value(1400.0f) * 1.25f;
+    float baseSpeed = configuration->get("controllerMouseSpeed").optFloat().value(1400.0f) * 1.25f; //TODO: 1.25 should be a resolution modifier, so higher resolutions get a speed boost
     if (baseSpeed <= 0.0f)
       return;
 
-    float panelMouseDeadzone = configuration->get("controllerMouseDeadzone").optFloat().value(0.20f) * 1.5f;
+    float panelMouseDeadzone = configuration->get("controllerMouseDeadzone").optFloat().value(0.20f) * 2.0f;
     Vec2F panelStick = m_controllerLeftStick;
     for (size_t i = 0; i < 2; i++)
     {
@@ -1182,7 +1182,7 @@ void ClientApplication::updateControllerMouse(float dt) {
         panelStick[i] = 0.0f;
       }
       else {
-        //panelStick[i] = std::copysign(std::abs(panelStick[i]) - panelMouseDeadzone, panelStick[i]);
+        //panelStick[i] = std::copysign(std::abs(panelStick[i]) - panelMouseDeadzone, panelStick[i]); //TODO: this should have a remap, so the top speed can still be achieved
       }
     }
 
@@ -1217,7 +1217,7 @@ void ClientApplication::updateControllerMouse(float dt) {
     return;
 
   float mouseDeadzone = configuration->get("controllerMouseDeadzone").optFloat().value(0.20f);
-  float aimingDeadzone = mouseDeadzone * 2.0f;
+  float aimingDeadzone = mouseDeadzone * 3.0f;
   bool forcedAimOnly = isActionTaken(InterfaceAction::PlayerControllerAimOnly);
   bool lockAimDirection = !forcedAimOnly && isActionTaken(InterfaceAction::PlayerControllerMoveOnly);
   bool moveOnlyJustPressed = lockAimDirection && !m_controllerMoveOnlyWasActive;
@@ -1227,7 +1227,7 @@ void ClientApplication::updateControllerMouse(float dt) {
     Vec2F rightStick;
     rightStick[0] = applyControllerAxisResponse(m_controllerRightStickRaw[0], mouseDeadzone, 1.0f);
     rightStick[1] = applyControllerAxisResponse(m_controllerRightStickRaw[1], mouseDeadzone, 1.0f);
-
+    Vec2F cursorWorld = m_mainInterface->cursorWorldPosition();
     if (stickAxisActive(rightStick)) {
       Vec2F desiredVelocity = Vec2F(rightStick[0], -rightStick[1]) * mouseSpeed;
       applyVirtualCursorVelocity(desiredVelocity, dt);
@@ -1241,7 +1241,6 @@ void ClientApplication::updateControllerMouse(float dt) {
 
     if (moveOnlyJustPressed) {
       m_controllerLockedAimDirectionValid = false;
-      Vec2F cursorWorld = m_mainInterface->cursorWorldPosition();
       Vec2F cursorDirection = worldClient->geometry().diff(cursorWorld, playerPosition);
       float cursorDirectionMagnitude = cursorDirection.magnitude();
       if (cursorDirectionMagnitude > 0.001f) {
@@ -1256,7 +1255,7 @@ void ClientApplication::updateControllerMouse(float dt) {
     }
 
     if ((lockAimDirection || forcedAimOnly) && !m_controllerLockedAimDirectionValid) {
-      Vec2F cursorWorld = m_mainInterface->cursorWorldPosition();
+      
       Vec2F cursorDirection = m_universeClient->worldClient()->geometry().diff(cursorWorld, playerPosition);
       float cursorDirectionMagnitude = cursorDirection.magnitude();
       if (cursorDirectionMagnitude > 0.001f) {
@@ -1267,6 +1266,7 @@ void ClientApplication::updateControllerMouse(float dt) {
       } else if (lockAimDirection && leftStickActive) {
         // Fallback for MoveOnly if cursor direction cannot be derived when RT is first held.
         m_controllerLockedAimDirection = Vec2F(m_controllerLeftStick[0], -m_controllerLeftStick[1]) / leftStickMagnitude;
+        m_controllerLockedAimDirection += Vec2F(m_controllerRightStick[0], -m_controllerRightStick[1]); //enables right stick aiming when locked
         m_controllerLockedAimDistance = 10.0f;
         m_controllerLockedAimDirectionValid = true;
       }
@@ -1275,8 +1275,15 @@ void ClientApplication::updateControllerMouse(float dt) {
     if (leftStickActive
       || ((lockAimDirection || forcedAimOnly) && m_controllerLockedAimDirectionValid)) {
       Maybe<Vec2F> liveStickDirection;
-      if (leftStickActive)
+      if (leftStickActive){
+        Vec2F leftStick = m_controllerLeftStick;
+        float movementDeadZone = aimingDeadzone * 2.0f;
+        for (size_t i = 0; i < 2; i++)
+        {
+          if(leftStick[i] < movementDeadZone) leftStick[i] = 0;
+        }
         liveStickDirection = Vec2F(m_controllerLeftStick[0], -m_controllerLeftStick[1]) / leftStickMagnitude;
+      }
 
       Vec2F stickDirection;
       if (lockAimDirection && m_controllerLockedAimDirectionValid) {
@@ -1322,8 +1329,9 @@ void ClientApplication::updateControllerMouse(float dt) {
             Vec2F collisionPoint = geometry.nearestTo(castStart, collision->first);
             Vec2F collisionDelta = geometry.diff(collisionPoint, castStart);
             float forwardDistance = collisionDelta[0] * stickDirection[0] + collisionDelta[1] * stickDirection[1];
-            if (forwardDistance > 0.0f)
-              projectedCursorWorld = collisionPoint;
+            if (forwardDistance > 0.0f){
+              projectedCursorWorld = (collisionPoint*2.0f + cursorWorld)/3.0f;
+            }
           }
         }
 
@@ -1345,8 +1353,7 @@ void ClientApplication::updateControllerMouse(float dt) {
 
         Vec2F desiredVelocity;
         if (distance > 0.0f) {
-          float maxSpeed = mouseSpeed;
-          if(!cursorHasCollidedWithTerrain) maxSpeed *= 0.5f;
+          float maxSpeed = mouseSpeed * 0.5f;
           float frameLimitedSpeed = distance / max(dt, 0.0001f);
           float desiredSpeed = min(maxSpeed, frameLimitedSpeed);
           desiredVelocity = toTarget / distance * desiredSpeed;
@@ -1396,7 +1403,7 @@ bool ClientApplication::applyVirtualCursorVelocity(Vec2F const& desiredVelocity,
   Vec2F direction = desiredVelocity / desiredSpeed;
 
   // Accelerate into higher speeds across multiple frames, but apply slowdown immediately.
-  constexpr float CursorAcceleration = 10000.0f;
+  constexpr float CursorAcceleration = 4000.0f;
   float appliedSpeed = desiredSpeed;
   if (desiredSpeed > lastSpeed)
     appliedSpeed = min(desiredSpeed, lastSpeed + CursorAcceleration * dt);
