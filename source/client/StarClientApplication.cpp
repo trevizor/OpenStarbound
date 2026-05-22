@@ -1236,16 +1236,18 @@ void ClientApplication::updateControllerMouse(float dt) {
     auto worldClient = m_universeClient->worldClient();
     Vec2F playerPosition = m_player->position();
     float leftStickMagnitude = m_controllerLeftStick.magnitude();
-    bool leftStickActive = stickAxisActive(m_controllerLeftStick, aimingDeadzone);
+    
     Vec2F leftStick = m_controllerLeftStick;
     Vec2F rightStick = Vec2F(m_controllerRightStick[0], -m_controllerRightStick[1]);
-
     float movementDeadZone = aimingDeadzone * 2.0f;
     for (size_t i = 0; i < 2; i++)
     {
       if(std::abs(leftStick[i]) < movementDeadZone) leftStick[i] = 0;
       if(std::abs(rightStick[i]) < aimingDeadzone) rightStick[i] = 0;
     }
+
+    bool leftStickActive = stickAxisActive(m_controllerLeftStick, aimingDeadzone);
+    bool rightStickkActive = stickAxisActive(m_controllerLeftStick, aimingDeadzone);
 
     if (moveOnlyJustPressed) {
       m_controllerLockedAimDirectionValid = false;
@@ -1290,6 +1292,7 @@ void ClientApplication::updateControllerMouse(float dt) {
         {
           if(leftStick[i] < movementDeadZone) leftStick[i] = 0;
         }
+        if(rightStickkActive) leftStick += rightStick;
         liveStickDirection = Vec2F(m_controllerLeftStick[0], -m_controllerLeftStick[1]) / leftStickMagnitude;
       }
 
