@@ -118,6 +118,9 @@ private:
 
   Vec2I m_cursorScreenPos;
   InterfaceCursor m_cursor;
+  // Delayed cursor move for menu initialization
+  bool m_pendingCursorMove = false;
+  Vec2I m_pendingCursorPos;
   TitleState m_titleState;
 
   PanePtr m_mainMenu;

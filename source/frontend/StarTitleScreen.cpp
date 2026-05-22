@@ -112,8 +112,16 @@ bool TitleScreen::handleInputEvent(InputEvent const& event) {
   return m_paneManager.sendInputEvent(event);
 }
 
+
 void TitleScreen::update(float dt) {
+  
+
   m_cursor.update(dt);
+  // Apply delayed cursor move if needed
+  if (m_pendingCursorMove) {
+    m_cursorScreenPos = m_pendingCursorPos;
+    m_pendingCursorMove = false;
+  }
 
   for (auto p : m_rightAnchoredButtons)
     p.first->setPosition(Vec2I(m_guiContext->windowWidth() / m_guiContext->interfaceScale(), 0) + p.second);
@@ -258,6 +266,12 @@ void TitleScreen::initMainMenu() {
       backMenu->addChild(key, button);
     else
       m_mainMenu->addChild(key, button);
+
+    if(key == "singleplayer"){
+      m_pendingCursorMove = true;
+      m_pendingCursorPos = button->position();
+    }
+
   }
 
   m_mainMenu->setAnchor(PaneAnchor::BottomLeft);
