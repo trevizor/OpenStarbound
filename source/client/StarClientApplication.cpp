@@ -1056,6 +1056,7 @@ bool ClientApplication::trySnapPanelCursor(Vec2F& targetScreenPos, float snapRad
 void ClientApplication::movePanelCursorByStep(Vec2I const& direction) {
   if (!m_guiContext)
     return;
+  appController()->setCursorVisible(true);
 
   m_virtualCursorVelocity = {};
 
