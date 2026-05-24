@@ -41,7 +41,7 @@ InventoryPane::InventoryPane(MainInterface* parent, PlayerPtr player, ContainerI
 
     auto inventory = m_player->inventory();
     auto selectedItem = itemGrid->selectedItem();
-    if (context()->shiftHeld()) {
+    if (context()->shiftHeld()) { //TODO: replace context()->shiftHeld() by an actual action, make it bindable to a controller button
       if (auto sourceItem = itemGrid->selectedItem()) {
         if (auto activeMerchantPane = m_parent->activeMerchantPane()) {
           auto remainder = activeMerchantPane->addItems(inventory->takeSlot(inventorySlot));

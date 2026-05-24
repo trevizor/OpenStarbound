@@ -780,8 +780,11 @@ void ClientApplication::processInput(InputEvent const& event) {
         if (paneManager) {
           auto topPane = paneManager->topPane({PaneLayer::ModalWindow, PaneLayer::Window});
           if (auto containerPane = as<ContainerPane>(topPane)) {
-            if (containerPane->triggerTakeAll())
+            if (containerPane->triggerTakeAll()){
+              containerPane->dismissed(); //TODO: this should close the pane
               return;
+            }
+              
           }
         }
       }
