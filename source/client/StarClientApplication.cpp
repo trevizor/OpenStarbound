@@ -46,9 +46,13 @@
 
 #if defined STAR_SYSTEM_WINDOWS
 #include <windows.h>
+// graphics driver is told by these exports to default to the dedicated GPU
 extern "C" __declspec(dllexport) DWORD NvOptimusEnablement = 1;
 extern "C" __declspec(dllexport) DWORD AmdPowerXpressRequestHighPerformance = 1;
-#endif // graphics driver is told by these exports to default to the dedicated GPU
+
+// https://docs.kicad.org/doxygen/windows_2app_8cpp_source.html L45
+extern "C" __declspec(dllexport) void NoHotPatch() { return; }
+#endif 
 
 namespace Star {
 
@@ -261,6 +265,7 @@ Json const AdditionalDefaultConfiguration = Json::parseJson(R"JSON(
       "borderless" : false,
       "maximized" : true,
       "antiAliasing" : false,
+      "hdr": true,
       "zoomLevel" : 3.0,
       "cameraSpeedFactor" : 1.0,
       "interfaceScale" : 0,
@@ -501,7 +506,7 @@ void ClientApplication::applicationInit(ApplicationControllerPtr appController) 
     m_immediateFont = *assets->bytes("/hobo.ttf");
     ImFontConfig config{};
     config.FontDataOwnedByAtlas = false;
-    config.FontBuilderFlags = ImGuiFreeTypeBuilderFlags_ForceAutoHint;
+    config.FontLoaderFlags = ImGuiFreeTypeLoaderFlags_ForceAutoHint;
     io.Fonts->AddFontFromMemoryTTF(m_immediateFont.ptr(), m_immediateFont.size(),
       16, &config, io.Fonts->GetGlyphRangesDefault());
   }
@@ -1459,6 +1464,7 @@ void ClientApplication::render() {
   auto& renderer = Application::renderer();
 
   renderer->setMultiSampling(config->get("antiAliasing").optBool().value(false) ? 4 : 0);
+  renderer->setMainHDR(config->get("hdr").optBool().value(true));
   renderer->switchEffectConfig("interface");
 
   if (auto interfaceScale = config->get("interfaceScale").optFloat().value(); interfaceScale != 0)
